@@ -13,9 +13,8 @@ from os.path import dirname, abspath
 from envs import REGISTRY as env_REGISTRY, data
 from baselines import REGISTRY as agent_REGISTRY
 from modules.utils import get_config, recursive_dict_update
-from modules import RunnerDual
 from modules.multi_processing import MultiPeocessRunner
-from modules import Runner, magicRunner
+from modules import Runner, magicRunner, RunnerDual
 
 def main(args):
 
@@ -59,7 +58,7 @@ def main(args):
     if args.use_offline_wandb:
         os.environ['WANDB_MODE'] = 'dryrun'
 
-    wandb.init(project='new', name=args.experiment_id, tags=['Dong'], dir=results_path)
+    wandb.init(project='AAAI', name=args.experiment_id, tags=['Ming'], dir=results_path)
     wandb.config.update(args)
 
     #======================================register environment==============================================
