@@ -53,7 +53,7 @@ def main(args):
 
 
     #======================================wandb==============================================
-    results_path = os.path.join(dirname(dirname(abspath(__file__))), "../results")
+    results_path = os.path.join(dirname(abspath(__file__)), "results")
     args.experiment_id = f"{args.memo}_{args.algo}_{args.seed}_{datetime.datetime.now().strftime('%d_%H_%M')}"
 
     if args.use_offline_wandb:
