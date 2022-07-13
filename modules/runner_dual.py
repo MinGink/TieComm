@@ -5,11 +5,13 @@ import numpy as np
 from torch.optim import Adam
 
 from .utils import merge_dict
+from runner import Runner
 import time
 
 
-class RunnerDual(object):
+class RunnerDual(Runner):
     def __init__(self, args, env, agent):
+        super(RunnerDual, self).__init__(args, env, agent)
 
         self.args = args
         self.env = env
@@ -259,19 +261,9 @@ class RunnerDual(object):
 
 
 
-    def reset(self):
-        self.env.reset()
-
-
-    def get_env_info(self):
-        return self.env.get_env_info()
-
 
     def choose_action(self, action_out):
         dist = torch.distributions.Categorical(action_out)
         action = dist.sample()
         return action
 
-
-    def save_model(self):
-        return self.agent.save_model()

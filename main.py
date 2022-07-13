@@ -10,8 +10,7 @@ import torch
 import datetime
 import signal
 from os.path import dirname, abspath
-import data
-from envs import REGISTRY as env_REGISTRY
+from envs import REGISTRY as env_REGISTRY, data
 from baselines import REGISTRY as agent_REGISTRY
 from modules.utils import get_config, recursive_dict_update
 from modules import RunnerDual
@@ -68,17 +67,13 @@ def main(args):
         env = data.init(args.env, args, False)
         args.obs_shape = env.observation_dim
         args.n_actions = env.num_actions
-
         args.dim_actions = env.dim_actions
 
-
-    # Hard attention
+        # Hard attention
         if args.hard_attn and args.commnet:
         # add comm_action as last dim in actions
             args.n_actions = [*args.n_actions, 2]
             args.dim_actions = env.dim_actions + 1
-
-
     else:
         env = env_REGISTRY[args.env](**args.env_args)
         env_info = env.get_env_info()
@@ -174,7 +169,7 @@ if __name__ == '__main__':
     parser.add_argument('--memo', type=str, default="TieComm", help='memo')
     parser.add_argument('--env', type=str, default="lbf", help='environment name')
     parser.add_argument('--env_map', type=str, default="lbforaging:Foraging-15x15-10p-10f-v2", help='environment map name')
-    parser.add_argument('--algo', type=str, default="commnet", help='algorithm name',choices='tiecomm, ac_basic')
+    parser.add_argument('--algo', type=str, default="commnet", help='algorithm name',choices='tiecomm, ac_basic，commnet')
     parser.add_argument('--seed', type=int, default=None, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--total_epoches', type=int, default=2000, help='total number of training epochs')

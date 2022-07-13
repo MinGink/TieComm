@@ -1,7 +1,5 @@
-import sys
 import gym
-import envs.traffic_junction
-from env_wrappers import *
+from envs.env_wrappers import *
 
 def init(env_name, args, final_init=True):
     if env_name == 'predator_prey':
