@@ -5,7 +5,7 @@ import numpy as np
 from torch.optim import Adam
 
 from .utils import merge_dict
-from runner import Runner
+from .runner import Runner
 import time
 
 class magicRunner(Runner):

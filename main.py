@@ -15,7 +15,7 @@ from baselines import REGISTRY as agent_REGISTRY
 from modules.utils import get_config, recursive_dict_update
 from modules import RunnerDual
 from modules.multi_processing import MultiPeocessRunner
-from modules.runner import Runner, magicRunner
+from modules import Runner, magicRunner
 
 def main(args):
 
@@ -168,9 +168,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="TieComm", help='memo')
     parser.add_argument('--env', type=str, default="lbf", help='environment name')
-    parser.add_argument('--env_map', type=str, default="lbforaging:Foraging-15x15-10p-10f-v2", help='environment map name')
-    parser.add_argument('--algo', type=str, default="commnet", help='algorithm name',choices='tiecomm, ac_basic，commnet')
-    parser.add_argument('--seed', type=int, default=None, help='random seed')
+    parser.add_argument('--env_map', type=str, default="lbforaging:Foraging-10x10-3p-3f-v2", help='environment map name')
+    parser.add_argument('--algo', type=str, default="tiecomm", help='algorithm name',choices='tiecomm, ac_basic，commnet')
+    parser.add_argument('--seed', type=int, default= None, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--total_epoches', type=int, default=2000, help='total number of training epochs')
     parser.add_argument('--epoch_size', type=int, default=10, help='epoch size')
