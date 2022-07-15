@@ -181,8 +181,8 @@ def signal_handler(signal, frame):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="debug", help='memo')
-    parser.add_argument('--env', type=str, default="tj", help='environment name')
-    parser.add_argument('--env_map', type=str, default="tj:traffic_junction_v0", help='environment map name')
+    parser.add_argument('--env', type=str, default="lbf", help='environment name')
+    parser.add_argument('--env_map', type=str, default="lbforaging:Foraging-10x10-6p-6f-v2", help='environment map name')
     parser.add_argument('--algo', type=str, default="tiecomm", help='algorithm name',choices='tiecomm,tiecomm_random,tiecomm_no, ac_basic，commnet')
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
