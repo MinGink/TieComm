@@ -14,7 +14,7 @@ from envs import REGISTRY as env_REGISTRY, data
 from baselines import REGISTRY as agent_REGISTRY
 from modules.utils import get_config, recursive_dict_update
 from modules.multi_processing import MultiPeocessRunner
-from modules import Runner, magicRunner, RunnerDual
+from modules import Runner, magicRunner, RunnerDual, RunnerRandom
 
 def main(args):
 
@@ -87,8 +87,13 @@ def main(args):
     agent = agent_REGISTRY[args.algo](args)
 
 
-    if args.algo == 'tiecomm':
+    if args.algo in['tiecomm','tiecomm_no']:
         run = RunnerDual
+    elif args.algo in ['magic']:
+        run = magicRunner
+    elif args.algo in ['tiecomm_random']:
+        run = RunnerRandom
+
     else:
         run = Runner
 
@@ -168,7 +173,7 @@ if __name__ == '__main__':
     parser.add_argument('--memo', type=str, default="debug", help='memo')
     parser.add_argument('--env', type=str, default="lbf", help='environment name')
     parser.add_argument('--env_map', type=str, default="lbforaging:Foraging-15x15-4p-3f-v2", help='environment map name')
-    parser.add_argument('--algo', type=str, default="tiecomm", help='algorithm name',choices='tiecomm, ac_basic，commnet')
+    parser.add_argument('--algo', type=str, default="tiecomm", help='algorithm name',choices='tiecomm,tiecomm_random,tiecomm_no, ac_basic，commnet')
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')

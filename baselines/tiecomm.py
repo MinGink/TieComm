@@ -23,6 +23,7 @@ class TieCommAgent(nn.Module):
         super(TieCommAgent, self).__init__()
 
         self.args = args
+        self.seed = args.seed
 
         self.n_agents = args.n_agents
         self.hid_size = args.hid_size
@@ -31,18 +32,10 @@ class TieCommAgent(nn.Module):
         self.god = GodAC(args)
 
 
-        self.random_group = [list(range(self.n_agents))]
-        self.enable_random_group = args.enable_random_group
-
-
-
-    def random_2_groups(self):
-        self.one_group = list(range(self.nagents))
-        group_1 = sorted(random.sample(self.one_group, 5))
-        group_2 = list(filter(lambda x: x not in group_1, self.one_group))
-
-        return [group_1,group_2]
-
+    def random_set(self):
+        G = nx.binomial_graph(self.n_agents, 0.5, seed= self.seed , directed=False)
+        set = algorithms.louvain(G).communities
+        return set
 
 
     def communicate(self, local_obs, set):
@@ -210,9 +203,13 @@ class GodAC(nn.Module):
         adj_matrix[self.i_lower] = adj_matrix.T[self.i_lower]
 
         G = nx.from_numpy_matrix(adj_matrix)
+
         set = algorithms.louvain(G).communities
 
         return set, action_out, value, relation
+
+
+
 
 
 

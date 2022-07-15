@@ -3,23 +3,19 @@ import torch.nn as nn
 from collections import namedtuple
 import numpy as np
 from torch.optim import Adam
+from modules import Runner
 
 from .utils import merge_dict
-from modules import Runner
 import time
 
 
-class RunnerDual(Runner):
+class RunnerRandom(Runner):
     def __init__(self, args, env, agent):
-        super(RunnerDual, self).__init__(args, env, agent)
+        super(RunnerRandom, self).__init__(args, env, agent)
 
         self.args = args
         self.env = env
         self.agent = agent
-        self.algo = args.algo
-        self.n_agents = args.n_agents
-
-        self.n_nodes = int(self.n_agents * (self.n_agents - 1)/2)
 
         self.total_steps = 0
 
@@ -29,9 +25,7 @@ class RunnerDual(Runner):
 
         self.transition = namedtuple('Transition', ('state', 'obs',
                                                     'actions','action_outs','rewards',
-                                                    'episode_masks', 'episode_agent_masks','values',
-                                                    'god_action_out', 'god_value', 'god_action','god_reward'
-                                                    ))
+                                                    'episode_masks', 'episode_agent_masks','values'))
 
 
 
@@ -41,17 +35,6 @@ class RunnerDual(Runner):
 
 
 
-    def train_batch(self, epoch_size):
-
-        batch_data, batch_log = self.collect_epoch_data(epoch_size)
-        self.optimizer.zero_grad()
-        train_log = self.compute_grad(batch_data)
-        for p in self.params:
-            if p._grad is not None:
-                p._grad.data /= batch_log['num_steps']
-        merge_dict(batch_log, train_log)
-        self.optimizer.step()
-        return train_log
 
 
 
@@ -60,6 +43,7 @@ class RunnerDual(Runner):
 
     def run_an_episode(self):
         memory = []
+        info = dict()
         log = dict()
         episode_return = 0
 
@@ -71,8 +55,8 @@ class RunnerDual(Runner):
 
         for t in range(self.args.episode_length):
 
-            obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-            set,god_action_out, god_value, god_action = self.agent.god(obs_tensor)
+
+            set = self.agent.random_set()
             after_comm = self.agent.communicate(obs_tensor, set)
             action_outs, values = self.agent.agent(after_comm)
 
@@ -91,9 +75,8 @@ class RunnerDual(Runner):
             if all(dones) or t == self.args.episode_length - 1:
                 episode_mask = np.ones(np.array(rewards).shape)
 
-
             trans = self.transition(state, np.array(obs), actions, action_outs, np.array(rewards),
-                                    episode_mask, episode_agent_mask, values, god_action_out, god_value, god_action, god_reward)
+                                    episode_mask, episode_agent_mask, values)
             memory.append(trans)
 
 
@@ -115,74 +98,6 @@ class RunnerDual(Runner):
 
 
     def compute_grad(self, batch):
-        log={}
-        agent_log = self.compute_agent_grad(batch)
-        god_log = self.compute_god_grad(batch)
-        merge_dict(agent_log, log)
-        merge_dict(god_log, log)
-
-        return log
-
-
-
-
-    def compute_god_grad(self, batch):
-
-        log = dict()
-        batch_size = len(batch.actions)
-        n = self.n_nodes
-
-        episode_masks = torch.Tensor(batch.episode_masks)[:,:1].repeat(1,n)
-        #episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
-
-        god_rewards = torch.Tensor(batch.god_reward).unsqueeze(-1).repeat(1,n)
-        god_actions = torch.stack(batch.god_action, dim=0)
-        god_values = torch.stack(batch.god_value, dim=0).squeeze(-1)
-        god_action_outs = torch.stack(batch.god_action_out, dim=0)
-
-
-
-        returns = torch.Tensor(batch_size, n)
-        advantages = torch.Tensor(batch_size, n)
-        prev_return = 0
-
-        for i in reversed(range(batch_size)):
-            returns[i] = god_rewards[i] + self.args.gamma * prev_return * (1 - episode_masks[i])
-            prev_return = returns[i].clone()
-
-        for i in reversed(range(batch_size)):
-            advantages[i] = returns[i] - god_values.data[i]
-
-        if self.args.normalize_rewards:
-            advantages = (advantages - advantages.mean()) / advantages.std()
-
-
-
-        actions_taken = torch.gather(god_action_outs, dim=-1, index = god_actions.unsqueeze(-1)).squeeze(-1)
-        log_actions_taken = torch.log(actions_taken + 1e-10)
-
-        action_loss = (-advantages.detach().view(-1) * log_actions_taken.view(-1)).sum()
-
-
-        value_loss = ((god_values - returns).pow(2).view(-1)).sum()
-
-        total_loss = action_loss + self.args.value_coeff * value_loss
-
-        total_loss.backward()
-
-        log['god_action_loss'] = action_loss.item()
-        log['god_value_loss'] = value_loss.item()
-        log['god_total_loss'] = total_loss.item()
-
-
-        return log
-
-
-
-
-
-
-    def compute_agent_grad(self, batch):
 
         log = dict()
 
@@ -243,3 +158,6 @@ class RunnerDual(Runner):
         log['total_loss'] = total_loss.item()
 
         return log
+
+
+

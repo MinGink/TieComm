@@ -1,0 +1,14 @@
+2022-07-15 15:22:09,287 INFO    MainThread:40027 [internal.py:wandb_internal():90] W&B internal server running at pid: 40027, started at: 2022-07-15 15:22:09.286508
+2022-07-15 15:22:09,292 INFO    WriterThread:40027 [datastore.py:open_for_write():75] open: /Users/ming/Documents/TieComm/results/wandb/offline-run-20220715_152206-1fdrjok2/run-1fdrjok2.wandb
+2022-07-15 15:22:09,293 DEBUG   HandlerThread:40027 [handler.py:handle_request():140] handle_request: run_start
+2022-07-15 15:22:09,294 DEBUG   HandlerThread:40027 [meta.py:__init__():35] meta init
+2022-07-15 15:22:09,295 DEBUG   HandlerThread:40027 [meta.py:__init__():49] meta init done
+2022-07-15 15:22:09,295 DEBUG   HandlerThread:40027 [meta.py:probe():209] probe
+2022-07-15 15:22:09,298 DEBUG   HandlerThread:40027 [meta.py:_setup_git():199] setup git
+2022-07-15 15:22:09,353 DEBUG   HandlerThread:40027 [meta.py:_setup_git():206] setup git done
+2022-07-15 15:22:09,354 DEBUG   HandlerThread:40027 [meta.py:_save_pip():53] save pip
+2022-07-15 15:22:09,355 DEBUG   HandlerThread:40027 [meta.py:_save_pip():67] save pip done
+2022-07-15 15:22:09,355 DEBUG   HandlerThread:40027 [meta.py:_save_conda():74] save conda
+2022-07-15 15:22:14,858 DEBUG   HandlerThread:40027 [meta.py:_save_conda():84] save conda done
+2022-07-15 15:22:14,859 DEBUG   HandlerThread:40027 [meta.py:probe():247] probe done
+2022-07-15 15:22:29,512 WARNING MainThread:40027 [internal.py:wandb_internal():153] Internal process interrupt: 1
