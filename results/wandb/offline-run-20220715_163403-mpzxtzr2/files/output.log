@@ -1,0 +1,13 @@
+
+You pressed Ctrl+C! Exiting gracefully.
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevd.py", line 1491, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ming/Documents/TieComm/main.py", line 187, in <module>
+    main(args)
+  File "/Users/ming/Documents/TieComm/main.py", line 66, in main
+    env = env_REGISTRY['tj'](args)
+TypeError: __init__() takes 1 positional argument but 2 were given
+We've got an error while stopping in post-mortem: <class 'TypeError'>

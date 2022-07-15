@@ -1,8 +1,10 @@
 import time
 import numpy as np
 import torch
-from gym import spaces
+import gym
 from inspect import getargspec
+from gym.envs.registration import register
+
 
 class GymWrapper(object):
     '''

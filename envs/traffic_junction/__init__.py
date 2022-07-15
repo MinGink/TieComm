@@ -1,8 +1,3 @@
-from gym.envs.registration import register
 
+from .traffic_junction_env import TrafficJunctionEnv
 
-
-register(
-    id='TrafficJunction-v0',
-    entry_point='traffic_junction.traffic_junction_env:TrafficJunctionEnv',
-)

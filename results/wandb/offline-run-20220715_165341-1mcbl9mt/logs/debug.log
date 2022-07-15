@@ -1,0 +1,25 @@
+2022-07-15 16:53:41,130 INFO    MainThread:43075 [wandb_setup.py:_flush():76] Configure stats pid to 43075
+2022-07-15 16:53:41,130 INFO    MainThread:43075 [wandb_setup.py:_flush():76] Loading settings from /Users/ming/.config/wandb/settings
+2022-07-15 16:53:41,131 INFO    MainThread:43075 [wandb_setup.py:_flush():76] Loading settings from /Users/ming/Documents/TieComm/wandb/settings
+2022-07-15 16:53:41,131 INFO    MainThread:43075 [wandb_setup.py:_flush():76] Loading settings from environment variables: {'mode': 'dryrun'}
+2022-07-15 16:53:41,131 INFO    MainThread:43075 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main.py', 'program': '/Users/ming/Documents/TieComm/main.py'}
+2022-07-15 16:53:41,131 INFO    MainThread:43075 [wandb_init.py:_log_setup():461] Logging user logs to /Users/ming/Documents/TieComm/results/wandb/offline-run-20220715_165341-1mcbl9mt/logs/debug.log
+2022-07-15 16:53:41,131 INFO    MainThread:43075 [wandb_init.py:_log_setup():462] Logging internal logs to /Users/ming/Documents/TieComm/results/wandb/offline-run-20220715_165341-1mcbl9mt/logs/debug-internal.log
+2022-07-15 16:53:41,132 INFO    MainThread:43075 [wandb_init.py:init():495] calling init triggers
+2022-07-15 16:53:41,132 INFO    MainThread:43075 [wandb_init.py:init():498] wandb.init called with sweep_config: {}
+config: {}
+2022-07-15 16:53:41,133 INFO    MainThread:43075 [wandb_init.py:init():548] starting backend
+2022-07-15 16:53:41,133 INFO    MainThread:43075 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2022-07-15 16:53:41,148 INFO    MainThread:43075 [backend.py:ensure_launched():217] starting backend process...
+2022-07-15 16:53:41,161 INFO    MainThread:43075 [backend.py:ensure_launched():222] started backend process with pid: 43087
+2022-07-15 16:53:41,166 INFO    MainThread:43075 [wandb_init.py:init():558] backend started and connected
+2022-07-15 16:53:41,179 INFO    MainThread:43075 [wandb_init.py:init():634] updated telemetry
+2022-07-15 16:53:41,213 INFO    MainThread:43075 [wandb_init.py:init():700] starting run threads in backend
+2022-07-15 16:53:46,238 INFO    MainThread:43075 [wandb_run.py:_console_start():1893] atexit reg
+2022-07-15 16:53:46,240 INFO    MainThread:43075 [wandb_run.py:_redirect():1766] redirect: SettingsConsole.REDIRECT
+2022-07-15 16:53:46,242 INFO    MainThread:43075 [wandb_run.py:_redirect():1771] Redirecting console.
+2022-07-15 16:53:46,245 INFO    MainThread:43075 [wandb_run.py:_redirect():1827] Redirects installed.
+2022-07-15 16:53:46,245 INFO    MainThread:43075 [wandb_init.py:init():732] run started, returning control to user process
+2022-07-15 16:53:46,278 INFO    MainThread:43075 [wandb_run.py:_config_callback():1131] config_cb None None {'hid_size': 128, 'total_epoches': 2000, 'epoch_size': 10, 'use_multiprocessing': False, 'use_offline_wandb': True, 'grad_norm_clip': 10, 'use_cuda': False, 'n_agents': 1, 'n_actions': 1, 'obs_shape': 32, 'state_shape': 32, 'buffer_cpu_only': True, 'max_steps': 40, 'normalize_rewards': False, 'action_scale': 1.0, 'random': False, 'use_tensorboard': False, 'save': False, 'save_every': 50000, 'local_results_path': 'results', 'batch_size': 500, 'lr': 0.001, 'tau': 1.0, 'gamma': 1.0, 'lamda': 0.95, 'qk_hid_size': 16, 'value_hid_size': 32, 'entr': 0, 'value_coeff': 0.01, 'add_value_last_step': True, 'recurrent': False, 'commnet': False, 'ic3net': False, 'tarcomm': False, 'gacomm': False, 'magic': False, 'comm_mode': 'avg', 'comm_passes': 1, 'comm_mask_zero': False, 'mean_ratio': 1.0, 'rnn_type': 'MLP', 'detach_gap': 10, 'comm_init': 'uniform', 'hard_attn': False, 'comm_action_one': False, 'advantages_per_action': False, 'share_weights': False, 'env': 'tj', 'env_args': {'key': 'tj:traffic_junction_v0', 'time_limit': 100, 'pretrained_wrapper': None, 'seed': 666}, 'n_agent': 10, 'dim': 14, 'add_rate_min': 0.2, 'add_rate_max': 0.2, 'difficulty': 'medium', 'vision': 1, 'nprocess': 16, 'num_epochs': 2000, 'curr_start': 0, 'curr_end': 0, 'vocab_type': 'bool', 'name': 'tiecomm_random', 'memo': 'debug', 'env_map': 'tj:traffic_junction_v0', 'algo': 'tiecomm_random', 'seed': 666, 'device': 'cpu', 'experiment_id': 'tj_tiecomm_random_debug'}
+2022-07-15 16:53:57,059 INFO    MainThread:43075 [wandb_run.py:_atexit_cleanup():1853] got exitcode: 0
+2022-07-15 16:53:57,064 INFO    MainThread:43075 [wandb_run.py:_restore():1833] restore

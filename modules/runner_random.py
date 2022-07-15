@@ -64,8 +64,6 @@ class RunnerRandom(Runner):
 
             rewards, dones, env_info = self.env.step(actions)
 
-            god_reward = np.sum(rewards)
-
             next_state = self.env.get_state()
             next_obs = self.env.get_obs()
 

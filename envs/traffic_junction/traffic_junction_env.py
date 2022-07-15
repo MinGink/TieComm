@@ -25,6 +25,7 @@ import gym
 import numpy as np
 from gym import spaces
 from .traffic_helper import *
+from gym.envs.registration import register
 
 
 def nPr(n,r):
@@ -34,7 +35,7 @@ def nPr(n,r):
 class TrafficJunctionEnv(gym.Env):
     # metadata = {'render.modes': ['human']}
 
-    def __init__(self,):
+    def __init__(self):
         self.__version__ = "0.0.1"
 
         # TODO: better config handling
@@ -46,6 +47,8 @@ class TrafficJunctionEnv(gym.Env):
 
         self.episode_over = False
         self.has_failed = 0
+
+
 
     def init_curses(self):
         self.stdscr = curses.initscr()
@@ -193,8 +196,8 @@ class TrafficJunctionEnv(gym.Env):
         self.stat = dict()
 
         # set add rate according to the curriculum
-        epoch_range = (self.curr_end - self.curr_start)
-        add_rate_range = (self.add_rate_max - self.add_rate_min)
+        #epoch_range = (self.curr_end - self.curr_start)
+        #add_rate_range = (self.add_rate_max - self.add_rate_min)
         # if epoch is not None and epoch_range > 0 and add_rate_range > 0 and epoch > self.epoch_last_update:
         #     self.curriculum(epoch)
         #     self.epoch_last_update = epoch
@@ -505,6 +508,7 @@ class TrafficJunctionEnv(gym.Env):
         # Test all paths
         assert self._unittest_path(paths)
 
+
     def _set_paths(self, difficulty):
         route_grid = self.route_grid if self.vocab_type == 'bool' else self.grid
         self.routes = get_routes(self.dims, route_grid, difficulty)
@@ -575,7 +579,6 @@ class TrafficJunctionEnv(gym.Env):
 
             # Change last act for color:
             self.car_last_act[idx] = 0
-
 
 
     def _get_reward(self):

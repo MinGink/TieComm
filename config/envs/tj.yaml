@@ -1,4 +1,4 @@
-env: "gymma"
+env: "tj"
 
 env_args:
   key: traffic_junction

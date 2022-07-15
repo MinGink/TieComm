@@ -10,11 +10,14 @@ import torch
 import datetime
 import signal
 from os.path import dirname, abspath
-from envs import REGISTRY as env_REGISTRY, data
+from envs import REGISTRY as env_REGISTRY
 from baselines import REGISTRY as agent_REGISTRY
+from envs.env_wrappers import GymWrapper
 from modules.utils import get_config, recursive_dict_update
 from modules.multi_processing import MultiPeocessRunner
 from modules import Runner, magicRunner, RunnerDual, RunnerRandom
+import gym
+from gym import register
 
 def main(args):
 
@@ -62,8 +65,15 @@ def main(args):
     wandb.config.update(args)
 
     #======================================register environment==============================================
-    if args.env == 'traffic_junction':
-        env = data.init(args.env, args, False)
+    if args.env == 'tj':
+        register(
+            id='TrafficJunction-v0',
+            entry_point='envs:TrafficJunctionEnv',
+        )
+        env = gym.make('TrafficJunction-v0')
+        env.multi_agent_init(args)
+        env = GymWrapper(env)
+
         args.obs_shape = env.observation_dim
         args.n_actions = env.num_actions
         args.dim_actions = env.dim_actions
@@ -171,8 +181,8 @@ def signal_handler(signal, frame):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="debug", help='memo')
-    parser.add_argument('--env', type=str, default="lbf", help='environment name')
-    parser.add_argument('--env_map', type=str, default="lbforaging:Foraging-15x15-4p-3f-v2", help='environment map name')
+    parser.add_argument('--env', type=str, default="tj", help='environment name')
+    parser.add_argument('--env_map', type=str, default="tj:traffic_junction_v0", help='environment map name')
     parser.add_argument('--algo', type=str, default="tiecomm", help='algorithm name',choices='tiecomm,tiecomm_random,tiecomm_no, ac_basic，commnet')
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
