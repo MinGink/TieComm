@@ -53,7 +53,7 @@ def main(args):
 
     #======================================wandb==============================================
     results_path = os.path.join(dirname(abspath(__file__)), "results")
-    args.experiment_id = f"{args.env_map}_{args.algo}_{args.seed}_{datetime.datetime.now().strftime('%d_%H_%M')}"
+    args.experiment_id = f"{args.memo}_{args.algo}_{args.seed}_{datetime.datetime.now().strftime('%d_%H_%M')}"
 
     if args.use_offline_wandb:
         os.environ['WANDB_MODE'] = 'dryrun'
@@ -165,11 +165,11 @@ def signal_handler(signal, frame):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="TieComm", help='memo')
+    parser.add_argument('--memo', type=str, default="rware", help='memo')
     parser.add_argument('--env', type=str, default="lbf", help='environment name')
-    parser.add_argument('--env_map', type=str, default="lbforaging:Foraging-15x15-4p-3f-v2", help='environment map name')
+    parser.add_argument('--env_map', type=str, default="rware:rware-small-4ag-v1", help='environment map name')
     parser.add_argument('--algo', type=str, default="tiecomm", help='algorithm name',choices='tiecomm, ac_basic，commnet')
-    parser.add_argument('--seed', type=int, default= None, help='random seed')
+    parser.add_argument('--seed', type=int, default= 666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
     parser.add_argument('--total_epoches', type=int, default=2000, help='total number of training epochs')
