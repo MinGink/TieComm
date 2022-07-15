@@ -171,6 +171,7 @@ if __name__ == '__main__':
     parser.add_argument('--algo', type=str, default="tiecomm", help='algorithm name',choices='tiecomm, ac_basic，commnet')
     parser.add_argument('--seed', type=int, default= None, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
+    parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
     parser.add_argument('--total_epoches', type=int, default=2000, help='total number of training epochs')
     parser.add_argument('--epoch_size', type=int, default=10, help='epoch size')
     args = parser.parse_args()

@@ -83,7 +83,6 @@ class TieCommAgent(nn.Module):
         hidden = self.agent.intra_fc(input)
         score = torch.softmax(hidden, dim=0)
         weighted_emb = score * hidden
-
         return weighted_emb
 
 
@@ -146,7 +145,6 @@ class AgentAC(nn.Module):
     def forward(self, after_comm):
 
         final_obs = self.attention(after_comm)
-
         x = F.relu(self.final_fc1(final_obs))
         action_out = F.softmax(self.final_fc2(x), dim=-1)
 
@@ -198,6 +196,7 @@ class GodAC(nn.Module):
         x = F.relu(self.fc2(matrixs))
         #score = F.sigmoid(self.fc3(x))
         action_out  = F.softmax(self.fc3(x), dim=-1)
+
 
         value = F.relu(self.value_fc2(matrixs))
         value = self.value_fc3(value)
