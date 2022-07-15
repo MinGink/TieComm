@@ -167,7 +167,7 @@ class GodAC(nn.Module):
         self.fc2 = nn.Linear(self.hid_size * 2, self.hid_size)
         self.fc3 = nn.Linear(self.hid_size, 2)
 
-        self.value_fc2 = nn.Linear(self.hid_size * 2, self.hid_size)
+        self.value_fc2 = nn.Linear(self.hid_size * self.n_agents, self.hid_size)
         self.value_fc3 = nn.Linear(self.hid_size, 1)
 
 
@@ -184,8 +184,8 @@ class GodAC(nn.Module):
 
     def forward(self, inputs):
 
-        x = F.relu(self.fc1(inputs)).unsqueeze(0)
-        attn_output, attn_output_weights = self.multihead_attn(x, x, x)
+        hid = F.relu(self.fc1(inputs)).unsqueeze(0)
+        attn_output, attn_output_weights = self.multihead_attn(hid, hid, hid)
 
         h = attn_output.squeeze(0)
 
@@ -198,8 +198,8 @@ class GodAC(nn.Module):
         action_out  = F.softmax(self.fc3(x), dim=-1)
 
 
-        value = F.relu(self.value_fc2(matrixs))
-        value = self.value_fc3(value)
+        value = F.relu(self.value_fc2(hid.flatten(start_dim=1, end_dim=-1)))
+        value = self.value_fc3(value).repeat(action_out.shape[0], 1)
 
         dist = torch.distributions.Categorical(action_out)
         relation = dist.sample()
