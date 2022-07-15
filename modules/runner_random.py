@@ -16,6 +16,8 @@ class RunnerRandom(Runner):
         self.args = args
         self.env = env
         self.agent = agent
+        self.algo = args.algo
+        self.n_agents =args.n_agents
 
         self.total_steps = 0
 
@@ -31,9 +33,7 @@ class RunnerRandom(Runner):
 
         self.params = [p for p in self.agent.parameters()]
         self.optimizer = Adam(params=self.agent.parameters(), lr=args.lr)
-
-
-
+        self.no_group = list(range(self.n_agents))
 
 
 
@@ -56,7 +56,10 @@ class RunnerRandom(Runner):
         for t in range(self.args.episode_length):
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-            set = self.agent.random_set()
+            if self.algo == 'tiecomm_random':
+                set = self.agent.random_set()
+            else:
+                set = [self.no_group]
             after_comm = self.agent.communicate(obs_tensor, set)
             action_outs, values = self.agent.agent(after_comm)
 

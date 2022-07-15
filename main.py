@@ -97,13 +97,12 @@ def main(args):
     agent = agent_REGISTRY[args.algo](args)
 
 
-    if args.algo in['tiecomm','tiecomm_no']:
+    if args.algo in['tiecomm']:
         run = RunnerDual
     elif args.algo in ['magic']:
         run = magicRunner
-    elif args.algo in ['tiecomm_random']:
+    elif args.algo in ['tiecomm_random','tiecomm_no']:
         run = RunnerRandom
-
     else:
         run = Runner
 

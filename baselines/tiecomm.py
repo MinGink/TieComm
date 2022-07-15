@@ -50,7 +50,6 @@ class TieCommAgent(nn.Module):
         # inter_obs
         if num_coms == 1:
             intra_obs = self.intra_com(local_obs)
-
         else:
             group_emd_list = []
             for i in range (num_coms):
