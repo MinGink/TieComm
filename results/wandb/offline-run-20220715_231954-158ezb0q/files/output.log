@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevd.py", line 1491, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ming/Documents/TieComm/main.py", line 196, in <module>
+    main(args)
+  File "/Users/ming/Documents/TieComm/main.py", line 131, in main
+    log = runner.train_batch(epoch_size)
+  File "/Users/ming/Documents/TieComm/modules/runner.py", line 38, in train_batch
+    batch_data, batch_log = self.collect_epoch_data(epoch_size)
+  File "/Users/ming/Documents/TieComm/modules/runner.py", line 56, in collect_epoch_data
+    episode_data, episode_log = self.run_an_episode()
+  File "/Users/ming/Documents/TieComm/modules/runner_random.py", line 63, in run_an_episode
+    after_comm = self.agent.communicate(obs_tensor, set)
+  File "/Users/ming/Documents/TieComm/baselines/tiecomm.py", line 52, in communicate
+    intra_obs = self.intra_com(local_obs)
+  File "/Users/ming/Documents/TieComm/baselines/tiecomm.py", line 78, in intra_com
+    weighted_emb,_ = self.agent.intra_attn((input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0)))
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1102, in _call_impl
+    return forward_call(*input, **kwargs)
+TypeError: forward() missing 2 required positional arguments: 'key' and 'value'

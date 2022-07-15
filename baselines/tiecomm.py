@@ -72,26 +72,29 @@ class TieCommAgent(nn.Module):
 
 
     def intra_com(self, input):
-        hidden = self.agent.intra_fc(input)
-        score = torch.softmax(hidden, dim=0)
-        weighted_emb = score * hidden
-        return weighted_emb
+        #hidden = self.agent.intra_fc(input)
+        #score = torch.softmax(hidden, dim=0)
+        #weighted_emb = score * hidden
+        weighted_emb,_ = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
+        return weighted_emb.squeeze(0)
 
 
 
     def inter_com(self, input):
-        embeding = self.agent.inter_fc(input)
-        score = torch.softmax(embeding, dim=0)
-        weighted_emb = score * input
-        return weighted_emb
+        #embeding = self.agent.inter_fc(input)
+        #score = torch.softmax(embeding, dim=0)
+        #weighted_emb = score * input
+        weighted_emb,_ = self.agent.inter_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
+        return weighted_emb.squeeze(0)
+        #return weighted_emb
 
 
 
-    def group_embedding_sum(self, local_obs):
-        score = torch.sum(local_obs,dim=0).unsqueeze(0)
-        x = score.unsqueeze(0)
-        embedding = self.agent.group_embedding_layer(x)
-        return embedding
+    # def group_embedding_sum(self, local_obs):
+    #     score = torch.sum(local_obs,dim=0).unsqueeze(0)
+    #     x = score.unsqueeze(0)
+    #     embedding = self.agent.group_embedding_layer(x)
+    #     return embedding
 
 
 
