@@ -55,7 +55,7 @@ class RunnerRandom(Runner):
 
         for t in range(self.args.episode_length):
 
-
+            obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
             set = self.agent.random_set()
             after_comm = self.agent.communicate(obs_tensor, set)
             action_outs, values = self.agent.agent(after_comm)
