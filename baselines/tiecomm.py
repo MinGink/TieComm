@@ -116,7 +116,7 @@ class AgentAC(nn.Module):
         self.inter_fc = nn.Linear(self.hid_size, self.hid_size, bias=False)
         self.inter_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
 
-        self.final_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
+        self.final_attn = nn.MultiheadAttention(self.hid_size, 4, batch_first=True)
         self.final_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
         self.final_fc2 = nn.Linear(self.hid_size, args.n_actions)
 
