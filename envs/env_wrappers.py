@@ -55,13 +55,9 @@ class GymWrapper(object):
     def action_space(self):
         return self.env.action_space
 
-    def reset(self, epoch):
-        reset_args = getargspec(self.env.reset).args
-        if 'epoch' in reset_args:
-            obs = self.env.reset(epoch)
-        else:
-            obs = self.env.reset()
+    def reset(self):
 
+        obs = self.env.reset()
         obs = self._flatten_obs(obs)
         return obs
 

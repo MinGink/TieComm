@@ -212,9 +212,6 @@ class GodAC(nn.Module):
 
 
 
-
-
-
     def _generate_adj(self, relation):
         adj_matrixs = torch.zeros(self.n_agents * self.n_agents,1,dtype=torch.long)
         adj_matrixs[self.index,:] = relation.unsqueeze(-1)

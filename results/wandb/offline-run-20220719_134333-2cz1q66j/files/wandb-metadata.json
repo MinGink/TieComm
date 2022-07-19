@@ -1,0 +1,26 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.8.13",
+    "heartbeatAt": "2022-07-19T05:43:35.820575",
+    "startedAt": "2022-07-19T05:43:33.737050",
+    "docker": null,
+    "cpu_count": 8,
+    "cuda": null,
+    "args": [
+        "--algo",
+        "tiecomm_no",
+        "--use_offline_wandb"
+    ],
+    "state": "running",
+    "program": "/Users/ming/Documents/TieComm/main.py",
+    "codePath": "main.py",
+    "git": {
+        "remote": "https://github.com/MinGink/TieComm.git",
+        "commit": "f3620607b93e5fbd6dcd386dccbf9dd275ff2cc1"
+    },
+    "email": "yangmingink@gmail.com",
+    "root": "/Users/ming/Documents/TieComm",
+    "host": "MBP.local",
+    "username": "ming",
+    "executable": "/opt/anaconda3/envs/tiecomm/bin/python"
+}
