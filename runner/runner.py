@@ -5,20 +5,20 @@ import numpy as np
 from torch.optim import Adam
 from modules.utils import merge_dict
 import time
+import argparse
 
 
 class Runner(object):
-    def __init__(self, args, env, agent):
+    def __init__(self, config, env, agent):
 
-        self.args = args
+        self.args = argparse.Namespace(**config)
         self.env = env
         self.agent = agent
 
         self.total_steps = 0
 
         self.gamma = self.args.gamma
-        self.lamda = self.args.lamda
-
+        # self.lamda = self.args.lamda
 
         self.transition = namedtuple('Transition', ('obs', 'actions','action_outs','rewards',
                                                     'episode_masks', 'episode_agent_masks','values'))
@@ -26,7 +26,7 @@ class Runner(object):
 
 
         self.params = [p for p in self.agent.parameters()]
-        self.optimizer = Adam(params=self.agent.parameters(), lr=args.lr)
+        self.optimizer = Adam(params=self.agent.parameters(), lr=self.args.lr)
 
 
 
@@ -39,6 +39,7 @@ class Runner(object):
         for p in self.params:
             if p._grad is not None:
                 p._grad.data /= batch_log['num_steps']
+
         merge_dict(batch_log, train_log)
         self.optimizer.step()
         return train_log
@@ -46,7 +47,7 @@ class Runner(object):
 
 
 
-    def collect_epoch_data(self, epoch_size=1):
+    def collect_epoch_data(self, epoch_size):
         epoch_data = []
         epoch_log = dict()
         num_episodes = 0
@@ -63,59 +64,58 @@ class Runner(object):
 
 
     def run_an_episode(self):
+
         memory = []
         info = dict()
         log = dict()
         episode_return = 0
 
         self.reset()
-
         obs = self.env.get_obs()
 
         #prev_hid = self.agent.init_hidden(batch_size=state.shape[0])
 
-        for t in range(self.args.episode_length):
-            if t == 0 and self.args.hard_attn and self.args.commnet:
-                info['comm_action'] = np.zeros(self.args.n_agents, dtype=int)
+        step = 1
+        done = False
+        while not done and step < self.args.episode_length:
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
             action_outs, values = self.agent(obs_tensor,info)
 
             actions = self.choose_action(action_outs)
 
-            rewards, dones, env_info = self.env.step(actions)
+            next_obs, rewards, done, env_info = self.env.step(actions)
 
-            #next_state = self.env.get_state()
-            next_obs = self.env.get_obs()
-            if self.args.hard_attn and self.args.commnet:
-                info['comm_action'] = actions[-1] if not self.args.comm_action_one else np.ones(self.args.n_agents,
-                                                                                                dtype=int)
 
             episode_mask = np.zeros(np.array(rewards).shape)
-            episode_agent_mask = np.array(dones) + 0
 
-            if all(dones) or t == self.args.episode_length - 1:
+            if done or step == self.args.episode_length-1:
                 episode_mask = np.ones(np.array(rewards).shape)
 
-
             trans = self.transition(np.array(obs), actions, action_outs, np.array(rewards),
-                                    episode_mask, episode_agent_mask, values)
+                                    episode_mask, episode_mask, values)
+
+
             memory.append(trans)
 
-
-            #state = next_state
             obs = next_obs
-
-
             episode_return += float(sum(rewards))
+            step += 1
             self.total_steps += 1
 
-            if all(dones) or t == self.args.episode_length - 1:
-                log['episode_return'] = [episode_return]
-                log['episode_steps'] = [t + 1]
-                log['num_steps'] = t + 1
-                break
+        log['episode_return'] = [episode_return]
+        log['episode_steps'] = [step]
+        log['num_steps'] = step
+
 
         return memory ,log
+
+    def _compute_returns(self, rewards, masks, next_value):
+        returns = [next_value]
+        for rew, done in zip(reversed(rewards), reversed(masks)):
+            ret = returns[0] * self.gamma + rew * (1 - done.unsqueeze(1))
+            returns.insert(0, ret)
+        return returns
+
 
 
 
@@ -126,34 +126,39 @@ class Runner(object):
         rewards = torch.Tensor(batch.rewards)
         actions = torch.stack(batch.actions,dim=0)
         episode_masks = torch.Tensor(batch.episode_masks)
-        episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
         values = torch.stack(batch.values, dim=0).squeeze(-1) # (batch, n,1
         action_outs = torch.stack(batch.action_outs, dim=0)
 
+        # episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
+
+
         batch_size = len(batch.actions)
-        n = self.args.n_agents
+        # n = self.args.n_agents
 
-        coop_returns = torch.Tensor(batch_size, n)
-        ncoop_returns = torch.Tensor(batch_size, n)
-        returns = torch.Tensor(batch_size, n)
-        advantages = torch.Tensor(batch_size, n)
+        returns = self._compute_returns(rewards, episode_masks, values)
 
-        prev_coop_return = 0
-        prev_ncoop_return = 0
-
-        for i in reversed(range(batch_size)):
-            coop_returns[i] = rewards[i] + self.args.gamma * prev_coop_return * (1-episode_masks[i])
-            ncoop_returns[i] = rewards[i] + self.args.gamma * prev_ncoop_return * (1- episode_masks[i]) * (1-episode_agent_masks[i])
-
-            prev_coop_return = coop_returns[i].clone()
-            prev_ncoop_return = ncoop_returns[i].clone()
-
-            returns[i] = (self.args.mean_ratio * coop_returns[i].mean()) \
-                        + ((1 - self.args.mean_ratio) * ncoop_returns[i])
+        advantages = returns - values
 
 
-        for i in reversed(range(batch_size)):
-            advantages[i] = returns[i] - values.data[i]
+        # coop_returns = torch.Tensor(batch_size, n)
+        # ncoop_returns = torch.Tensor(batch_size, n)
+        # returns = torch.Tensor(batch_size, n)
+        # advantages = torch.Tensor(batch_size, n)
+        #
+        # prev_coop_return = 0
+        # prev_ncoop_return = 0
+        #
+        # for i in reversed(range(batch_size)):
+        #     coop_returns[i] = rewards[i] + self.args.gamma * prev_coop_return * (1-episode_masks[i])
+        #     ncoop_returns[i] = rewards[i] + self.args.gamma * prev_ncoop_return * (1- episode_masks[i]) * (1-episode_agent_masks[i])
+        #
+        #     prev_coop_return = coop_returns[i].clone()
+        #     prev_ncoop_return = ncoop_returns[i].clone()
+        #
+        #     returns[i] = (self.args.mean_ratio * coop_returns[i].mean()) \
+        #                 + ((1 - self.args.mean_ratio) * ncoop_returns[i])
+        # for i in reversed(range(batch_size)):
+        #     advantages[i] = returns[i] - values.data[i]
 
         if self.args.normalize_rewards:
             advantages = (advantages - advantages.mean()) / advantages.std()

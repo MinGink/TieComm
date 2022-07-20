@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevd.py", line 1491, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ming/Documents/TieComm/main.py", line 175, in <module>
+    main(args)
+  File "/Users/ming/Documents/TieComm/main.py", line 113, in main
+    log = runner.train_batch(epoch_size)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 36, in train_batch
+    batch_data, batch_log = self.collect_epoch_data(epoch_size)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 55, in collect_epoch_data
+    episode_data, episode_log = self.run_an_episode()
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 84, in run_an_episode
+    rewards, dones, env_info = self.env.step(actions)
+  File "/Users/ming/Documents/TieComm/envs/traffic_junction/env_wrappers.py", line 83, in step
+    obs, r, done, info = self.env.step(action)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/wrappers/order_enforcing.py", line 11, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/traffic_junction/traffic_junction_env.py", line 235, in step
+    assert len(action) == self.ncar, "Action for each agent should be provided."
+TypeError: len() of unsized object

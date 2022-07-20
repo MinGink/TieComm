@@ -1,6 +1,6 @@
 from functools import partial
 from .multiagentenv import MultiAgentEnv, _GymWrapper
-from .env_wrappers import GymWrapper
+from envs.traffic_junction.env_wrappers import GymWrapper
 from .traffic_junction.traffic_junction_env import TrafficJunctionEnv
 import gym
 

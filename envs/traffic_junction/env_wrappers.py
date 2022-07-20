@@ -12,8 +12,8 @@ class GymWrapper(object):
     '''
     def __init__(self, config):
         env = gym.make('TrafficJunction-v0')
-        args = argparse.Namespace(**config)
-        env.multi_agent_init(args)
+        self.args = argparse.Namespace(**config)
+        env.multi_agent_init(self.args)
         self.env = env
 
     @property
@@ -33,6 +33,11 @@ class GymWrapper(object):
             return total_obs_dim
         else:
             return int(np.prod(self.env.observation_space.shape))
+
+    @property
+    def n_agents(self):
+        return self.args.n_agents
+
 
     @property
     def num_actions(self):
@@ -59,9 +64,9 @@ class GymWrapper(object):
         return self.env.action_space
 
     def reset(self):
-        obs = self.env.reset()
-        obs = self._flatten_obs(obs)
-        return obs
+        self.env.reset()
+        #obs = self._flatten_obs(obs)
+        #return obs
 
     def display(self):
         self.env.render()
@@ -73,11 +78,12 @@ class GymWrapper(object):
     def step(self, action):
         # TODO: Modify all environments to take list of action
         # instead of doing this
-        if self.dim_actions == 1:
-            action = action[0]
+        action = action.numpy().tolist()
+        #if self.dim_actions == 1:
+        #action = action[0]
         obs, r, done, info = self.env.step(action)
         obs = self._flatten_obs(obs)
-        return (obs, r, done, info)
+        return obs, r, done, info
 
     def reward_terminal(self):
         if hasattr(self.env, 'reward_terminal'):
@@ -95,13 +101,31 @@ class GymWrapper(object):
                 _obs.append(np.concatenate(ag_obs))
             obs = np.stack(_obs)
 
-        obs = obs.reshape(1, -1, self.observation_dim)
-        obs = torch.from_numpy(obs).double()
+        obs = obs.reshape(-1, self.observation_dim)
+        #obs = torch.from_numpy(obs).double()
         return obs
 
+
+
     def get_obs(self):
-        if hasattr(self.env, 'stat'):
-            self.env.stat.pop('steps_taken', None)
-            return self.env.stat
-        else:
-            return dict()
+        obs = self.env.get_obs()
+        obs = self._flatten_obs(obs)
+        return obs
+        # if hasattr(self.env, 'stat'):
+        #     self.env.stat.pop('steps_taken', None)
+        #     return self.env.stat
+        # else:
+        #     return dict()
+
+
+
+
+    def get_env_info(self):
+        env_info = {"obs_shape": self.observation_dim,
+                    "n_actions": self.num_actions,
+                    "n_agents": self.n_agents,
+                    'episode_length': self.args.episode_length
+                    }
+        return env_info
+
+

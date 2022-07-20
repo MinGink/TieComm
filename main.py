@@ -74,21 +74,25 @@ def main(args):
     #         args.n_actions = [*args.n_actions, 2]
     #         args.dim_actions = env.dim_actions + 1
     # else:
-    #     env_info = env.get_env_info()
-    #     args.obs_shape = env_info["obs_shape"]
-    #     args.n_actions = env_info["n_actions"]
-    #     args.n_agents = env_info["n_agents"]
-    #     args.state_shape = env_info["state_shape"]
-    #     args.episode_length = env_info["episode_limit"]
+
 
 
     env = env_REGISTRY[args.env](env_config)
+
+    env_info = env.get_env_info()
+    agent_config['obs_shape'] = env_info["obs_shape"]
+    agent_config['n_actions'] = env_info["n_actions"]
+    agent_config['n_agents'] = env_info["n_agents"]
+    exp_config['episode_length'] = env_info["episode_length"]
     agent = agent_REGISTRY[args.agent](agent_config)
-    run = runner_REGISTRY[args.agent]
+
+
 
     epoch_size = exp_config['epoch_size']
 
 
+
+    run = runner_REGISTRY[args.agent]
     if args.use_multiprocessing:
         for p in agent.parameters():
             p.data.share_memory_()
@@ -96,6 +100,7 @@ def main(args):
         epoch_size = 1
     else:
         runner = run(exp_config, env, agent)
+
 
 
 

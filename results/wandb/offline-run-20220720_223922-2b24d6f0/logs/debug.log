@@ -1,0 +1,35 @@
+2022-07-20 22:39:22,750 INFO    MainThread:29154 [wandb_setup.py:_flush():76] Configure stats pid to 29154
+2022-07-20 22:39:22,752 INFO    MainThread:29154 [wandb_setup.py:_flush():76] Loading settings from /Users/ming/.config/wandb/settings
+2022-07-20 22:39:22,752 INFO    MainThread:29154 [wandb_setup.py:_flush():76] Loading settings from /Users/ming/Documents/TieComm/wandb/settings
+2022-07-20 22:39:22,752 INFO    MainThread:29154 [wandb_setup.py:_flush():76] Loading settings from environment variables: {'mode': 'dryrun'}
+2022-07-20 22:39:22,752 INFO    MainThread:29154 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main.py', 'program': '/Users/ming/Documents/TieComm/main.py'}
+2022-07-20 22:39:22,753 INFO    MainThread:29154 [wandb_init.py:_log_setup():461] Logging user logs to /Users/ming/Documents/TieComm/results/wandb/offline-run-20220720_223922-2b24d6f0/logs/debug.log
+2022-07-20 22:39:22,753 INFO    MainThread:29154 [wandb_init.py:_log_setup():462] Logging internal logs to /Users/ming/Documents/TieComm/results/wandb/offline-run-20220720_223922-2b24d6f0/logs/debug-internal.log
+2022-07-20 22:39:22,755 INFO    MainThread:29154 [wandb_init.py:init():495] calling init triggers
+2022-07-20 22:39:22,756 INFO    MainThread:29154 [wandb_init.py:init():498] wandb.init called with sweep_config: {}
+config: {}
+2022-07-20 22:39:22,756 INFO    MainThread:29154 [wandb_init.py:init():548] starting backend
+2022-07-20 22:39:22,756 INFO    MainThread:29154 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2022-07-20 22:39:22,778 INFO    MainThread:29154 [backend.py:ensure_launched():217] starting backend process...
+2022-07-20 22:39:22,808 INFO    MainThread:29154 [backend.py:ensure_launched():222] started backend process with pid: 29166
+2022-07-20 22:39:22,816 INFO    MainThread:29154 [wandb_init.py:init():558] backend started and connected
+2022-07-20 22:39:22,854 INFO    MainThread:29154 [wandb_init.py:init():634] updated telemetry
+2022-07-20 22:39:22,915 INFO    MainThread:29154 [wandb_init.py:init():700] starting run threads in backend
+2022-07-20 22:39:27,937 INFO    MainThread:29154 [wandb_run.py:_console_start():1893] atexit reg
+2022-07-20 22:39:27,939 INFO    MainThread:29154 [wandb_run.py:_redirect():1766] redirect: SettingsConsole.REDIRECT
+2022-07-20 22:39:27,940 INFO    MainThread:29154 [wandb_run.py:_redirect():1771] Redirecting console.
+2022-07-20 22:39:27,945 INFO    MainThread:29154 [wandb_run.py:_redirect():1827] Redirects installed.
+2022-07-20 22:39:27,946 INFO    MainThread:29154 [wandb_init.py:init():732] run started, returning control to user process
+2022-07-20 22:39:27,962 INFO    MainThread:29154 [wandb_run.py:_config_callback():1131] config_cb None None {'memo': 'debug', 'total_epoches': 2000, 'epoch_size': 10, 'use_multiprocessing': False, 'use_offline_wandb': True, 'grad_norm_clip': 10, 'use_cuda': False, 'normalize_rewards': False, 'gamma': 1.0, 'env': 'tj', 'env_map': "'tj", 'agent': 'ac_basic', 'seed': 666, 'n_agents': 10, 'dim': 14, 'episode_length': 40, 'add_rate_min': 0.2, 'add_rate_max': 0.2, 'difficulty': 'medium', 'vision': 1, 'vocab_type': 'bool', 'curr_start': 0, 'curr_end': 0, 'name': 'ac_basic', 'hid_size': 64, 'device': 'cpu', 'exp_id': 'tj_ac_basic_debug'}
+2022-07-20 22:39:27,976 INFO    MainThread:29154 [wandb_run.py:_atexit_cleanup():1862] got exitcode: 0
+2022-07-20 22:39:27,980 INFO    MainThread:29154 [wandb_run.py:_restore():1834] restore
+2022-07-20 22:39:30,488 INFO    MainThread:29154 [wandb_run.py:_on_finish():1991] got exit ret: 
+2022-07-20 22:39:30,593 INFO    MainThread:29154 [wandb_run.py:_on_finish():1991] got exit ret: 
+2022-07-20 22:39:30,702 INFO    MainThread:29154 [wandb_run.py:_on_finish():1991] got exit ret: done: true
+exit_result {
+}
+local_info {
+}
+
+2022-07-20 22:39:32,184 INFO    MainThread:29154 [wandb_run.py:_footer_history_summary_info():3099] rendering history
+2022-07-20 22:39:32,185 INFO    MainThread:29154 [wandb_run.py:_footer_history_summary_info():3131] rendering summary

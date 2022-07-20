@@ -323,6 +323,11 @@ class TrafficJunctionEnv(gym.Env):
 
         self.empty_bool_base_grid = self._onehot_initialization(self.pad_grid)
 
+
+    def get_obs(self):
+        return self._get_obs()
+
+
     def _get_obs(self):
         h, w = self.dims
         self.bool_base_grid = self.empty_bool_base_grid.copy()

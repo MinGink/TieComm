@@ -1,0 +1,14 @@
+2022-07-20 22:04:14,949 INFO    MainThread:27986 [internal.py:wandb_internal():90] W&B internal server running at pid: 27986, started at: 2022-07-20 22:04:14.948601
+2022-07-20 22:04:14,953 INFO    WriterThread:27986 [datastore.py:open_for_write():75] open: /Users/ming/Documents/TieComm/results/wandb/offline-run-20220720_220413-2g3kdo1s/run-2g3kdo1s.wandb
+2022-07-20 22:04:14,954 DEBUG   HandlerThread:27986 [handler.py:handle_request():140] handle_request: run_start
+2022-07-20 22:04:14,956 DEBUG   HandlerThread:27986 [meta.py:__init__():35] meta init
+2022-07-20 22:04:14,956 DEBUG   HandlerThread:27986 [meta.py:__init__():49] meta init done
+2022-07-20 22:04:14,956 DEBUG   HandlerThread:27986 [meta.py:probe():209] probe
+2022-07-20 22:04:14,958 DEBUG   HandlerThread:27986 [meta.py:_setup_git():199] setup git
+2022-07-20 22:04:14,998 DEBUG   HandlerThread:27986 [meta.py:_setup_git():206] setup git done
+2022-07-20 22:04:14,999 DEBUG   HandlerThread:27986 [meta.py:_save_pip():53] save pip
+2022-07-20 22:04:15,000 DEBUG   HandlerThread:27986 [meta.py:_save_pip():67] save pip done
+2022-07-20 22:04:15,000 DEBUG   HandlerThread:27986 [meta.py:_save_conda():74] save conda
+2022-07-20 22:04:18,390 DEBUG   HandlerThread:27986 [meta.py:_save_conda():84] save conda done
+2022-07-20 22:04:18,390 DEBUG   HandlerThread:27986 [meta.py:probe():247] probe done
+2022-07-20 22:11:41,153 WARNING MainThread:27986 [internal.py:wandb_internal():153] Internal process interrupt: 1
