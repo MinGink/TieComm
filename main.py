@@ -39,16 +39,12 @@ def main(args):
 
 
     #merge config
-    config = merge_dict(default_config, env_config)
-    config = merge_dict(config, agent_config)
-
+    config = {}
+    config.update(default_config)
+    config.update(env_config)
+    config.update(agent_config)
 
     #======================================load config==============================================
-    args = argparse.Namespace(**config)
-    args.device = "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
-
-
-    #======================================load configs==============================================
     args = argparse.Namespace(**config)
     args.device = "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
 
@@ -57,7 +53,7 @@ def main(args):
     results_path = os.path.join(dirname(abspath(__file__)), "results")
     args.exp_id = f"{args.env}_{args.agent}_{args.memo}" #_{datetime.datetime.now().strftime('%d_%H_%M')}"
 
-    if args.exp_args['use_offline_wandb']:
+    if args.use_offline_wandb:
         os.environ['WANDB_MODE'] = 'dryrun'
 
     wandb.init(project='AAAI', name=args.exp_id, tags=['Ming'], dir=results_path)
@@ -65,7 +61,7 @@ def main(args):
 
 
     #======================================register environment==============================================
-    env = env_REGISTRY[args.env](env_config)
+
 
     # if args.env == 'tj':
     #     args.obs_shape = env.observation_dim
@@ -86,18 +82,20 @@ def main(args):
     #     args.episode_length = env_info["episode_limit"]
 
 
+    env = env_REGISTRY[args.env](env_config)
     agent = agent_REGISTRY[args.agent](agent_config)
-    run = runner_REGISTRY[args.agent](exp_config)
+    run = runner_REGISTRY[args.agent]
+
+    epoch_size = exp_config['epoch_size']
 
 
     if args.use_multiprocessing:
         for p in agent.parameters():
             p.data.share_memory_()
-        runner = MultiPeocessRunner(args, lambda: run(args, env, agent))
+        runner = MultiPeocessRunner(exp_config, lambda: run(exp_config, env, agent))
         epoch_size = 1
     else:
-        pass
-
+        runner = run(exp_config, env, agent)
 
 
 
