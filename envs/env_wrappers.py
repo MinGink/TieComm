@@ -4,13 +4,16 @@ import torch
 import gym
 from inspect import getargspec
 from gym.envs.registration import register
-
+import argparse
 
 class GymWrapper(object):
     '''
     for multi-agent
     '''
-    def __init__(self, env):
+    def __init__(self, config):
+        env = gym.make('TrafficJunction-v0')
+        args = argparse.Namespace(**config)
+        env.multi_agent_init(args)
         self.env = env
 
     @property
@@ -56,7 +59,6 @@ class GymWrapper(object):
         return self.env.action_space
 
     def reset(self):
-
         obs = self.env.reset()
         obs = self._flatten_obs(obs)
         return obs
@@ -97,7 +99,7 @@ class GymWrapper(object):
         obs = torch.from_numpy(obs).double()
         return obs
 
-    def get_stat(self):
+    def get_obs(self):
         if hasattr(self.env, 'stat'):
             self.env.stat.pop('steps_taken', None)
             return self.env.stat

@@ -124,19 +124,15 @@ class FlattenObservation(ObservationWrapper):
 
 
 
-
-
-
-
 class _GymWrapper(MultiAgentEnv):
-    def __init__(self, key, time_limit, pretrained_wrapper, **kwargs):
+    def __init__(self, key, time_limit, **kwargs):
 
         self.episode_limit = time_limit
         self._env = TimeLimit(gym.make(f"{key}"), max_episode_steps=time_limit)
         self._env = FlattenObservation(self._env)
 
-        if pretrained_wrapper:
-            self._env = getattr(pretrained, pretrained_wrapper)(self._env)
+        # if pretrained_wrapper:
+        #     self._env = getattr(pretrained, pretrained_wrapper)(self._env)
 
         self.n_agents = self._env.n_agents
         self._obs = None
@@ -184,20 +180,20 @@ class _GymWrapper(MultiAgentEnv):
         """ Returns the shape of the state"""
         return self.n_agents * flatdim(self.longest_observation_space)
 
-    def get_obs_agent(self, agent_id):
-        """ Returns observation for agent_id """
-        raise self._obs[agent_id]
-
-    def get_obs_size(self):
-        """ Returns the shape of the observation """
-        return flatdim(self.longest_observation_space)
-
-    def get_state(self):
-        return np.concatenate(self._obs, axis=0).astype(np.float32)
-
-    def get_state_size(self):
-        """ Returns the shape of the state"""
-        return self.n_agents * flatdim(self.longest_observation_space)
+    # def get_obs_agent(self, agent_id):
+    #     """ Returns observation for agent_id """
+    #     raise self._obs[agent_id]
+    #
+    # def get_obs_size(self):
+    #     """ Returns the shape of the observation """
+    #     return flatdim(self.longest_observation_space)
+    #
+    # def get_state(self):
+    #     return np.concatenate(self._obs, axis=0).astype(np.float32)
+    #
+    # def get_state_size(self):
+    #     """ Returns the shape of the state"""
+    #     return self.n_agents * flatdim(self.longest_observation_space)
 
     def get_avail_actions(self):
         avail_actions = []

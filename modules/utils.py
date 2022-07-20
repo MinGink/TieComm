@@ -4,7 +4,7 @@ import collections
 import numpy as np
 import torch
 import numbers
-
+import sys
 
 def merge_dict(src, dest):
     for k, v in src.items():
@@ -23,18 +23,33 @@ def merge_dict(src, dest):
                 dest[k] = [dest[k], v]
 
 
+def signal_handler(signal, frame):
+    print('You pressed Ctrl+C! Exiting gracefully.')
+    sys.exit(0)
 
-
-
-
-
-def get_config(params, arg_name, subfolder):
-        with open(os.path.join(os.path.dirname(__file__), "../config", subfolder, "{}.yaml".format(arg_name)), "r") as f:
+def get_config(arg_name, subfolder=None):
+    if arg_name == 'default':
+        with open(os.path.join(os.path.dirname(__file__), "experiment.yaml"), "r") as f:
+            try:
+                config_dict = yaml.safe_load(f)
+            except yaml.YAMLError as exc:
+                assert False, "experiment.yaml error: {}".format(exc)
+    else:
+        with open(os.path.join(os.path.dirname(__file__), subfolder, "{}.yaml".format(arg_name)), "r") as f:
             try:
                 config_dict = yaml.safe_load(f)
             except yaml.YAMLError as exc:
                 assert False, "{}.yaml error: {}".format(arg_name, exc)
-        return config_dict
+    return config_dict
+
+
+# def get_config(params, arg_name, subfolder):
+#         with open(os.path.join(os.path.dirname(__file__), "../configs", subfolder, "{}.yaml".format(arg_name)), "r") as f:
+#             try:
+#                 config_dict = yaml.safe_load(f)
+#             except yaml.YAMLError as exc:
+#                 assert False, "{}.yaml error: {}".format(arg_name, exc)
+#         return config_dict
 
 
 

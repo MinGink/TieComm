@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevd.py", line 1491, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ming/Documents/TieComm/main.py", line 175, in <module>
+    main(args)
+  File "/Users/ming/Documents/TieComm/main.py", line 88, in main
+    agent = agent_REGISTRY[agent_name](agent_config)
+  File "/Users/ming/Documents/TieComm/baselines/models.py", line 12, in __init__
+    self.affine1 = nn.Linear(args.obs_shape, args.hid_size)
+AttributeError: 'dict' object has no attribute 'obs_shape'

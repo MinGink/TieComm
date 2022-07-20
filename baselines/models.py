@@ -3,23 +3,32 @@ import torch.autograd as autograd
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
+import argparse
 
 
 class MLP(nn.Module):
-    def __init__(self, args):
+    def __init__(self, agent_config):
         super(MLP, self).__init__()
-        self.args = args
-        self.affine1 = nn.Linear(args.obs_shape, args.hid_size)
-        self.affine2 = nn.Linear(args.hid_size, args.hid_size)
-        self.head = nn.Linear(args.hid_size,args.n_actions)
-        self.value_head = nn.Linear(args.hid_size, 1)
+        self.args = argparse.Namespace(**agent_config)
+
+        self.affine1 = nn.Linear(self.args.obs_shape, self.args.hid_size)
+        self.affine2 = nn.Linear(self.args.hid_size, self.args.hid_size)
+        self.head = nn.Linear(self.args.hid_size,self.args.n_actions)
+        self.value_head = nn.Linear(self.args.hid_size, 1)
         self.tanh = nn.Tanh()
 
+
+
+
     def forward(self, x, info={}):
+
         x = self.tanh(self.affine1(x))
-        h = self.tanh(sum([self.affine2(x), x]))
-        v = self.value_head(h)
-        a = F.softmax(self.head(h), dim=-1)
+        x = self.tanh(self.affine2(x))
+
+        #h = self.tanh(sum([self.affine2(x), x]))
+
+        a = F.softmax(self.head(x), dim=-1)
+        v = self.value_head(x)
 
         return a, v
 

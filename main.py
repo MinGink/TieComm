@@ -2,48 +2,26 @@ import os
 import numpy as np
 import random
 import time
-import yaml
 import wandb
 import argparse
 import sys
 import torch
-import datetime
 import signal
 from os.path import dirname, abspath
 from envs import REGISTRY as env_REGISTRY
 from baselines import REGISTRY as agent_REGISTRY
-from envs.env_wrappers import GymWrapper
-from modules.utils import get_config, recursive_dict_update
+from runner import REGISTRY as runner_REGISTRY
 from modules.multi_processing import MultiPeocessRunner
-from modules import Runner, magicRunner, RunnerDual, RunnerRandom
-import gym
-from gym import register
+from configs.utils import get_config, recursive_dict_update, signal_handler, merge_dict
+
+
+
 
 def main(args):
 
-    #======================================load config==============================================
-    #defualt config
-    with open(os.path.join(os.path.dirname(__file__), "config", "default.yaml"), "r") as f:
-        try:
-            config_dict = yaml.safe_load(f)
-        except yaml.YAMLError as exc:
-            assert False, "default.yaml error: {}".format(exc)
-
-
-    #env config
-    env_config = get_config(args, args.env, "envs")
-    config_dict = recursive_dict_update(config_dict, env_config)
-    config_dict['env_args']['key'] = args.env_map
-
-    #algo config
-    alg_config = get_config(args, args.algo, "algos")
-    config_dict = recursive_dict_update(config_dict, alg_config)
-
-    config_dict = recursive_dict_update(config_dict, vars(args))
-
-
-    args = argparse.Namespace(**config_dict)
-    args.device = "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
+    default_config = get_config('experiment')
+    env_config = get_config(args.env, 'envs')
+    agent_config = get_config(args.agent, 'agents')
 
     if args.seed == None:
         args.seed = np.random.randint(0, 10000)
@@ -51,60 +29,65 @@ def main(args):
     torch.manual_seed(args.seed)
     random.seed(args.seed)
     np.random.seed(args.seed)
-    args.env_args['seed'] = args.seed
+
+
+
+    #update configs
+    exp_config = recursive_dict_update(default_config,vars(args))
+    env_config = recursive_dict_update(env_config, vars(args))
+    agent_config = recursive_dict_update(agent_config, vars(args))
+
+
+    #merge config
+    config = merge_dict(default_config, env_config)
+    config = merge_dict(config, agent_config)
+
+
+    #======================================load config==============================================
+    args = argparse.Namespace(**config)
+    args.device = "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
+
+
+    #======================================load configs==============================================
+    args = argparse.Namespace(**config)
+    args.device = "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
 
 
     #======================================wandb==============================================
     results_path = os.path.join(dirname(abspath(__file__)), "results")
-    args.experiment_id = f"{args.env}_{args.algo}_{args.memo}" #_{datetime.datetime.now().strftime('%d_%H_%M')}"
+    args.exp_id = f"{args.env}_{args.agent}_{args.memo}" #_{datetime.datetime.now().strftime('%d_%H_%M')}"
 
-    if args.use_offline_wandb:
+    if args.exp_args['use_offline_wandb']:
         os.environ['WANDB_MODE'] = 'dryrun'
 
-    wandb.init(project='AAAI', name=args.experiment_id, tags=['Ming'], dir=results_path)
+    wandb.init(project='AAAI', name=args.exp_id, tags=['Ming'], dir=results_path)
     wandb.config.update(args)
 
+
     #======================================register environment==============================================
-    if args.env == 'tj':
-        register(
-            id='TrafficJunction-v0',
-            entry_point='envs:TrafficJunctionEnv',
-        )
-        env = gym.make('TrafficJunction-v0')
-        env.multi_agent_init(args)
-        env = GymWrapper(env)
+    env = env_REGISTRY[args.env](env_config)
 
-        args.obs_shape = env.observation_dim
-        args.n_actions = env.num_actions
-        args.dim_actions = env.dim_actions
-
-        # Hard attention
-        if args.hard_attn and args.commnet:
-        # add comm_action as last dim in actions
-            args.n_actions = [*args.n_actions, 2]
-            args.dim_actions = env.dim_actions + 1
-    else:
-        env = env_REGISTRY[args.env](**args.env_args)
-        env_info = env.get_env_info()
-        args.obs_shape = env_info["obs_shape"]
-        args.n_actions = env_info["n_actions"]
-        args.n_agents = env_info["n_agents"]
-        args.state_shape = env_info["state_shape"]
-        args.episode_length = env_info["episode_limit"]
+    # if args.env == 'tj':
+    #     args.obs_shape = env.observation_dim
+    #     args.n_actions = env.num_actions
+    #     args.dim_actions = env.dim_actions
+    #
+    #     # Hard attention
+    #     if args.hard_attn and args.commnet:
+    #     # add comm_action as last dim in actions
+    #         args.n_actions = [*args.n_actions, 2]
+    #         args.dim_actions = env.dim_actions + 1
+    # else:
+    #     env_info = env.get_env_info()
+    #     args.obs_shape = env_info["obs_shape"]
+    #     args.n_actions = env_info["n_actions"]
+    #     args.n_agents = env_info["n_agents"]
+    #     args.state_shape = env_info["state_shape"]
+    #     args.episode_length = env_info["episode_limit"]
 
 
-
-    agent = agent_REGISTRY[args.algo](args)
-
-
-    if args.algo in['tiecomm']:
-        run = RunnerDual
-    elif args.algo in ['magic']:
-        run = magicRunner
-    elif args.algo in ['tiecomm_random','tiecomm_no']:
-        run = RunnerRandom
-    else:
-        run = Runner
+    agent = agent_REGISTRY[args.agent](agent_config)
+    run = runner_REGISTRY[args.agent](exp_config)
 
 
     if args.use_multiprocessing:
@@ -112,18 +95,14 @@ def main(args):
             p.data.share_memory_()
         runner = MultiPeocessRunner(args, lambda: run(args, env, agent))
         epoch_size = 1
-    elif args.magic==True:
-        runner = magicRunner(args, env, agent)
-        epoch_size = args.epoch_size
     else:
-        runner = run(args, env,agent)
-        epoch_size = args.epoch_size
+        pass
+
 
 
 
     total_num_episodes = 0
     total_num_steps = 0
-
 
     for epoch in range(args.total_epoches):
         epoch_begin_time = time.time()
@@ -135,7 +114,7 @@ def main(args):
 
         epoch_time = time.time() - epoch_begin_time
 
-        if args.algo == 'tiecomm':
+        if args.agent == 'tiecomm':
             wandb.log({"epoch": epoch,
                         'episode': total_num_episodes,
                         'epoch_time': epoch_time,
@@ -163,6 +142,9 @@ def main(args):
 
         print('current epoch: {}/{}'.format(epoch, args.total_epoches))
 
+
+
+
     if sys.flags.interactive == 0 and args.use_multiprocessing:
         runner.quit()
         os._exit(0)
@@ -171,18 +153,12 @@ def main(args):
 
 
 
-def signal_handler(signal, frame):
-    print('You pressed Ctrl+C! Exiting gracefully.')
-    sys.exit(0)
-
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="debug", help='memo')
     parser.add_argument('--env', type=str, default="tj", help='environment name')
     parser.add_argument('--env_map', type=str, default="'tj", help='environment map name')
-    parser.add_argument('--algo', type=str, default="tiecomm", help='algorithm name',choices='tiecomm,tiecomm_random,tiecomm_no, ac_basic，commnet')
+    parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',choices='tiecomm,tiecomm_random,tiecomm_no, ac_basic，commnet')
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
@@ -191,12 +167,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     training_begin_time = time.time()
+
     signal.signal(signal.SIGINT, signal_handler)
-
     main(args)
-
     training_time = time.time() - training_begin_time
-
     print('training time: {} h'.format(training_time/3600))
 
 

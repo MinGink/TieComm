@@ -38,7 +38,7 @@ class TrafficJunctionEnv(gym.Env):
     def __init__(self):
         self.__version__ = "0.0.1"
 
-        # TODO: better config handling
+        # TODO: better configs handling
         self.OUTSIDE_CLASS = 0
         self.ROAD_CLASS = 1
         self.CAR_CLASS = 2
@@ -47,6 +47,7 @@ class TrafficJunctionEnv(gym.Env):
 
         self.episode_over = False
         self.has_failed = 0
+
 
 
 
@@ -78,6 +79,7 @@ class TrafficJunctionEnv(gym.Env):
                          help="Difficulty level, easy|medium|hard")
         env.add_argument('--vocab_type', type=str, default='bool',
                          help="Type of location vector to use, bool|scalar")
+
 
 
     def multi_agent_init(self, args):

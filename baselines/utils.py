@@ -29,7 +29,7 @@ def merge_dict(src, dest):
 
 
 def get_config(params, arg_name, subfolder):
-        with open(os.path.join(os.path.dirname(__file__), "../config", subfolder, "{}.yaml".format(arg_name)), "r") as f:
+        with open(os.path.join(os.path.dirname(__file__), "../configs", subfolder, "{}.yaml".format(arg_name)), "r") as f:
             try:
                 config_dict = yaml.safe_load(f)
             except yaml.YAMLError as exc:
