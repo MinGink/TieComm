@@ -9,6 +9,7 @@ use_cuda: False # Use GPU
 normalize_rewards: False
 gamma: 1.0
 lr: 0.001 #learning rate
+value_coeff: 0.01 #coeff for value loss term
 
 
 
@@ -49,7 +50,7 @@ lr: 0.001 #learning rate
 #value_hid_size: 32 #value size for soft attention
 #
 #entr: 0 #entropy regularization coeff
-#value_coeff: 0.01 #coeff for value loss term
+#
 #
 #add_value_last_step: True
 #recurrent: False #make the model recurrent in time

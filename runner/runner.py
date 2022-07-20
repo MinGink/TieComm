@@ -110,9 +110,9 @@ class Runner(object):
         return memory ,log
 
     def _compute_returns(self, rewards, masks, next_value):
-        returns = [next_value]
+        returns = [torch.zeros_like(next_value)]
         for rew, done in zip(reversed(rewards), reversed(masks)):
-            ret = returns[0] * self.gamma + rew * (1 - done.unsqueeze(1))
+            ret = returns[0] * self.gamma * (1 - done) + rew
             returns.insert(0, ret)
         return returns
 
@@ -131,12 +131,12 @@ class Runner(object):
 
         # episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
 
-
-        batch_size = len(batch.actions)
+        #
+        # batch_size = len(batch.actions)
         # n = self.args.n_agents
 
-        returns = self._compute_returns(rewards, episode_masks, values)
-
+        returns = self._compute_returns(rewards, episode_masks, values[-1])
+        returns = torch.stack(returns)[:-1]
         advantages = returns - values
 
 

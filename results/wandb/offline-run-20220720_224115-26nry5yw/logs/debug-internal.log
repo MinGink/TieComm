@@ -11,3 +11,4 @@
 2022-07-20 22:41:17,183 DEBUG   HandlerThread:29258 [meta.py:_save_conda():74] save conda
 2022-07-20 22:41:22,437 DEBUG   HandlerThread:29258 [meta.py:_save_conda():84] save conda done
 2022-07-20 22:41:22,438 DEBUG   HandlerThread:29258 [meta.py:probe():247] probe done
+2022-07-20 22:58:32,611 WARNING MainThread:29258 [internal.py:wandb_internal():153] Internal process interrupt: 1
