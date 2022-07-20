@@ -158,7 +158,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="debug", help='memo')
+    parser.add_argument('--memo', type=str, default="memo", help='memo')
     parser.add_argument('--env', type=str, default="tj", help='environment name')
     parser.add_argument('--env_map', type=str, default="'tj", help='environment map name')
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',choices='tiecomm,tiecomm_random,tiecomm_no, ac_basic，commnet')
