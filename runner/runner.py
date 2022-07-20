@@ -109,6 +109,9 @@ class Runner(object):
 
         return memory ,log
 
+
+
+
     def _compute_returns(self, rewards, masks, next_value):
         returns = [torch.zeros_like(next_value)]
         for rew, done in zip(reversed(rewards), reversed(masks)):
