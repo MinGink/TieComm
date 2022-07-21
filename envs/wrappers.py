@@ -122,20 +122,6 @@ class Wrapper(object):
         """ Returns the shape of the state"""
         return self.n_agents * flatdim(self.longest_observation_space)
 
-    # def get_obs_agent(self, agent_id):
-    #     """ Returns observation for agent_id """
-    #     raise self._obs[agent_id]
-    #
-    # def get_obs_size(self):
-    #     """ Returns the shape of the observation """
-    #     return flatdim(self.longest_observation_space)
-    #
-    # def get_state(self):
-    #     return np.concatenate(self._obs, axis=0).astype(np.float32)
-    #
-    # def get_state_size(self):
-    #     """ Returns the shape of the state"""
-    #     return self.n_agents * flatdim(self.longest_observation_space)
 
     def get_avail_actions(self):
         avail_actions = []

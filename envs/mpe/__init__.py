@@ -3,9 +3,6 @@ from gym.core import Env
 from gym.spaces import Box, Discrete, Tuple
 import importlib
 
-__version__ = "1.3.5"
-
-
 
 class PettingZooWrapper(Env):
 
@@ -14,7 +11,7 @@ class PettingZooWrapper(Env):
     def __init__(self, lib_name, env_name, **kwargs):
 
         PZEnv = importlib.import_module(f"envs.{lib_name}.{env_name}")
-        print(PZEnv)
+        #print(PZEnv)
         self._env = PZEnv.parallel_env(**kwargs)
 
         n_agents = self._env.num_agents
@@ -51,3 +48,6 @@ class PettingZooWrapper(Env):
 
     def close(self):
         return self._env.close()
+
+if __name__ == '__main__':
+    print('test')

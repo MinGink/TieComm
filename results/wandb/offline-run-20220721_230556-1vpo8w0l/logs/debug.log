@@ -1,0 +1,25 @@
+2022-07-21 23:05:56,020 INFO    MainThread:23520 [wandb_setup.py:_flush():76] Configure stats pid to 23520
+2022-07-21 23:05:56,021 INFO    MainThread:23520 [wandb_setup.py:_flush():76] Loading settings from /Users/ming/.config/wandb/settings
+2022-07-21 23:05:56,021 INFO    MainThread:23520 [wandb_setup.py:_flush():76] Loading settings from /Users/ming/Documents/TieComm/wandb/settings
+2022-07-21 23:05:56,021 INFO    MainThread:23520 [wandb_setup.py:_flush():76] Loading settings from environment variables: {'mode': 'dryrun'}
+2022-07-21 23:05:56,021 INFO    MainThread:23520 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main.py', 'program': '/Users/ming/Documents/TieComm/main.py'}
+2022-07-21 23:05:56,021 INFO    MainThread:23520 [wandb_init.py:_log_setup():461] Logging user logs to /Users/ming/Documents/TieComm/results/wandb/offline-run-20220721_230556-1vpo8w0l/logs/debug.log
+2022-07-21 23:05:56,021 INFO    MainThread:23520 [wandb_init.py:_log_setup():462] Logging internal logs to /Users/ming/Documents/TieComm/results/wandb/offline-run-20220721_230556-1vpo8w0l/logs/debug-internal.log
+2022-07-21 23:05:56,022 INFO    MainThread:23520 [wandb_init.py:init():495] calling init triggers
+2022-07-21 23:05:56,022 INFO    MainThread:23520 [wandb_init.py:init():498] wandb.init called with sweep_config: {}
+config: {}
+2022-07-21 23:05:56,023 INFO    MainThread:23520 [wandb_init.py:init():548] starting backend
+2022-07-21 23:05:56,023 INFO    MainThread:23520 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2022-07-21 23:05:56,036 INFO    MainThread:23520 [backend.py:ensure_launched():217] starting backend process...
+2022-07-21 23:05:56,054 INFO    MainThread:23520 [backend.py:ensure_launched():222] started backend process with pid: 23535
+2022-07-21 23:05:56,058 INFO    MainThread:23520 [wandb_init.py:init():558] backend started and connected
+2022-07-21 23:05:56,075 INFO    MainThread:23520 [wandb_init.py:init():634] updated telemetry
+2022-07-21 23:05:56,112 INFO    MainThread:23520 [wandb_init.py:init():700] starting run threads in backend
+2022-07-21 23:06:01,130 INFO    MainThread:23520 [wandb_run.py:_console_start():1893] atexit reg
+2022-07-21 23:06:01,132 INFO    MainThread:23520 [wandb_run.py:_redirect():1766] redirect: SettingsConsole.REDIRECT
+2022-07-21 23:06:01,133 INFO    MainThread:23520 [wandb_run.py:_redirect():1771] Redirecting console.
+2022-07-21 23:06:01,136 INFO    MainThread:23520 [wandb_run.py:_redirect():1827] Redirects installed.
+2022-07-21 23:06:01,137 INFO    MainThread:23520 [wandb_init.py:init():732] run started, returning control to user process
+2022-07-21 23:06:01,155 INFO    MainThread:23520 [wandb_run.py:_config_callback():1131] config_cb None None {'memo': 'debug', 'total_epoches': 2000, 'epoch_size': 10, 'use_multiprocessing': True, 'use_offline_wandb': True, 'grad_norm_clip': 10, 'use_cuda': False, 'normalize_rewards': False, 'gamma': 1.0, 'lr': 0.001, 'value_coeff': 0.01, 'env': 'tj', 'map': 'pz-mpe-large-spread-v1', 'agent': 'ac_basic', 'seed': 666, 'n_agents': 10, 'dim': 14, 'episode_length': 40, 'add_rate_min': 0.2, 'add_rate_max': 0.2, 'difficulty': 'medium', 'vision': 1, 'vocab_type': 'bool', 'curr_start': 0, 'curr_end': 0, 'name': 'ac_basic', 'hid_size': 64, 'device': 'cpu', 'exp_id': 'tj_ac_basic_debug'}
+2022-07-21 23:06:22,504 INFO    MainThread:23520 [wandb_run.py:_atexit_cleanup():1862] got exitcode: 0
+2022-07-21 23:06:22,520 INFO    MainThread:23520 [wandb_run.py:_restore():1834] restore

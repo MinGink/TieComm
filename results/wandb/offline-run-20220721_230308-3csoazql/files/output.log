@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevd.py", line 1491, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ming/Documents/TieComm/main.py", line 158, in <module>
+    main(args)
+  File "/Users/ming/Documents/TieComm/main.py", line 65, in main
+    env = env_REGISTRY[args.env](env_config)
+  File "/Users/ming/Documents/TieComm/envs/tj_wrappers.py", line 14, in __init__
+    env = gym.make('TrafficJunction-v0')
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/envs/registration.py", line 235, in make
+    return registry.make(id, **kwargs)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/envs/registration.py", line 129, in make
+    env = spec.make(**kwargs)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/envs/registration.py", line 89, in make
+    cls = load(self.entry_point)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/envs/registration.py", line 26, in load
+    mod_name, attr_name = name.split(":")
+ValueError: not enough values to unpack (expected 2, got 1)

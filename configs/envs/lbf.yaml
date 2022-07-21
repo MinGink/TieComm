@@ -1,13 +1,13 @@
 env: "lbforaging"
 map: lbforaging:Foraging-10x10-3p-3f-v2
 time_limit: 50
-pretrained_wrapper: null
 
 
-test_greedy: True
-test_nepisode: 100
-test_interval: 50000
-log_interval: 50000
-runner_log_interval: 10000
-learner_log_interval: 10000
-t_max: 2050000
+
+#Foraging{-2s}-{size}x{size}-{players}p-{food}f{-coop}-v2"
+#sizes = range(5, 20)
+#players = range(2, 20)
+#foods = range(1, 10)
+#coop = [True, False]
+#partial_obs = [True, False]
+

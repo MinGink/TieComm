@@ -62,22 +62,6 @@ def main(args):
 
 
     #======================================register environment==============================================
-
-
-    # if args.env == 'tj':
-    #     args.obs_shape = env.observation_dim
-    #     args.n_actions = env.num_actions
-    #     args.dim_actions = env.dim_actions
-    #
-    #     # Hard attention
-    #     if args.hard_attn and args.commnet:
-    #     # add comm_action as last dim in actions
-    #         args.n_actions = [*args.n_actions, 2]
-    #         args.dim_actions = env.dim_actions + 1
-    # else:
-
-
-
     env = env_REGISTRY[args.env](env_config)
 
     env_info = env.get_env_info()
@@ -88,11 +72,7 @@ def main(args):
     agent = agent_REGISTRY[args.agent](agent_config)
 
 
-
     epoch_size = exp_config['epoch_size']
-
-
-
     run = runner_REGISTRY[args.agent]
     if args.use_multiprocessing:
         for p in agent.parameters():
@@ -160,14 +140,16 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="debug", help='memo')
-    parser.add_argument('--env', type=str, default="mpe", help='environment name')
-    parser.add_argument('--map', type=str, default="pz-mpe-large-spread-v1", help='environment map name')
-    parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',choices='tiecomm,tiecomm_random,tiecomm_no, ac_basic，commnet')
+    parser.add_argument('--env', type=str, default="rware", help='environment name',
+                        choices=['mpe','lbforaging','rware','tj'])
+    parser.add_argument('--map', type=str, default="rware-1color-medium-6ag-hard-v1", help='environment map name')
+    parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
+                        choices=['tiecomm','tiecomm_random','tiecomm_no', 'ac_basic','commnet'])
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
     parser.add_argument('--total_epoches', type=int, default=2000, help='total number of training epochs')
-    parser.add_argument('--epoch_size', type=int, default=10, help='epoch size')
+    parser.add_argument('--epoch_size', type=int, default=2, help='epoch size')
     args = parser.parse_args()
 
     training_begin_time = time.time()
@@ -176,18 +158,3 @@ if __name__ == '__main__':
     main(args)
     training_time = time.time() - training_begin_time
     print('training time: {} h'.format(training_time/3600))
-
-
-    #======================================end==============================================
-    # Clean up after finishing
-    # print("Exiting Main")
-
-
-    # for t in threading.enumerate():
-    #     if t.name != "MainThread":
-    #         #print("Thread {} is alive! Is daemon: {}".format(t.name, t.daemon))
-    #         t.join(timeout=1)
-    #         #print("Thread joined")
-    # print("Stopping all threads")
-    # # Making sure framework really exits
-    # os._exit(os.EX_OK)
