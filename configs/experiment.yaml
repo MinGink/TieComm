@@ -1,7 +1,7 @@
 memo: defalut
 # --- Defaults ---
 total_epoches: 10000 #number of training epochs
-epoch_size: 20 #number of update iterations in an epoch = How many processes to run
+epoch_size: 2 #number of update iterations in an epoch = How many processes to run
 use_multiprocessing: False #use multiprocessing to parallelize the process
 use_offline_wandb: False # Log results to wandb
 grad_norm_clip: 10 # Reduce magnitude of gradients above this L2 norm
