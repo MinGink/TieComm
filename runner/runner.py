@@ -76,16 +76,10 @@ class Runner(object):
         while not done and step < self.args.episode_length:
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
             action_outs, values = self.agent(obs_tensor,info)
-
             actions = self.choose_action(action_outs)
-
             rewards, done, env_info = self.env.step(actions)
-
             next_obs = self.env.get_obs()
-
-
             episode_mask = np.zeros(np.array(rewards).shape)
-
             if done or step == self.args.episode_length-1:
                 episode_mask = np.ones(np.array(rewards).shape)
 
