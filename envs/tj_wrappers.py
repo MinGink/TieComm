@@ -6,7 +6,7 @@ from inspect import getargspec
 from gym.envs.registration import register
 import argparse
 
-class GymWrapper(object):
+class TJ_Wrapper(object):
     '''
     for multi-agent
     '''

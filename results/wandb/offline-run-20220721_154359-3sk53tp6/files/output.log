@@ -1,0 +1,20 @@
+
+<module 'envs.mpe.large_spread_v0' from '/Users/ming/Documents/TieComm/envs/mpe/large_spread_v0.py'>
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevd.py", line 1491, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ming/Documents/TieComm/main.py", line 175, in <module>
+    main(args)
+  File "/Users/ming/Documents/TieComm/main.py", line 80, in main
+    env = env_REGISTRY[args.env](env_config)
+  File "/Users/ming/Documents/TieComm/envs/pz_wrappers.py", line 22, in __init__
+    self._env = PZEnv.parallel_env()
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/to_parallel.py", line 63, in par_fn
+    env = env_fn(**kwargs)
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 11, in env
+    env = raw_env(**kwargs)
+  File "/Users/ming/Documents/TieComm/envs/mpe/large_spread_v0.py", line 12, in __init__
+    world = scenario.make_world(**env_args)
+TypeError: make_world() missing 1 required positional argument: 'groups'

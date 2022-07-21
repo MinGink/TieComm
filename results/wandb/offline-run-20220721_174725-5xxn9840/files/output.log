@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 961, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 961, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 973, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'pettingzoo'

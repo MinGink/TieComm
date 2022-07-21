@@ -1,0 +1,397 @@
+<module 'envs.mpe.large_spread_v1' from '/Users/ming/Documents/TieComm/envs/mpe/large_spread_v1.py'>
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'leidenalg', 'graph_tool', 'wurlitzer', 'infomap', 'karateclub'}
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'infomap', 'wurlitzer', 'graph_tool', 'leidenalg', 'karateclub'}
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'wurlitzer', 'infomap', 'karateclub', 'leidenalg', 'graph_tool'}
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'leidenalg', 'graph_tool', 'karateclub', 'infomap', 'wurlitzer'}
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'leidenalg', 'wurlitzer', 'karateclub', 'graph_tool', 'infomap'}
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'wurlitzer', 'karateclub', 'graph_tool', 'leidenalg', 'infomap'}
+Note: to be able to use all overlapping methods, you need to install some additional packages: Note: to be able to use all overlapping methods, you need to install some additional packages:  {'ASLPAw', 'karateclub'}Note: to be able to use all overlapping methods, you need to install some additional packages:   {'karateclub', 'ASLPAw'}{'ASLPAw', 'karateclub'}
+Note: to be able to use all overlapping methods, you need to install some additional packages:  {'ASLPAw', 'karateclub'}Note: to be able to use all overlapping methods, you need to install some additional packages:  {'ASLPAw', 'karateclub'}
+Note: to be able to use all overlapping methods, you need to install some additional packages:  {'karateclub', 'ASLPAw'}
+Note: to be able to use all bipartite methods, you need to install some additional packages:  {'leidenalg', 'infomap', 'wurlitzer'}
+Note: to be able to use all bipartite methods, you need to install some additional packages:  {'wurlitzer', 'leidenalg', 'infomap'}
+Note: to be able to use all bipartite methods, you need to install some additional packages:  Note: to be able to use all bipartite methods, you need to install some additional packages: {'leidenalg', 'infomap', 'wurlitzer'}
+{'leidenalg', 'wurlitzer', 'infomap'}
+Note: to be able to use all bipartite methods, you need to install some additional packages:  {'wurlitzer', 'leidenalg', 'infomap'}
+Note: to be able to use all bipartite methods, you need to install some additional packages:  {'wurlitzer', 'infomap', 'leidenalg'}
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'infomap', 'graph_tool', 'karateclub', 'wurlitzer', 'leidenalg'}
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'leidenalg', 'infomap', 'graph_tool', 'wurlitzer', 'karateclub'}
+Note: to be able to use all crisp methods, you need to install some additional packages:  {'infomap', 'karateclub', 'wurlitzer', 'leidenalg', 'graph_tool'}
+Note: to be able to use all overlapping methods, you need to install some additional packages:  {'karateclub', 'ASLPAw'}
+Note: to be able to use all overlapping methods, you need to install some additional packages:  {'ASLPAw', 'karateclub'}
+Note: to be able to use all overlapping methods, you need to install some additional packages:  {'karateclub', 'ASLPAw'}
+Note: to be able to use all bipartite methods, you need to install some additional packages:  {'leidenalg', 'infomap', 'wurlitzer'}
+Note: to be able to use all bipartite methods, you need to install some additional packages:  {'infomap', 'wurlitzer', 'leidenalg'}
+Note: to be able to use all bipartite methods, you need to install some additional packages:  {'infomap', 'leidenalg', 'wurlitzer'}
+current epoch: 0/2000
+current epoch: 1/2000
+current epoch: 2/2000
+current epoch: 3/2000
+current epoch: 4/2000
+current epoch: 5/2000
+current epoch: 6/2000
+current epoch: 7/2000
+current epoch: 8/2000
+current epoch: 9/2000
+current epoch: 10/2000
+current epoch: 11/2000
+current epoch: 12/2000
+current epoch: 13/2000
+current epoch: 14/2000
+current epoch: 15/2000
+current epoch: 16/2000
+current epoch: 17/2000
+current epoch: 18/2000
+current epoch: 19/2000
+current epoch: 20/2000
+current epoch: 21/2000
+current epoch: 22/2000
+current epoch: 23/2000
+current epoch: 24/2000
+current epoch: 25/2000
+current epoch: 26/2000
+current epoch: 27/2000
+current epoch: 28/2000
+current epoch: 29/2000
+current epoch: 30/2000
+current epoch: 31/2000
+current epoch: 32/2000
+current epoch: 33/2000
+current epoch: 34/2000
+current epoch: 35/2000
+current epoch: 36/2000
+current epoch: 37/2000
+current epoch: 38/2000
+current epoch: 39/2000
+current epoch: 40/2000
+current epoch: 41/2000
+current epoch: 42/2000
+current epoch: 43/2000
+current epoch: 44/2000
+current epoch: 45/2000
+current epoch: 46/2000
+current epoch: 47/2000
+current epoch: 48/2000
+current epoch: 49/2000
+current epoch: 50/2000
+current epoch: 51/2000
+current epoch: 52/2000
+current epoch: 53/2000
+current epoch: 54/2000
+current epoch: 55/2000
+current epoch: 56/2000
+current epoch: 57/2000
+current epoch: 58/2000
+current epoch: 59/2000
+current epoch: 60/2000
+current epoch: 61/2000
+current epoch: 62/2000
+current epoch: 63/2000
+current epoch: 64/2000
+current epoch: 65/2000
+current epoch: 66/2000
+current epoch: 67/2000
+current epoch: 68/2000
+current epoch: 69/2000
+current epoch: 70/2000
+current epoch: 71/2000
+current epoch: 72/2000
+current epoch: 73/2000
+current epoch: 74/2000
+current epoch: 75/2000
+current epoch: 76/2000
+current epoch: 77/2000
+current epoch: 78/2000
+current epoch: 79/2000
+current epoch: 80/2000
+current epoch: 81/2000
+current epoch: 82/2000
+current epoch: 83/2000
+current epoch: 84/2000
+current epoch: 85/2000
+current epoch: 86/2000
+current epoch: 87/2000
+current epoch: 88/2000
+current epoch: 89/2000
+current epoch: 90/2000
+current epoch: 91/2000
+current epoch: 92/2000
+current epoch: 93/2000
+current epoch: 94/2000
+current epoch: 95/2000
+current epoch: 96/2000
+current epoch: 97/2000
+current epoch: 98/2000
+current epoch: 99/2000
+current epoch: 100/2000
+current epoch: 101/2000
+current epoch: 102/2000
+current epoch: 103/2000
+current epoch: 104/2000
+current epoch: 105/2000
+current epoch: 106/2000
+You pressed Ctrl+C! Exiting gracefully.
+Process MultiProcessWorker-6:
+Process MultiProcessWorker-3:
+Process MultiProcessWorker-2:
+Process MultiProcessWorker-9:
+Process MultiProcessWorker-4:
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 39, in run
+    train_log = self.runner.compute_grad(batch_data)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 128, in compute_grad
+    actions = torch.stack(batch.actions,dim=0)
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 37, in run
+    batch_data, batch_log = self.runner.collect_epoch_data(epoch_size)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 57, in collect_epoch_data
+    epoch_data = Transition(*zip(*epoch_Process MultiProcessWorker-5:
+Process MultiProcessWorker-8:
+data))
+  File "<string>", line 1, in __new__
+KeyboardInterrupt
+KeyboardInterrupt
+Process MultiProcessWorker-10:
+Process MultiProcessWorker-7:
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 37, in run
+    batch_data, batch_log = self.runner.collect_epoch_data(epoch_size)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 52, in collect_epoch_data
+    episode_data, episode_log = self.run_an_episode()
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 82, in run_an_episode
+    rewards, done, env_info = self.env.step(actions)
+  File "/Users/ming/Documents/TieComm/envs/wrappers.py", line 35, in step
+    self._obs = [
+  File "/Users/ming/Documents/TieComm/envs/wrappers.py", line 36, in <listcomp>
+    np.pad(
+  File "<__array_function__ internals>", line 180, in pad
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/numpy/lib/arraypad.py", line 743, in pad
+    pad_width = _as_pairs(pad_width, array.ndim, as_index=True)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/numpy/lib/arraypad.py", line 509, in _as_pairs
+    if as_index and (x[0] < 0 or x[1] < 0):
+KeyboardInterrupt
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 28, in run
+    task = self.worker.recv()
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/connection.py", line 414, in _recv_bytes
+    buf = self._recv(4)
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 37, in run
+    batch_data, batch_log = self.runner.collect_epoch_data(epoch_size)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/connection.py", line 379, in _recv
+    chunk = read(handle, remaining)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 52, in collect_epoch_data
+    episode_data, episode_log = self.run_an_episode()
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 82, in run_an_episode
+    rewards, done, env_info = self.env.step(actions)
+  File "/Users/ming/Documents/TieComm/envs/wrappers.py", line 34, in step
+    self._obs, reward, done, info = self._env.step(actions)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/core.py", line 323, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/lbf_warppers.py", line 23, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/wrappers/order_enforcing.py", line 11, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/mpe/__init__.py", line 44, in step
+    observations, rewards, dones, infos = self._env.step(dict_actions)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/to_parallel.py", line 40, in step
+    self.aec_env.step(actions.get(agent, None))
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 375, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 105, in step
+    super().step(action, False)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 199, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 283, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 170, in step
+    self._execute_world_step()
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 111, in _execute_world_step
+    self.world.step()
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/core.py", line 126, in step
+    p_force = self.apply_environment_force(p_force)
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/core.py", line 149, in apply_environment_force
+    [f_a, f_b] = self.get_collision_force(entity_a, entity_b)
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/core.py", line 183, in get_collision_force
+    def get_collision_force(self, entity_a, entity_b):
+KeyboardInterrupt
+KeyboardInterrupt
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 37, in run
+    batch_data, batch_log = self.runner.collect_epoch_data(epoch_size)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 52, in collect_epoch_data
+    episode_data, episode_log = self.run_an_episode()
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 82, in run_an_episode
+    rewards, done, env_info = self.env.step(actions)
+  File "/Users/ming/Documents/TieComm/envs/wrappers.py", line 34, in step
+    self._obs, reward, done, info = self._env.step(actions)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/core.py", line 323, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/lbf_warppers.py", line 23, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/wrappers/order_enforcing.py", line 11, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/mpe/__init__.py", line 44, in step
+    observations, rewards, dones, infos = self._env.step(dict_actions)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/to_parallel.py", line 40, in step
+    self.aec_env.step(actions.get(agent, None))
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 375, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 105, in step
+    super().step(action, False)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 199, in step
+    return super().step(action, observe)
+Traceback (most recent call last):
+  File "/Users/ming/Documents/TieComm/  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 39, in run
+    train_log = self.runner.compute_grad(batch_data)
+envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 179, in compute_grad
+    total_loss.backward()
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/torch/_tensor.py", line 307, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/torch/autograd/__init__.py", line 154, in backward
+    Variable._execution_engine.run_backward(
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 283, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 170, in step
+    self._execute_world_step()
+KeyboardInterrupt
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 111, in _execute_world_step
+    self.world.step()
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/core.py", line 126, in step
+    p_force = self.apply_environment_force(p_force)
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/core.py", line 147, in apply_environment_force
+    if(b <= a):
+KeyboardInterrupt
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 37, in run
+    batch_data, batch_log = self.runner.collect_epoch_data(epoch_size)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/process.py", line 315, in _bootstrap
+    self.run()
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 52, in collect_epoch_data
+    episode_data, episode_log = self.run_an_episode()
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 82, in run_an_episode
+    rewards, done, env_info = self.env.step(actions)
+  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 37, in run
+    batch_data, batch_log = self.runner.collect_epoch_data(epoch_size)
+  File "/Users/ming/Documents/TieComm/envs/wrappers.py", line 34, in step
+    self._obs, reward, done, info = self._env.step(actions)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 52, in collect_epoch_data
+    episode_data, episode_log = self.run_an_episode()
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/core.py", line 323, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/lbf_warppers.py", line 23, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/runner/runner.py", line 82, in run_an_episode
+    rewards, done, env_info = self.env.step(actions)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/wrappers/order_enforcing.py", line 11, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/wrappers.py", line 34, in step
+    self._obs, reward, done, info = self._env.step(actions)
+  File "/Users/ming/Documents/TieComm/envs/mpe/__init__.py", line 44, in step
+    observations, rewards, dones, infos = self._env.step(dict_actions)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/core.py", line 323, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/lbf_warppers.py", line 23, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/wrappers/order_enforcing.py", line 11, in step
+    observation, reward, done, info = self.env.step(action)
+  File "/Users/ming/Documents/TieComm/envs/mpe/__init__.py", line 44, in step
+    observations, rewards, dones, infos = self._env.step(dict_actions)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/to_parallel.py", line 40, in step
+    self.aec_env.step(actions.get(agent, None))
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 375, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 105, in step
+    super().step(action, False)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 199, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 283, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 170, in step
+    self._execute_world_step()
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 118, in _execute_world_step
+    agent_reward = float(self.scenario.reward(agent, self.world))
+  File "/Users/ming/Documents/TieComm/envs/mpe/scenarios/large_spread.py", line 94, in reward
+    np.sum(
+  File "<__array_function__ internals>", line 180, in sum
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/numpy/core/fromnumeric.py", line 2296, in sum
+    return _wrapreduction(a, np.add, 'sum', axis, dtype, out, keepdims=keepdims,
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/numpy/core/fromnumeric.py", line 69, in _wrapreduction
+    def _wrapreduction(obj, ufunc, method, axis, dtype, out, **kwargs):
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/to_parallel.py", line 40, in step
+    self.aec_env.step(actions.get(agent, None))
+KeyboardInterrupt
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 375, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 105, in step
+    super().step(action, False)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 199, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 283, in step
+    return super().step(action, observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/utils/wrappers.py", line 66, in step
+    next_obs = self.env.step(action, observe=observe)
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 170, in step
+    self._execute_world_step()
+  File "/Users/ming/Documents/TieComm/envs/mpe/_mpe_utils/simple_env.py", line 115, in _execute_world_step
+    global_reward = float(self.scenario.global_reward(self.world))
+  File "/Users/ming/Documents/TieComm/envs/mpe/scenarios/large_spread.py", line 112, in global_reward
+    rew -= np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos)))
+  File "<__array_function__ internals>", line 180, in sum
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/numpy/core/fromnumeric.py", line 2296, in sum
+    return _wrapreduction(a, np.add, 'sum', axis, dtype, out, keepdims=keepdims,
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/numpy/core/fromnumeric.py", line 70, in _wrapreduction
+    passkwargs = {k: v for k, v in kwargs.items()
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/numpy/core/fromnumeric.py", line 70, in <dictcomp>
+    passkwargs = {k: v for k, v in kwargs.items()
+KeyboardInterrupt
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe
+libc++abi: terminating with uncaught exception of type std::__1::system_error: Broken pipe

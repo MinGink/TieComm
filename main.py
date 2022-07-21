@@ -29,6 +29,7 @@ def main(args):
     torch.manual_seed(args.seed)
     random.seed(args.seed)
     np.random.seed(args.seed)
+    env_config['seed'] = args.seed
 
 
 
@@ -158,9 +159,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="memo", help='memo')
-    parser.add_argument('--env', type=str, default="tj", help='environment name')
-    parser.add_argument('--env_map', type=str, default="'tj", help='environment map name')
+    parser.add_argument('--memo', type=str, default="debug", help='memo')
+    parser.add_argument('--env', type=str, default="mpe", help='environment name')
+    parser.add_argument('--map', type=str, default="pz-mpe-large-spread-v1", help='environment map name')
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',choices='tiecomm,tiecomm_random,tiecomm_no, ac_basic，commnet')
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')

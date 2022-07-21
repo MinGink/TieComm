@@ -79,7 +79,9 @@ class Runner(object):
 
             actions = self.choose_action(action_outs)
 
-            next_obs, rewards, done, env_info = self.env.step(actions)
+            rewards, done, env_info = self.env.step(actions)
+
+            next_obs = self.env.get_obs()
 
 
             episode_mask = np.zeros(np.array(rewards).shape)

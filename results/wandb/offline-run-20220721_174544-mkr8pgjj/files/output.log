@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevd.py", line 1491, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ming/Documents/TieComm/main.py", line 175, in <module>
+    main(args)
+  File "/Users/ming/Documents/TieComm/main.py", line 80, in main
+    env = env_REGISTRY[args.env](env_config)
+  File "/Users/ming/Documents/TieComm/envs/wrappers.py", line 16, in __init__
+    self._env = TimeLimit(gym.make(f"{key}"), max_episode_steps=time_limit)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/envs/registration.py", line 235, in make
+    return registry.make(id, **kwargs)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/envs/registration.py", line 128, in make
+    spec = self.spec(path)
+  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/site-packages/gym/envs/registration.py", line 151, in spec
+    raise error.Error(
+gym.error.Error: Attempted to look up malformed environment ID: b'large_spread_v1'. (Currently all IDs must be of the form ^(?:[\w:-]+\/)?([\w:.-]+)-v(\d+)$.)

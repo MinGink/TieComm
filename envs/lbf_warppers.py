@@ -1,66 +1,8 @@
-import sys
-import os
 import numpy as np
 import gym
 from gym import ObservationWrapper, spaces
-from gym.envs import registry as gym_registry
 from gym.spaces import flatdim
 from gym.wrappers import TimeLimit as GymTimeLimit
-# from envs import pretrained
-
-
-class MultiAgentEnv(object):
-
-    def step(self, actions):
-        """ Returns reward, terminated, info """
-        raise NotImplementedError
-
-    def get_obs(self):
-        """ Returns all agent observations in a list """
-        raise NotImplementedError
-
-    def get_obs_agent(self, agent_id):
-        """ Returns observation for agent_id """
-        raise NotImplementedError
-
-    def get_obs_size(self):
-        """ Returns the shape of the observation """
-        raise NotImplementedError
-
-    def get_state(self):
-        raise NotImplementedError
-
-    def get_state_size(self):
-        """ Returns the shape of the state"""
-        raise NotImplementedError
-
-    def get_avail_actions(self):
-        raise NotImplementedError
-
-    def get_avail_agent_actions(self, agent_id):
-        """ Returns the available actions for agent_id """
-        raise NotImplementedError
-
-    def get_total_actions(self):
-        """ Returns the total number of actions an agent could ever take """
-        # TODO: This is only suitable for a discrete 1 dimensional action space for each agent
-        raise NotImplementedError
-
-    def reset(self):
-        """ Returns initial observations and states"""
-        raise NotImplementedError
-
-    def render(self):
-        raise NotImplementedError
-
-    def close(self):
-        raise NotImplementedError
-
-    def seed(self):
-        raise NotImplementedError
-
-    def save_replay(self):
-        raise NotImplementedError
 
 
 
@@ -84,10 +26,6 @@ class TimeLimit(GymTimeLimit):
             info["TimeLimit.truncated"] = not all(done)
             done = len(observation) * [True]
         return observation, reward, done, info
-
-
-
-
 
 
 
@@ -124,15 +62,12 @@ class FlattenObservation(ObservationWrapper):
 
 
 
-class _GymWrapper(MultiAgentEnv):
+class _GymWrapper(object):
     def __init__(self, key, time_limit, **kwargs):
 
         self.episode_limit = time_limit
         self._env = TimeLimit(gym.make(f"{key}"), max_episode_steps=time_limit)
         self._env = FlattenObservation(self._env)
-
-        # if pretrained_wrapper:
-        #     self._env = getattr(pretrained, pretrained_wrapper)(self._env)
 
         self.n_agents = self._env.n_agents
         self._obs = None
@@ -180,20 +115,6 @@ class _GymWrapper(MultiAgentEnv):
         """ Returns the shape of the state"""
         return self.n_agents * flatdim(self.longest_observation_space)
 
-    # def get_obs_agent(self, agent_id):
-    #     """ Returns observation for agent_id """
-    #     raise self._obs[agent_id]
-    #
-    # def get_obs_size(self):
-    #     """ Returns the shape of the observation """
-    #     return flatdim(self.longest_observation_space)
-    #
-    # def get_state(self):
-    #     return np.concatenate(self._obs, axis=0).astype(np.float32)
-    #
-    # def get_state_size(self):
-    #     """ Returns the shape of the state"""
-    #     return self.n_agents * flatdim(self.longest_observation_space)
 
     def get_avail_actions(self):
         avail_actions = []

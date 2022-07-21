@@ -1,6 +1,5 @@
 env: "lbforaging"
-
-key: lbforaging:Foraging-10x10-3p-3f-v2
+map: lbforaging:Foraging-10x10-3p-3f-v2
 time_limit: 50
 pretrained_wrapper: null
 
