@@ -4,6 +4,7 @@ import torch.nn as nn
 import numpy as np
 import random
 from .utils import merge_dict
+import argparse
 
 
 class MultiProcessWorker(mp.Process):
@@ -51,17 +52,17 @@ class MultiProcessWorker(mp.Process):
 
 
 class MultiPeocessRunner():
-    def __init__(self, args, runner):
-        self.args = args
-        self.runner = runner()
+    def __init__(self, config, runner):
 
-        self.n_workers = args.epoch_size -1
+        self.args = argparse.Namespace(**config)
+        self.runner = runner()
+        self.n_workers = self.args.epoch_size -1
 
         self.pool = []
         for i in range(self.n_workers):
             reciver, sender = mp.Pipe()
             self.pool.append(reciver)
-            worker = MultiProcessWorker(i, runner, sender, seed=args.seed)
+            worker = MultiProcessWorker(i, runner, sender, seed=self.args.seed)
             worker.start()
 
         self.grads = None

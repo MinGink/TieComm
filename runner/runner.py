@@ -7,7 +7,8 @@ from modules.utils import merge_dict
 import time
 import argparse
 
-
+Transition = namedtuple('Transition', ('obs', 'actions', 'action_outs', 'rewards',
+                                            'episode_masks', 'episode_agent_masks', 'values'))
 class Runner(object):
     def __init__(self, config, env, agent):
 
@@ -19,10 +20,6 @@ class Runner(object):
 
         self.gamma = self.args.gamma
         # self.lamda = self.args.lamda
-
-        self.transition = namedtuple('Transition', ('obs', 'actions','action_outs','rewards',
-                                                    'episode_masks', 'episode_agent_masks','values'))
-
 
 
         self.params = [p for p in self.agent.parameters()]
@@ -57,7 +54,7 @@ class Runner(object):
             merge_dict(episode_log, epoch_log)
             num_episodes += 1
 
-        epoch_data = self.transition(*zip(*epoch_data))
+        epoch_data = Transition(*zip(*epoch_data))
         epoch_log['num_episodes'] = num_episodes
 
         return epoch_data, epoch_log
@@ -73,7 +70,6 @@ class Runner(object):
         self.reset()
         obs = self.env.get_obs()
 
-        #prev_hid = self.agent.init_hidden(batch_size=state.shape[0])
 
         step = 1
         done = False
@@ -91,7 +87,7 @@ class Runner(object):
             if done or step == self.args.episode_length-1:
                 episode_mask = np.ones(np.array(rewards).shape)
 
-            trans = self.transition(np.array(obs), actions, action_outs, np.array(rewards),
+            trans = Transition(np.array(obs), actions, action_outs, np.array(rewards),
                                     episode_mask, episode_mask, values)
 
 
