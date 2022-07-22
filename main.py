@@ -140,7 +140,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
-    parser.add_argument('--total_epoches', type=int, default=500, help='total number of training epochs')
+    parser.add_argument('--total_epoches', type=int, default=200, help='total number of training epochs')
     parser.add_argument('--epoch_size', type=int, default=10, help='epoch size')
     args = parser.parse_args()
 
