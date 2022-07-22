@@ -1,4 +1,4 @@
-from .traffic_junction_env import TrafficJunctionEnv
+from .traffic_junction_world import TrafficJunctionEnv
 
 easy_dict = {
     'n_agents': 5,

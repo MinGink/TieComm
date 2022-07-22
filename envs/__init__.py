@@ -1,6 +1,6 @@
 # from .multiagentenv import MultiAgentEnv, _GymWrapper
 from .tj_wrappers import TJ_Wrapper
-from .traffic_junction.traffic_junction_env import TrafficJunctionEnv
+from .traffic_junction.traffic_junction_world import TrafficJunctionEnv
 from .wrappers import Wrapper
 from pathlib import Path
 import os
@@ -25,7 +25,7 @@ for e in envs:
 
 register(
     id='TrafficJunction-v0',
-    entry_point='envs.traffic_junction:TrafficJunctionEnv',
+    entry_point='envs.traffic_junction.traffic_junction_world:TrafficJunctionEnv',
 )
 
 
