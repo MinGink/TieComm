@@ -28,7 +28,7 @@ class MLP(nn.Module):
         #h = self.tanh(sum([self.affine2(x), x]))
 
         a = F.softmax(self.head(x), dim=-1)
-        v = self.value_head(x)
+        v = self.tanh(self.value_head(x))
 
         return a, v
 

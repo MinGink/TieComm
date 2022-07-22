@@ -139,11 +139,11 @@ class AgentAC(nn.Module):
     def forward(self, after_comm):
 
         final_obs = self.attention(after_comm)
-        x = F.relu(self.final_fc1(final_obs))
+        x = F.tanh(self.final_fc1(final_obs))
         action_out = F.softmax(self.final_fc2(x), dim=-1)
 
-        v = F.relu(self.value_fc1(final_obs))
-        value = self.value_fc2(v)
+        v = F.tanh(self.value_fc1(final_obs))
+        value = F.tanh(self.value_fc2(v))
 
         return action_out, value
 
