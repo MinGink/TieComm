@@ -15,8 +15,6 @@ from modules.multi_processing import MultiPeocessRunner
 from configs.utils import get_config, recursive_dict_update, signal_handler, merge_dict
 
 
-
-
 def main(args):
 
     default_config = get_config('experiment')
@@ -30,8 +28,6 @@ def main(args):
     random.seed(args.seed)
     np.random.seed(args.seed)
     env_config['seed'] = args.seed
-
-
 
     #update configs
     exp_config = recursive_dict_update(default_config,vars(args))
@@ -72,6 +68,7 @@ def main(args):
     exp_config['n_agents'] = env_info["n_agents"]
     agent = agent_REGISTRY[args.agent](agent_config)
 
+    wandb.watch(agent)
 
     epoch_size = exp_config['epoch_size']
     run = runner_REGISTRY[args.agent]
@@ -82,8 +79,6 @@ def main(args):
         epoch_size = 1
     else:
         runner = run(exp_config, env, agent)
-
-
 
 
     total_num_episodes = 0
@@ -98,8 +93,7 @@ def main(args):
         total_num_steps += log['num_steps']
 
         epoch_time = time.time() - epoch_begin_time
-
-        wandb.log({"epoch": epoch,
+        wandb.log({'epoch': epoch,
                    'episode': total_num_episodes,
                    'epoch_time': epoch_time,
                    'total_steps': total_num_steps,
@@ -111,15 +105,15 @@ def main(args):
                    })
 
         if args.agent == 'tiecomm':
-            wandb.log({"epoch": epoch,
-                        'episode': total_num_episodes,
-                       'god_action_loss': log['god_action_loss'],
-                       'god_value_loss': log['god_value_loss'],
-                       'god_total_loss': log['god_total_loss'],
-                        })
+            wandb.log({'epoch': epoch,
+                    'episode': total_num_episodes,
+                    'god_action_loss': log['god_action_loss'],
+                    'god_value_loss': log['god_value_loss'],
+                    'god_total_loss': log['god_total_loss'],
+                    })
 
         if args.env == 'tj':
-            wandb.log({"epoch": epoch,
+            wandb.log({'epoch': epoch,
                        'episode': total_num_episodes,
                        'success_rate':log['success_rate']
                        })
@@ -148,7 +142,7 @@ if __name__ == '__main__':
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
     parser.add_argument('--total_epoches', type=int, default=2000, help='total number of training epochs')
-    parser.add_argument('--epoch_size', type=int, default=2, help='epoch size')
+    parser.add_argument('--epoch_size', type=int, default=10, help='epoch size')
     args = parser.parse_args()
 
     training_begin_time = time.time()

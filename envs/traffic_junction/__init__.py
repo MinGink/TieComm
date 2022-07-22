@@ -8,7 +8,7 @@ easy_dict = {
     'add_rate_max': 0.3,
     'difficulty': 'easy',
     'vision': 1,
-    'vocab_type': bool,
+    'vocab_type': 'bool',
     'curr_start': 0,
     'curr_end': 0}
 
@@ -20,7 +20,7 @@ medium_dict = {
     'add_rate_max': 0.2,
     'difficulty': 'medium',
     'vision': 1,
-    'vocab_type': bool,
+    'vocab_type': 'bool',
     'curr_start': 0,
     'curr_end': 0}
 
@@ -33,7 +33,7 @@ hard_dict = {
     'add_rate_max': 0.05,
     'difficulty': 'hard',
     'vision': 1,
-    'vocab_type': bool,
+    'vocab_type': 'bool',
     'curr_start': 0,
     'curr_end': 0}
 

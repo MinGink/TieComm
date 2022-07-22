@@ -38,7 +38,6 @@ class TrafficJunctionEnv(gym.Env):
     def __init__(self):
         self.__version__ = "0.0.1"
 
-        # TODO: better configs handling
         self.OUTSIDE_CLASS = 0
         self.ROAD_CLASS = 1
         self.CAR_CLASS = 2
@@ -198,8 +197,8 @@ class TrafficJunctionEnv(gym.Env):
         self.stat = dict()
 
         # set add rate according to the curriculum
-        #epoch_range = (self.curr_end - self.curr_start)
-        #add_rate_range = (self.add_rate_max - self.add_rate_min)
+        # epoch_range = (self.curr_end - self.curr_start)
+        # add_rate_range = (self.add_rate_max - self.add_rate_min)
         # if epoch is not None and epoch_range > 0 and add_rate_range > 0 and epoch > self.epoch_last_update:
         #     self.curriculum(epoch)
         #     self.epoch_last_update = epoch
