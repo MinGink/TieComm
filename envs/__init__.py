@@ -29,7 +29,6 @@ register(
 )
 
 
-
 sizes = range(5, 20)
 players = range(2, 20)
 foods = range(1, 10)

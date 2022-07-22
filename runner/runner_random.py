@@ -25,18 +25,19 @@ class RunnerRandom(Runner):
 
 
     def run_an_episode(self):
+
         memory = []
         info = dict()
         log = dict()
         episode_return = 0
 
         self.reset()
-        #state = self.env.get_state()
         obs = self.env.get_obs()
 
-        #prev_hid = self.agent.init_hidden(batch_size=state.shape[0])
 
-        for t in range(self.args.episode_length):
+        step = 1
+        done = False
+        while not done and step < self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
@@ -50,32 +51,33 @@ class RunnerRandom(Runner):
 
             actions = self.choose_action(action_outs)
 
-            rewards, dones, env_info = self.env.step(actions)
+            rewards, done, env_info = self.env.step(actions)
 
-            next_state = self.env.get_state()
             next_obs = self.env.get_obs()
 
             episode_mask = np.zeros(np.array(rewards).shape)
-            episode_agent_mask = np.array(dones) + 0
+            # episode_agent_mask = np.array(dones) + 0
 
-            if all(dones) or t == self.args.episode_length - 1:
+            if done or step == self.args.episode_length - 1:
                 episode_mask = np.ones(np.array(rewards).shape)
 
             trans = Transition(np.array(obs), actions, action_outs, np.array(rewards),
-                                    episode_mask, episode_agent_mask, values)
+                                    episode_mask, episode_mask, values)
             memory.append(trans)
 
 
             obs = next_obs
-
-
             episode_return += float(sum(rewards))
+            step += 1
             self.total_steps += 1
 
-            if all(dones) or t == self.args.episode_length - 1:
-                log['episode_return'] = [episode_return]
-                log['episode_steps'] = [t + 1]
-                log['num_steps'] = t + 1
-                break
+
+        log['episode_return'] = [episode_return]
+        log['episode_steps'] = [step]
+        log['num_steps'] = step
+
+        if self.args.env == 'tj':
+            log['success_rate'] = self.env.get_success_rate()
+
 
         return memory ,log
