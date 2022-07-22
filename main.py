@@ -68,7 +68,7 @@ def main(args):
     exp_config['n_agents'] = env_info["n_agents"]
     agent = agent_REGISTRY[args.agent](agent_config)
 
-    wandb.watch(agent)
+    #wandb.watch(agent)
 
     epoch_size = exp_config['epoch_size']
     run = runner_REGISTRY[args.agent]
