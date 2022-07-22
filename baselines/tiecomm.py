@@ -32,7 +32,7 @@ class TieCommAgent(nn.Module):
 
 
     def random_set(self):
-        G = nx.binomial_graph(self.n_agents, 0.8, seed= self.seed , directed=False)
+        G = nx.binomial_graph(self.n_agents, 0.8, seed=self.seed , directed=False)
         set = algorithms.louvain(G).communities
         return set
 
@@ -71,9 +71,9 @@ class TieCommAgent(nn.Module):
 
 
     def intra_com(self, input):
-        #hidden = self.agent.intra_fc(input)
-        #score = torch.softmax(hidden, dim=0)
-        #weighted_emb = score * hidden
+        # hidden = self.agent.intra_fc(input)
+        # score = torch.softmax(hidden, dim=0)
+        # weighted_emb = score * hidden
         weighted_emb,_ = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
         return weighted_emb.squeeze(0)
 
@@ -204,9 +204,7 @@ class GodAC(nn.Module):
         adj_matrix[self.i_lower] = adj_matrix.T[self.i_lower]
 
         G = nx.from_numpy_matrix(adj_matrix)
-
         set = algorithms.louvain(G).communities
-
         return set, action_out, value, relation
 
 

@@ -21,14 +21,11 @@ class MLP(nn.Module):
 
 
     def forward(self, x, info={}):
-
         x = self.tanh(self.affine1(x))
-        x = self.tanh(self.affine2(x))
-
-        #h = self.tanh(sum([self.affine2(x), x]))
-
+        #x = self.tanh(self.affine2(x))
+        h = self.tanh(sum([self.affine2(x), x]))
         a = F.softmax(self.head(x), dim=-1)
-        v = self.tanh(self.value_head(x))
+        v = self.value_head(h)
 
         return a, v
 
