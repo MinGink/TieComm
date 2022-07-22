@@ -1,0 +1,23 @@
+2022-07-22 12:54:01,118 INFO    MainThread:35446 [wandb_setup.py:_flush():76] Configure stats pid to 35446
+2022-07-22 12:54:01,118 INFO    MainThread:35446 [wandb_setup.py:_flush():76] Loading settings from /Users/ming/.config/wandb/settings
+2022-07-22 12:54:01,118 INFO    MainThread:35446 [wandb_setup.py:_flush():76] Loading settings from /Users/ming/Documents/TieComm/wandb/settings
+2022-07-22 12:54:01,119 INFO    MainThread:35446 [wandb_setup.py:_flush():76] Loading settings from environment variables: {'mode': 'dryrun'}
+2022-07-22 12:54:01,119 INFO    MainThread:35446 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main.py', 'program': '/Users/ming/Documents/TieComm/main.py'}
+2022-07-22 12:54:01,119 INFO    MainThread:35446 [wandb_init.py:_log_setup():461] Logging user logs to /Users/ming/Documents/TieComm/results/wandb/offline-run-20220722_125401-1s82kvxn/logs/debug.log
+2022-07-22 12:54:01,119 INFO    MainThread:35446 [wandb_init.py:_log_setup():462] Logging internal logs to /Users/ming/Documents/TieComm/results/wandb/offline-run-20220722_125401-1s82kvxn/logs/debug-internal.log
+2022-07-22 12:54:01,120 INFO    MainThread:35446 [wandb_init.py:init():495] calling init triggers
+2022-07-22 12:54:01,120 INFO    MainThread:35446 [wandb_init.py:init():498] wandb.init called with sweep_config: {}
+config: {}
+2022-07-22 12:54:01,121 INFO    MainThread:35446 [wandb_init.py:init():548] starting backend
+2022-07-22 12:54:01,121 INFO    MainThread:35446 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=spawn,fork,forkserver, using: spawn
+2022-07-22 12:54:01,136 INFO    MainThread:35446 [backend.py:ensure_launched():217] starting backend process...
+2022-07-22 12:54:01,152 INFO    MainThread:35446 [backend.py:ensure_launched():222] started backend process with pid: 35489
+2022-07-22 12:54:01,157 INFO    MainThread:35446 [wandb_init.py:init():558] backend started and connected
+2022-07-22 12:54:01,175 INFO    MainThread:35446 [wandb_init.py:init():634] updated telemetry
+2022-07-22 12:54:01,218 INFO    MainThread:35446 [wandb_init.py:init():700] starting run threads in backend
+2022-07-22 12:54:06,242 INFO    MainThread:35446 [wandb_run.py:_console_start():1893] atexit reg
+2022-07-22 12:54:06,244 INFO    MainThread:35446 [wandb_run.py:_redirect():1766] redirect: SettingsConsole.REDIRECT
+2022-07-22 12:54:06,245 INFO    MainThread:35446 [wandb_run.py:_redirect():1771] Redirecting console.
+2022-07-22 12:54:06,249 INFO    MainThread:35446 [wandb_run.py:_redirect():1827] Redirects installed.
+2022-07-22 12:54:06,249 INFO    MainThread:35446 [wandb_init.py:init():732] run started, returning control to user process
+2022-07-22 12:54:06,260 INFO    MainThread:35446 [wandb_run.py:_config_callback():1131] config_cb None None {'memo': 'debug', 'total_epoches': 2000, 'epoch_size': 2, 'use_multiprocessing': True, 'use_offline_wandb': True, 'grad_norm_clip': 10, 'use_cuda': False, 'normalize_rewards': False, 'gamma': 1.0, 'lr': 0.001, 'value_coeff': 0.01, 'env': 'rware', 'map': 'rware-1color-medium-6ag-hard-v1', 'agent': 'tiecomm_no', 'seed': 666, 'time_limit': 500, 'name': 'tiecomm_no', 'hid_size': 64, 'device': 'cpu', 'exp_id': 'rware_tiecomm_no_debug'}

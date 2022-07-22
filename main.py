@@ -99,34 +99,32 @@ def main(args):
 
         epoch_time = time.time() - epoch_begin_time
 
+        wandb.log({"epoch": epoch,
+                   'episode': total_num_episodes,
+                   'epoch_time': epoch_time,
+                   'total_steps': total_num_steps,
+                   'episode_return': np.mean(log['episode_return']),
+                   "episode_steps": np.mean(log['episode_steps']),
+                   'action_loss': log['action_loss'],
+                   'value_loss': log['value_loss'],
+                   'total_loss': log['total_loss'],
+                   })
+
         if args.agent == 'tiecomm':
             wandb.log({"epoch": epoch,
                         'episode': total_num_episodes,
-                        'epoch_time': epoch_time,
-                        'total_steps': total_num_steps,
-                        'episode_return': np.mean(log['episode_return']),
-                        "episode_steps": np.mean(log['episode_steps']),
-                        'action_loss': log['action_loss'],
-                        'value_loss': log['value_loss'],
-                        'total_loss': log['total_loss'],
                        'god_action_loss': log['god_action_loss'],
                        'god_value_loss': log['god_value_loss'],
                        'god_total_loss': log['god_total_loss'],
                         })
-        else:
+
+        if args.env == 'tj':
             wandb.log({"epoch": epoch,
-                        'episode': total_num_episodes,
-                        'epoch_time': epoch_time,
-                        'total_steps': total_num_steps,
-                        'episode_return': np.mean(log['episode_return']),
-                        "episode_steps": np.mean(log['episode_steps']),
-                        'action_loss': log['action_loss'],
-                        'value_loss': log['value_loss'],
-                        'total_loss': log['total_loss'],
-                        })
+                       'episode': total_num_episodes,
+                       'success_rate':log['success_rate']
+                       })
 
         print('current epoch: {}/{}'.format(epoch, args.total_epoches))
-
 
 
 

@@ -2,16 +2,12 @@ import time
 import numpy as np
 import gym
 import argparse
-from traffic_junction import easy_dict, medium_dict, hard_dict
-
-
+from .traffic_junction import easy_dict, medium_dict, hard_dict
 
 
 class TJ_Wrapper(object):
     def __init__(self, config):
         env = gym.make('TrafficJunction-v0')
-
-
         if config['map'] == 'easy':
             config.update(easy_dict)
         elif config['map'] == 'medium':
@@ -125,9 +121,6 @@ class TJ_Wrapper(object):
         # else:
         #     return dict()
 
-
-
-
     def get_env_info(self):
         env_info = {"obs_shape": self.observation_dim,
                     "n_actions": self.num_actions,
@@ -135,5 +128,8 @@ class TJ_Wrapper(object):
                     'episode_length': self.args.episode_length
                     }
         return env_info
+
+    def get_sucess_rate(self):
+        return self.env.stat['success']
 
 

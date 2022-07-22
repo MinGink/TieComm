@@ -1,0 +1,26 @@
+2022-07-22 12:54:03,542 INFO    MainThread:35489 [internal.py:wandb_internal():90] W&B internal server running at pid: 35489, started at: 2022-07-22 12:54:03.541212
+2022-07-22 12:54:03,551 DEBUG   HandlerThread:35489 [handler.py:handle_request():140] handle_request: run_start
+2022-07-22 12:54:03,552 INFO    WriterThread:35489 [datastore.py:open_for_write():75] open: /Users/ming/Documents/TieComm/results/wandb/offline-run-20220722_125401-1s82kvxn/run-1s82kvxn.wandb
+2022-07-22 12:54:03,555 DEBUG   HandlerThread:35489 [meta.py:__init__():35] meta init
+2022-07-22 12:54:03,556 DEBUG   HandlerThread:35489 [meta.py:__init__():49] meta init done
+2022-07-22 12:54:03,556 DEBUG   HandlerThread:35489 [meta.py:probe():209] probe
+2022-07-22 12:54:03,559 DEBUG   HandlerThread:35489 [meta.py:_setup_git():199] setup git
+2022-07-22 12:54:03,625 DEBUG   HandlerThread:35489 [meta.py:_setup_git():206] setup git done
+2022-07-22 12:54:03,626 DEBUG   HandlerThread:35489 [meta.py:_save_pip():53] save pip
+2022-07-22 12:54:03,627 DEBUG   HandlerThread:35489 [meta.py:_save_pip():67] save pip done
+2022-07-22 12:54:03,627 DEBUG   HandlerThread:35489 [meta.py:_save_conda():74] save conda
+2022-07-22 12:54:09,731 DEBUG   HandlerThread:35489 [meta.py:_save_conda():84] save conda done
+2022-07-22 12:54:09,731 DEBUG   HandlerThread:35489 [meta.py:probe():247] probe done
+2022-07-22 12:54:15,892 DEBUG   HandlerThread:35489 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 12:54:19,719 DEBUG   HandlerThread:35489 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 12:54:23,891 DEBUG   HandlerThread:35489 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 12:54:27,820 DEBUG   HandlerThread:35489 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 12:54:31,967 DEBUG   HandlerThread:35489 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 12:54:36,336 DEBUG   HandlerThread:35489 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 12:54:42,121 WARNING MainThread:35489 [internal.py:wandb_internal():153] Internal process interrupt: 1
+2022-07-22 12:54:45,133 WARNING MainThread:35489 [internal.py:is_dead():387] Internal process exiting, parent pid 35446 disappeared
+2022-07-22 12:54:45,135 ERROR   MainThread:35489 [internal.py:wandb_internal():149] Internal process shutdown.
+2022-07-22 12:54:45,343 INFO    HandlerThread:35489 [handler.py:finish():806] shutting down handler
+2022-07-22 12:54:45,349 INFO    WriterThread:35489 [datastore.py:close():279] close: /Users/ming/Documents/TieComm/results/wandb/offline-run-20220722_125401-1s82kvxn/run-1s82kvxn.wandb
+2022-07-22 12:54:45,678 INFO    SenderThread:35489 [sender.py:finish():1114] shutting down sender
+2022-07-22 12:54:45,892 INFO    MainThread:35489 [internal.py:handle_exit():80] Internal process exited

@@ -96,7 +96,7 @@ class Runner(object):
         log['episode_return'] = [episode_return]
         log['episode_steps'] = [step]
         log['num_steps'] = step
-
+        log['success_rate'] = self.env.get_success_rate()
 
         return memory ,log
 

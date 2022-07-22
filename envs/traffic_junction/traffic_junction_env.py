@@ -299,7 +299,7 @@ class TrafficJunctionEnv(gym.Env):
     def exit_render(self):
         curses.endwin()
 
-    def seed(self):
+    def seed(self, seed):
         return
 
     def _set_grid(self):
@@ -623,10 +623,11 @@ class TrafficJunctionEnv(gym.Env):
         # random choice of idx from dead ones.
         return np.random.choice(car_idx[self.alive_mask == 0])
 
-    # def curriculum(self, epoch):
-    #     step_size = 0.01
-    #     step = (self.add_rate_max - self.add_rate_min) / (self.curr_end - self.curr_start)
-    #
-    #     if self.curr_start <= epoch < self.curr_end:
-    #         self.exact_rate = self.exact_rate + step
-    #         self.add_rate = step_size * (self.exact_rate // step_size)
+
+    def curriculum(self, epoch):
+        step_size = 0.01
+        step = (self.add_rate_max - self.add_rate_min) / (self.curr_end - self.curr_start)
+
+        if self.curr_start <= epoch < self.curr_end:
+            self.exact_rate = self.exact_rate + step
+            self.add_rate = step_size * (self.exact_rate // step_size)
