@@ -1,0 +1,52 @@
+2022-07-22 09:54:06,932 INFO    MainThread:26776 [internal.py:wandb_internal():90] W&B internal server running at pid: 26776, started at: 2022-07-22 09:54:06.931584
+2022-07-22 09:54:06,938 INFO    WriterThread:26776 [datastore.py:open_for_write():75] open: /Users/ming/Documents/TieComm/results/wandb/offline-run-20220722_095404-1wlbbvdg/run-1wlbbvdg.wandb
+2022-07-22 09:54:06,939 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: run_start
+2022-07-22 09:54:06,942 DEBUG   HandlerThread:26776 [meta.py:__init__():35] meta init
+2022-07-22 09:54:06,942 DEBUG   HandlerThread:26776 [meta.py:__init__():49] meta init done
+2022-07-22 09:54:06,942 DEBUG   HandlerThread:26776 [meta.py:probe():209] probe
+2022-07-22 09:54:06,944 DEBUG   HandlerThread:26776 [meta.py:_setup_git():199] setup git
+2022-07-22 09:54:07,016 DEBUG   HandlerThread:26776 [meta.py:_setup_git():206] setup git done
+2022-07-22 09:54:07,017 DEBUG   HandlerThread:26776 [meta.py:_save_pip():53] save pip
+2022-07-22 09:54:07,018 DEBUG   HandlerThread:26776 [meta.py:_save_pip():67] save pip done
+2022-07-22 09:54:07,018 DEBUG   HandlerThread:26776 [meta.py:_save_conda():74] save conda
+2022-07-22 09:54:11,845 DEBUG   HandlerThread:26776 [meta.py:_save_conda():84] save conda done
+2022-07-22 09:54:11,845 DEBUG   HandlerThread:26776 [meta.py:probe():247] probe done
+2022-07-22 09:54:18,761 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:54:22,607 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:54:26,624 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:54:33,184 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:54:37,797 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:54:42,404 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:54:47,190 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:54:51,920 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:54:56,487 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:00,855 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:05,104 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:09,329 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:13,459 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:17,447 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:21,476 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:25,606 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:29,772 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:34,265 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:38,446 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:43,055 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:47,695 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:52,192 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:55:57,363 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:03,709 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:09,065 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:13,539 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:18,139 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:22,926 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:27,247 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:32,731 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:37,098 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:42,063 DEBUG   HandlerThread:26776 [handler.py:handle_request():140] handle_request: partial_history
+2022-07-22 09:56:45,157 WARNING MainThread:26776 [internal.py:wandb_internal():153] Internal process interrupt: 1
+2022-07-22 09:56:49,174 WARNING MainThread:26776 [internal.py:is_dead():387] Internal process exiting, parent pid 26753 disappeared
+2022-07-22 09:56:49,175 ERROR   MainThread:26776 [internal.py:wandb_internal():149] Internal process shutdown.
+2022-07-22 09:56:49,273 INFO    SenderThread:26776 [sender.py:finish():1114] shutting down sender
+2022-07-22 09:56:50,071 INFO    HandlerThread:26776 [handler.py:finish():806] shutting down handler
+2022-07-22 09:56:50,092 INFO    WriterThread:26776 [datastore.py:close():279] close: /Users/ming/Documents/TieComm/results/wandb/offline-run-20220722_095404-1wlbbvdg/run-1wlbbvdg.wandb
+2022-07-22 09:56:50,220 INFO    MainThread:26776 [internal.py:handle_exit():80] Internal process exited

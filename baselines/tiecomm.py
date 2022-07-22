@@ -2,34 +2,33 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 import numpy as np
-from .utils import select_action, translate_action
 from cdlib import algorithms
 import networkx as nx
-from torch.nn import TransformerEncoder, TransformerEncoderLayer
-import math
-from sklearn.metrics.pairwise import cosine_similarity
-import matplotlib.pyplot as plt
-import random
-from gym import spaces
-from torch.distributions import Categorical
+import argparse
 
-
+# from torch.nn import TransformerEncoder, TransformerEncoderLayer
+# import math
+# from sklearn.metrics.pairwise import cosine_similarity
+# import matplotlib.pyplot as plt
+# import random
+# from gym import spaces
+# from torch.distributions import Categorical
 
 
 
 class TieCommAgent(nn.Module):
 
-    def __init__(self, args):
+    def __init__(self, agent_config):
         super(TieCommAgent, self).__init__()
 
-        self.args = args
-        self.seed = args.seed
+        self.args = argparse.Namespace(**agent_config)
+        self.seed = self.args.seed
 
-        self.n_agents = args.n_agents
-        self.hid_size = args.hid_size
+        self.n_agents = self.args.n_agents
+        self.hid_size = self.args.hid_size
 
-        self.agent = AgentAC(args)
-        self.god = GodAC(args)
+        self.agent = AgentAC(self.args)
+        self.god = GodAC(self.args)
 
 
     def random_set(self):
@@ -174,7 +173,7 @@ class GodAC(nn.Module):
 
         self.i_lower = np.tril_indices(self.n_agents, -1)
 
-        self.batch_size = args.batch_size
+        # self.batch_size = args.batch_size
 
 
     def forward(self, inputs):

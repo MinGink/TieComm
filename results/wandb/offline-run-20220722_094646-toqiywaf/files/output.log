@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/pydevd.py", line 1491, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/ming/Documents/TieComm/main.py", line 158, in <module>
+    main(args)
+  File "/Users/ming/Documents/TieComm/main.py", line 72, in main
+    agent = agent_REGISTRY[args.agent](agent_config)
+  File "/Users/ming/Documents/TieComm/baselines/tiecomm.py", line 26, in __init__
+    self.seed = args.seed
+AttributeError: 'dict' object has no attribute 'seed'

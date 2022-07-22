@@ -4,7 +4,7 @@ from collections import namedtuple
 import numpy as np
 from torch.optim import Adam
 from .runner import Runner
-
+import argparse
 from modules.utils import merge_dict
 import time
 
@@ -14,28 +14,13 @@ Transition = namedtuple('Transition', ('obs', 'actions', 'action_outs', 'rewards
 
 
 class RunnerRandom(Runner):
-    def __init__(self, args, env, agent):
-        super(RunnerRandom, self).__init__(args, env, agent)
-
-        self.args = args
-        self.env = env
-        self.agent = agent
-        self.algo = args.algo
-        self.n_agents =args.n_agents
-
-        self.total_steps = 0
-
-        self.gamma = self.args.gamma
-        self.lamda = self.args.lamda
+    def __init__(self, config, env, agent):
+        super(RunnerRandom, self).__init__(config, env, agent)
 
 
-        self.params = [p for p in self.agent.parameters()]
-        self.optimizer = Adam(params=self.agent.parameters(), lr=args.lr)
+        self.n_agents = self.args.n_agents
         self.no_group = list(range(self.n_agents))
-
-
-
-
+        self.algo = self.args.agent
 
 
 

@@ -27,7 +27,6 @@ class Runner(object):
 
 
 
-
     def train_batch(self, epoch_size):
 
         batch_data, batch_log = self.collect_epoch_data(epoch_size)
@@ -115,6 +114,12 @@ class Runner(object):
 
 
     def compute_grad(self, batch):
+        return self.compute_agent_grad(batch)
+
+
+
+
+    def compute_agent_grad(self, batch):
 
         log = dict()
 

@@ -69,6 +69,7 @@ def main(args):
     agent_config['n_actions'] = env_info["n_actions"]
     agent_config['n_agents'] = env_info["n_agents"]
     exp_config['episode_length'] = env_info["episode_length"]
+    exp_config['n_agents'] = env_info["n_agents"]
     agent = agent_REGISTRY[args.agent](agent_config)
 
 
