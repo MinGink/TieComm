@@ -8,7 +8,7 @@ from modules.utils import merge_dict
 from .runner import Runner
 import time
 
-Transition = namedtuple('Transition', ('state', 'obs', 'actions', 'action_outs', 'rewards',
+Transition = namedtuple('Transition', ('obs', 'actions', 'action_outs', 'rewards',
                                             'episode_masks', 'episode_agent_masks', 'values',
                                             'god_action_out', 'god_value', 'god_action', 'god_reward'
                                             ))
@@ -32,12 +32,14 @@ class RunnerDual(Runner):
         episode_return = 0
 
         self.reset()
-        state = self.env.get_state()
         obs = self.env.get_obs()
 
-        for t in range(self.args.episode_length):
+        step = 1
+        done = False
+        while not done and step < self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
+
             set,god_action_out, god_value, god_action = self.agent.god(obs_tensor)
             after_comm = self.agent.communicate(obs_tensor, set)
             action_outs, values = self.agent.agent(after_comm)
@@ -48,33 +50,32 @@ class RunnerDual(Runner):
 
             god_reward = np.sum(rewards)
 
-            next_state = self.env.get_state()
             next_obs = self.env.get_obs()
 
             episode_mask = np.zeros(np.array(rewards).shape)
-            episode_agent_mask = np.array(dones) + 0
+            #episode_agent_mask = np.array(dones) + 0
 
-            if all(dones) or t == self.args.episode_length - 1:
+            if done or step == self.args.episode_length - 1:
                 episode_mask = np.ones(np.array(rewards).shape)
 
 
-            trans = self.transition(state, np.array(obs), actions, action_outs, np.array(rewards),
-                                    episode_mask, episode_agent_mask, values, god_action_out, god_value, god_action, god_reward)
+            trans = Transition(np.array(obs), actions, action_outs, np.array(rewards),
+                                    episode_mask, episode_mask, values, god_action_out, god_value, god_action, god_reward)
             memory.append(trans)
 
 
-            state = next_state
             obs = next_obs
-
-
             episode_return += float(sum(rewards))
+            step += 1
             self.total_steps += 1
 
-            if all(dones) or t == self.args.episode_length - 1:
-                log['episode_return'] = [episode_return]
-                log['episode_steps'] = [t + 1]
-                log['num_steps'] = t + 1
-                break
+
+        log['episode_return'] = [episode_return]
+        log['episode_steps'] = [step]
+        log['num_steps'] = step
+
+        if self.args.env == 'tj':
+            log['success_rate'] = self.env.get_success_rate()
 
         return memory ,log
 

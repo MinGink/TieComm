@@ -27,7 +27,6 @@ class RunnerRandom(Runner):
     def run_an_episode(self):
 
         memory = []
-        info = dict()
         log = dict()
         episode_return = 0
 

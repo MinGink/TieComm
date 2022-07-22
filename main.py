@@ -115,7 +115,7 @@ def main(args):
         if args.env == 'tj':
             wandb.log({'epoch': epoch,
                        'episode': total_num_episodes,
-                       'success_rate':log['success_rate']
+                       'success_rate':log['success_rate']/total_num_episodes,
                        })
 
         print('current epoch: {}/{}'.format(epoch+1, args.total_epoches))
