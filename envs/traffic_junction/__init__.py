@@ -2,7 +2,7 @@ from .traffic_junction_world import TrafficJunctionEnv
 
 easy_dict = {
     'n_agents': 5,
-    'dim': 7,
+    'dim': 6,
     'episode_length': 20,
     'add_rate_min': 0.3,
     'add_rate_max': 0.3,
