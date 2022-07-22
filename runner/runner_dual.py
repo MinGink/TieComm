@@ -19,7 +19,6 @@ class RunnerDual(Runner):
         super(RunnerDual, self).__init__( config, env, agent)
 
 
-        self.algo = self.args.algo
         self.n_agents = self.args.n_agents
         self.n_nodes = int(self.n_agents * (self.n_agents - 1)/2)
 
