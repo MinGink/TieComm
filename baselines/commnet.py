@@ -1,3 +1,5 @@
+import argparse
+
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -13,7 +15,7 @@ class CommNetAgent(nn.Module):
     MLP based CommNet. Uses communication vector to communicate info
     between agents
     """
-    def __init__(self, args):
+    def __init__(self, agent_config):
         """Initialization method for this class, setup various internal networks
         and weights
 
@@ -24,65 +26,65 @@ class CommNetAgent(nn.Module):
         """
 
         super(CommNetAgent, self).__init__()
-        self.args = args
-        self.n_agents = args.n_agents
-        self.hid_size = args.hid_size
-        self.comm_passes = args.comm_passes
-        self.recurrent = args.recurrent
+        self.args = argparse.Namespace(**agent_config)
+        # self.n_agents = args.n_agents
+        # self.hid_size = args.hid_size
+        # self.comm_passes = args.comm_passes
+        # self.recurrent = args.recurrent
         # self.heads = nn.ModuleList([nn.Linear(args.hid_size, o)
         #                             for o in args.naction_heads])
-        self.head = nn.Linear(args.hid_size, args.n_actions)
-        self.init_std = args.init_std if hasattr(args, 'comm_init_std') else 0.2
+        self.head = nn.Linear(self.args.hid_size, self.args.n_actions)
+        self.init_std = self.args.init_std if hasattr(self.args, 'comm_init_std') else 0.2
 
         # Mask for communication
         if self.args.comm_mask_zero:
-            self.comm_mask = torch.zeros(self.n_agents, self.n_agents)
+            self.comm_mask = torch.zeros(self.args.n_agents, self.args.n_agents)
         else:
-            self.comm_mask = torch.ones(self.n_agents, self.n_agents) \
-                            - torch.eye(self.n_agents, self.n_agents)
+            self.comm_mask = torch.ones(self.args.n_agents, self.args.n_agents) \
+                            - torch.eye(self.args.n_agents, self.args.n_agents)
 
 
         # Since linear layers in PyTorch now accept * as any number of dimensions
         # between last and first dim, num_agents dimension will be covered.
         # The network below is function r in the paper for encoding
         # initial environment stage
-        self.encoder = nn.Linear(args.obs_shape, args.hid_size)
+        self.encoder = nn.Linear(self.args.obs_shape, self.args.hid_size)
 
         # if self.args.env_name == 'starcraft':
         #     self.state_encoder = nn.Linear(num_inputs, num_inputs)
         #     self.encoder = nn.Linear(num_inputs * 2, args.hid_size)
-        if args.recurrent:
-            self.hidd_encoder = nn.Linear(args.hid_size, args.hid_size)
+        if self.args.recurrent:
+            self.hidd_encoder = nn.Linear(self.args.hid_size, self.args.hid_size)
 
-        if args.recurrent:
-            self.init_hidden(args.batch_size)
-            self.f_module = nn.LSTMCell(args.hid_size, args.hid_size)
+        if self.args.recurrent:
+            self.init_hidden(self.args.batch_size)
+            self.f_module = nn.LSTMCell(self.args.hid_size, self.args.hid_size)
 
         else:
-            if args.share_weights:
-                self.f_module = nn.Linear(args.hid_size, args.hid_size)
+            if self.args.share_weights:
+                self.f_module = nn.Linear(self.args.hid_size, self.args.hid_size)
                 self.f_modules = nn.ModuleList([self.f_module
                                                 for _ in range(self.comm_passes)])
             else:
-                self.f_modules = nn.ModuleList([nn.Linear(args.hid_size, args.hid_size)
+                self.f_modules = nn.ModuleList([nn.Linear(self.args.hid_size, self.args.hid_size)
                                                 for _ in range(self.comm_passes)])
         # else:
             # raise RuntimeError("Unsupported RNN type.")
 
         # Our main function for converting current hidden state to next state
         # self.f = nn.Linear(args.hid_size, args.hid_size)
-        if args.share_weights:
-            self.C_module = nn.Linear(args.hid_size, args.hid_size)
+        if self.args.share_weights:
+            self.C_module = nn.Linear(self.args.hid_size, self.args.hid_size)
             self.C_modules = nn.ModuleList([self.C_module
-                                            for _ in range(self.comm_passes)])
+                                            for _ in range(self.args.comm_passes)])
         else:
-            self.C_modules = nn.ModuleList([nn.Linear(args.hid_size, args.hid_size)
-                                            for _ in range(self.comm_passes)])
+            self.C_modules = nn.ModuleList([nn.Linear(self.args.hid_size, self.args.hid_size)
+                                            for _ in range(self.args.comm_passes)])
         # self.C = nn.Linear(args.hid_size, args.hid_size)
 
         # initialise weights as 0
-        if args.comm_init == 'zeros':
-            for i in range(self.comm_passes):
+        if self.args.comm_init == 'zeros':
+            for i in range(self.args.comm_passes):
                 self.C_modules[i].weight.data.zero_()
         self.tanh = nn.Tanh()
 
@@ -91,7 +93,7 @@ class CommNetAgent(nn.Module):
         # Init weights for linear layers
         # self.apply(self.init_weights)
 
-        self.value_head = nn.Linear(self.hid_size, 1)
+        self.value_head = nn.Linear(self.args.hid_size, 1)
 
 
     def get_agent_mask(self, batch_size, info):
@@ -176,10 +178,10 @@ class CommNetAgent(nn.Module):
 
         for i in range(self.comm_passes):
             # Choose current or prev depending on recurrent
-            comm = hidden_state.view(batch_size, n, self.hid_size) if self.args.recurrent else hidden_state
+            comm = hidden_state.view(batch_size, n, self.args.hid_size) if self.args.recurrent else hidden_state
             #comm = comm.unsqueeze(0)
             # Get the next communication vector based on next hidden state
-            comm = comm.unsqueeze(-2).expand(-1, n, n, self.hid_size)
+            comm = comm.unsqueeze(-2).expand(-1, n, n, self.args.hid_size)
 
             # Create mask for masking self communication
             mask = self.comm_mask.view(1, n, n)
@@ -208,7 +210,7 @@ class CommNetAgent(nn.Module):
                 # skip connection - combine comm. matrix and encoded input for all agents
                 inp = x + c
 
-                inp = inp.view(batch_size * n, self.hid_size)
+                inp = inp.view(batch_size * n, self.args.hid_size)
 
                 output = self.f_module(inp, (hidden_state, cell_state))
 
@@ -225,7 +227,7 @@ class CommNetAgent(nn.Module):
         # v = v.view(hidden_state.size(0), n, -1)
         value_head = self.value_head(hidden_state)
         #h = hidden_state.view(batch_size, n, self.hid_size)
-        h = hidden_state.view(n, self.hid_size)
+        h = hidden_state.view(n, self.args.hid_size)
         # if self.continuous:
         #     action_mean = self.action_mean(h)
         #     action_log_std = self.action_log_std.expand_as(action_mean)
@@ -247,6 +249,6 @@ class CommNetAgent(nn.Module):
 
     def init_hidden(self, batch_size):
         # dim 0 = num of layers * num of direction
-        return tuple(( torch.zeros(batch_size * self.nagents, self.hid_size, requires_grad=True),
-                       torch.zeros(batch_size * self.nagents, self.hid_size, requires_grad=True)))
+        return tuple(( torch.zeros(batch_size * self.args.n_agents, self.args.hid_size, requires_grad=True),
+                       torch.zeros(batch_size * self.args.n_agents, self.args.hid_size, requires_grad=True)))
 

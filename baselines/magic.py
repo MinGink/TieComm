@@ -1,3 +1,5 @@
+import argparse
+
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -11,7 +13,7 @@ class MAGICAgent(nn.Module):
     The communication protocol of Multi-Agent Graph AttentIon Communication (MAGIC)
     """
 
-    def __init__(self, args):
+    def __init__(self, agent_config):
         super(MAGICAgent, self).__init__()
         """
         Initialization method for the MAGIC communication protocol (2 rounds of communication)
@@ -19,43 +21,43 @@ class MAGICAgent(nn.Module):
         Arguements:
             args (Namespace): Parse arguments
         """
-
-        self.args = args
-        self.n_agents = args.n_agents
-        self.hid_size = args.hid_size
+        self.args = argparse.Namespace(**agent_config)
+        # self.args = args
+        # self.n_agents = args.n_agents
+        # self.hid_size = args.hid_size
 
         dropout = 0
         negative_slope = 0.2
 
         # initialize sub-processors
-        self.sub_processor1 = GraphAttention(args.hid_size, args.gat_hid_size, dropout=dropout,
-                                             negative_slope=negative_slope, num_heads=args.gat_num_heads,
-                                             self_loop_type=args.self_loop_type1, average=False,
-                                             normalize=args.first_gat_normalize)
-        self.sub_processor2 = GraphAttention(args.gat_hid_size * args.gat_num_heads, args.hid_size, dropout=dropout,
-                                             negative_slope=negative_slope, num_heads=args.gat_num_heads_out,
-                                             self_loop_type=args.self_loop_type2, average=True,
-                                             normalize=args.second_gat_normalize)
+        self.sub_processor1 = GraphAttention(self.args.hid_size, self.args.gat_hid_size, dropout=dropout,
+                                             negative_slope=negative_slope, num_heads=self.args.gat_num_heads,
+                                             self_loop_type=self.args.self_loop_type1, average=False,
+                                             normalize=self.args.first_gat_normalize)
+        self.sub_processor2 = GraphAttention(self.args.gat_hid_size * self.args.gat_num_heads, self.args.hid_size, dropout=dropout,
+                                             negative_slope=negative_slope, num_heads=self.args.gat_num_heads_out,
+                                             self_loop_type=self.args.self_loop_type2, average=True,
+                                             normalize=self.args.second_gat_normalize)
         # initialize the gat encoder for the Scheduler
-        if args.use_gat_encoder:
-            self.gat_encoder = GraphAttention(args.hid_size, args.gat_encoder_out_size, dropout=dropout,
-                                              negative_slope=negative_slope, num_heads=args.ge_num_heads,
-                                              self_loop_type=1, average=True, normalize=args.gat_encoder_normalize)
+        if self.args.use_gat_encoder:
+            self.gat_encoder = GraphAttention(self.args.hid_size, self.args.gat_encoder_out_size, dropout=dropout,
+                                              negative_slope=negative_slope, num_heads=self.args.ge_num_heads,
+                                              self_loop_type=1, average=True, normalize=self.args.gat_encoder_normalize)
 
-        self.obs_encoder = nn.Linear(args.obs_shape, args.hid_size)
+        self.obs_encoder = nn.Linear(self.args.obs_shape, self.args.hid_size)
 
-        self.init_hidden(args.batch_size)
-        self.lstm_cell = nn.LSTMCell(args.hid_size, args.hid_size)
+        self.init_hidden(self.args.batch_size)
+        self.lstm_cell = nn.LSTMCell(self.args.hid_size, self.args.hid_size)
 
         # initialize mlp layers for the sub-schedulers
-        if not args.first_graph_complete:
-            if args.use_gat_encoder:
+        if not self.args.first_graph_complete:
+            if self.args.use_gat_encoder:
                 self.sub_scheduler_mlp1 = nn.Sequential(
-                    nn.Linear(args.gat_encoder_out_size * 2, args.gat_encoder_out_size // 2),
+                    nn.Linear(self.args.gat_encoder_out_size * 2, self.args.gat_encoder_out_size // 2),
                     nn.ReLU(),
-                    nn.Linear(args.gat_encoder_out_size // 2, args.gat_encoder_out_size // 2),
+                    nn.Linear(self.args.gat_encoder_out_size // 2, self.args.gat_encoder_out_size // 2),
                     nn.ReLU(),
-                    nn.Linear(args.gat_encoder_out_size // 2, 2))
+                    nn.Linear(self.args.gat_encoder_out_size // 2, 2))
             else:
                 self.sub_scheduler_mlp1 = nn.Sequential(
                     nn.Linear(self.hid_size * 2, self.hid_size // 2),
@@ -64,14 +66,14 @@ class MAGICAgent(nn.Module):
                     nn.ReLU(),
                     nn.Linear(self.hid_size // 8, 2))
 
-        if args.learn_second_graph and not args.second_graph_complete:
-            if args.use_gat_encoder:
+        if self.args.learn_second_graph and not self.args.second_graph_complete:
+            if self.args.use_gat_encoder:
                 self.sub_scheduler_mlp2 = nn.Sequential(
-                    nn.Linear(args.gat_encoder_out_size * 2, args.gat_encoder_out_size // 2),
+                    nn.Linear(self.args.gat_encoder_out_size * 2, self.args.gat_encoder_out_size // 2),
                     nn.ReLU(),
-                    nn.Linear(args.gat_encoder_out_size // 2, args.gat_encoder_out_size // 2),
+                    nn.Linear(self.args.gat_encoder_out_size // 2, self.args.gat_encoder_out_size // 2),
                     nn.ReLU(),
-                    nn.Linear(args.gat_encoder_out_size // 2, 2))
+                    nn.Linear(self.args.gat_encoder_out_size // 2, 2))
             else:
                 self.sub_scheduler_mlp2 = nn.Sequential(
                     nn.Linear(self.hid_size * 2, self.hid_size // 2),
@@ -80,28 +82,28 @@ class MAGICAgent(nn.Module):
                     nn.ReLU(),
                     nn.Linear(self.hid_size // 8, 2))
 
-        if args.message_encoder:
-            self.message_encoder = nn.Linear(args.hid_size, args.hid_size)
-        if args.message_decoder:
-            self.message_decoder = nn.Linear(args.hid_size, args.hid_size)
+        if self.args.message_encoder:
+            self.message_encoder = nn.Linear(self.args.hid_size, self.args.hid_size)
+        if self.args.message_decoder:
+            self.message_decoder = nn.Linear(self.args.hid_size, self.args.hid_size)
 
         # initialize weights as 0
-        if args.comm_init == 'zeros':
-            if args.message_encoder:
+        if self.args.comm_init == 'zeros':
+            if self.args.message_encoder:
                 self.message_encoder.weight.data.zero_()
-            if args.message_decoder:
+            if self.args.message_decoder:
                 self.message_decoder.weight.data.zero_()
-            if not args.first_graph_complete:
+            if not self.args.first_graph_complete:
                 self.sub_scheduler_mlp1.apply(self.init_linear)
-            if args.learn_second_graph and not args.second_graph_complete:
+            if self.args.learn_second_graph and not self.args.second_graph_complete:
                 self.sub_scheduler_mlp2.apply(self.init_linear)
 
         # initialize the action head (in practice, one action head is used)
         # self.action_heads = nn.ModuleList([nn.Linear(2*args.hid_size, o)
         #                                 for o in args.naction_heads])
-        self.action_heads = nn.Linear(2 * args.hid_size, args.n_actions)
+        self.action_heads = nn.Linear(2 * self.args.hid_size, self.args.n_actions)
         # initialize the value head
-        self.value_head = nn.Linear(2 * self.hid_size, 1)
+        self.value_head = nn.Linear(2 * self.args.hid_size, 1)
 
     def forward(self, x, info={}):
         """
@@ -229,8 +231,8 @@ class MAGICAgent(nn.Module):
         """
         Function to initialize the hidden states and cell states
         """
-        return tuple((torch.zeros(batch_size * self.n_agents, self.hid_size, requires_grad=True),
-                      torch.zeros(batch_size * self.n_agents, self.hid_size, requires_grad=True)))
+        return tuple((torch.zeros(batch_size * self.args.n_agents, self.args.hid_size, requires_grad=True),
+                      torch.zeros(batch_size * self.args.n_agents, self.args.hid_size, requires_grad=True)))
 
     def sub_scheduler(self, sub_scheduler_mlp, hidden_state, agent_mask, directed=True):
         """

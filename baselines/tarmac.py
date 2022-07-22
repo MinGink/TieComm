@@ -1,5 +1,5 @@
 # Slightly adapted from a version from Dr. Abhishek Das
-
+import argparse
 import math
 
 import torch
@@ -16,7 +16,7 @@ class TarCommAgent(nn.Module):
     between agents
     """
 
-    def __init__(self, args):
+    def __init__(self, agent_config):
         """Initialization method for this class, setup various internal networks
         and weights
 
@@ -27,63 +27,63 @@ class TarCommAgent(nn.Module):
         """
 
         super(TarCommAgent, self).__init__()
-        self.args = args
-        self.n_agents = args.n_agents
-        self.hid_size = args.hid_size
-        self.comm_passes = args.comm_passes
-        self.recurrent = args.recurrent
+        self.args = argparse.Namespace(**agent_config)
+        # self.n_agents = args.n_agents
+        # self.hid_size = args.hid_size
+        # self.comm_passes = args.comm_passes
+        # self.recurrent = args.recurrent
 
-        self.head = nn.Linear(args.hid_size, args.n_actions)
-        self.init_std = args.init_std if hasattr(args, 'comm_init_std') else 0.2
+        self.head = nn.Linear(self.args.hid_size, self.args.n_actions)
+        self.init_std = self.args.init_std if hasattr(self.args, 'comm_init_std') else 0.2
 
         # Mask for communication
         if self.args.comm_mask_zero:
-            self.comm_mask = torch.zeros(self.n_agents, self.n_agents)
+            self.comm_mask = torch.zeros(self.args.n_agents, self.args.n_agents)
         else:
-            self.comm_mask = torch.ones(self.n_agents, self.n_agents) \
-                             - torch.eye(self.n_agents, self.n_agents)
+            self.comm_mask = torch.ones(self.args.n_agents, self.args.n_agents) \
+                             - torch.eye(self.args.n_agents, self.args.n_agents)
 
         # Since linear layers in PyTorch now accept * as any number of dimensions
         # between last and first dim, num_agents dimension will be covered.
         # The network below is function r in the paper for encoding
         # initial environment stage
-        self.encoder = nn.Linear(args.obs_shape, args.hid_size)
+        self.encoder = nn.Linear(self.args.obs_shape, self.args.hid_size)
 
         # if self.args.env_name == 'starcraft':
         #     self.state_encoder = nn.Linear(num_inputs, num_inputs)
         #     self.encoder = nn.Linear(num_inputs * 2, args.hid_size)
-        if args.recurrent:
-            self.hidd_encoder = nn.Linear(args.hid_size, args.hid_size)
+        if self.args.recurrent:
+            self.hidd_encoder = nn.Linear(self.args.hid_size, self.args.hid_size)
 
-        if args.recurrent:
-            self.init_hidden(args.batch_size)
-            self.f_module = nn.LSTMCell(args.hid_size, args.hid_size)
+        if self.args.recurrent:
+            self.init_hidden(self.args.batch_size)
+            self.f_module = nn.LSTMCell(self.args.hid_size, self.args.hid_size)
 
         else:
-            if args.share_weights:
-                self.f_module = nn.Linear(args.hid_size, args.hid_size)
+            if self.args.share_weights:
+                self.f_module = nn.Linear(self.args.hid_size, self.args.hid_size)
                 self.f_modules = nn.ModuleList([self.f_module
                                                 for _ in range(self.comm_passes)])
             else:
-                self.f_modules = nn.ModuleList([nn.Linear(args.hid_size, args.hid_size)
+                self.f_modules = nn.ModuleList([nn.Linear(self.args.hid_size, self.args.hid_size)
                                                 for _ in range(self.comm_passes)])
         # else:
         # raise RuntimeError("Unsupported RNN type.")
 
         # Our main function for converting current hidden state to next state
         # self.f = nn.Linear(args.hid_size, args.hid_size)
-        if args.share_weights:
-            self.C_module = nn.Linear(args.hid_size, args.hid_size)
+        if self.args.share_weights:
+            self.C_module = nn.Linear(self.args.hid_size, self.args.hid_size)
             self.C_modules = nn.ModuleList([self.C_module
-                                            for _ in range(self.comm_passes)])
+                                            for _ in range(self.args.comm_passes)])
         else:
-            self.C_modules = nn.ModuleList([nn.Linear(args.hid_size, args.hid_size)
-                                            for _ in range(self.comm_passes)])
+            self.C_modules = nn.ModuleList([nn.Linear(self.args.hid_size, self.args.hid_size)
+                                            for _ in range(self.args.comm_passes)])
         # self.C = nn.Linear(args.hid_size, args.hid_size)
 
         # initialise weights as 0
-        if args.comm_init == 'zeros':
-            for i in range(self.comm_passes):
+        if self.args.comm_init == 'zeros':
+            for i in range(self.args.comm_passes):
                 self.C_modules[i].weight.data.zero_()
         self.tanh = nn.Tanh()
 
@@ -92,18 +92,18 @@ class TarCommAgent(nn.Module):
         # Init weights for linear layers
         # self.apply(self.init_weights)
 
-        self.value_head = nn.Linear(self.hid_size, 1)
+        self.value_head = nn.Linear(self.args.hid_size, 1)
 
         ######################################################
         # [TarMAC changeset] Attentional communication modules
         ######################################################
 
-        self.state2query = nn.Linear(args.hid_size, 16)
-        self.state2key = nn.Linear(args.hid_size, 16)
-        self.state2value = nn.Linear(args.hid_size, args.hid_size)
+        self.state2query = nn.Linear(self.args.hid_size, 16)
+        self.state2key = nn.Linear(self.args.hid_size, 16)
+        self.state2value = nn.Linear(self.args.hid_size, self.args.hid_size)
 
     def get_agent_mask(self, batch_size, info):
-        n = self.n_agents
+        n = self.args.n_agents
 
         if 'alive_mask' in info:
             agent_mask = torch.from_numpy(info['alive_mask'])
@@ -167,7 +167,7 @@ class TarCommAgent(nn.Module):
         x, hidden_state, cell_state = self.forward_state_encoder(x)
 
         batch_size = x.size()[0]
-        n = self.n_agents
+        n = self.args.n_agents
 
         num_agents_alive, agent_mask = self.get_agent_mask(batch_size, info)
         agent_mask_alive = agent_mask.clone()
@@ -181,9 +181,9 @@ class TarCommAgent(nn.Module):
 
         agent_mask_transpose = agent_mask.transpose(1, 2)
 
-        for i in range(self.comm_passes):
+        for i in range(self.aegs.comm_passes):
             # Choose current or prev depending on recurrent
-            comm = hidden_state.view(batch_size, n, self.hid_size) if self.args.recurrent else hidden_state
+            comm = hidden_state.view(batch_size, n, self.args.hid_size) if self.args.recurrent else hidden_state
 
             if self.args.comm_mask_zero:
                 comm_mask = torch.zeros_like(comm)
@@ -227,7 +227,7 @@ class TarCommAgent(nn.Module):
 
             # scores
             scores = torch.matmul(query, key.transpose(
-                -2, -1)) / math.sqrt(self.hid_size)
+                -2, -1)) / math.sqrt(self.args.hid_size)
             # scores = scores.masked_fill(comm_action_mask.squeeze(-1) == 0, -1e9)
             # Use agent_mask instead of comm_action_mask to make this work in tj env
             scores = scores.masked_fill(agent_mask.squeeze(-1) == 0, -1e9)
@@ -256,14 +256,14 @@ class TarCommAgent(nn.Module):
             ###########################################################
             # for tj: dead agents do not receive messages
             # for tj: alive agents with no comm actions can receive messages (align with tarmac+ic3net in pp)
-            comm *= agent_mask_alive.squeeze(-1)[:, 0].unsqueeze(-1).expand(batch_size, n, self.hid_size)
+            comm *= agent_mask_alive.squeeze(-1)[:, 0].unsqueeze(-1).expand(batch_size, n, self.args.hid_size)
             c = self.C_modules[i](comm)
 
             if self.args.recurrent:
                 # skip connection - combine comm. matrix and encoded input for all agents
                 inp = x + c
 
-                inp = inp.view(batch_size * n, self.hid_size)
+                inp = inp.view(batch_size * n, self.args.hid_size)
 
                 output = self.f_module(inp, (hidden_state, cell_state))
 
@@ -279,7 +279,7 @@ class TarCommAgent(nn.Module):
         # v = torch.stack([self.value_head(hidden_state[:, i, :]) for i in range(n)])
         # v = v.view(hidden_state.size(0), n, -1)
         value_head = self.value_head(hidden_state)
-        h = hidden_state.view(n, self.hid_size)
+        h = hidden_state.view(n, self.args.hid_size)
 
         action = F.log_softmax(self.head(h), dim=-1)
 
@@ -294,6 +294,6 @@ class TarCommAgent(nn.Module):
 
     def init_hidden(self, batch_size):
         # dim 0 = num of layers * num of direction
-        return tuple((torch.zeros(batch_size * self.n_agents, self.hid_size, requires_grad=True),
-                      torch.zeros(batch_size * self.n_agents, self.hid_size, requires_grad=True)))
+        return tuple((torch.zeros(batch_size * self.args.n_agents, self.args.hid_size, requires_grad=True),
+                      torch.zeros(batch_size * self.args.n_agents, self.args.hid_size, requires_grad=True)))
 

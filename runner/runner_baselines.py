@@ -34,10 +34,10 @@ class RunnerBaseline(Runner):
 
             actions = self.choose_action(action_outs)
 
-            rewards, dones, env_info = self.env.step(actions)
-
+            next_obs, rewards, dones, env_info = self.env.step(actions)
+            # rewards, dones, env_info = self.env.step(actions)
             #next_state = self.env.get_state()
-            next_obs = self.env.get_obs()
+            # next_obs = self.env.get_obs()
             if self.args.hard_attn and self.args.commnet:
                 info['comm_action'] = actions[-1] if not self.args.comm_action_one else np.ones(self.args.n_agents,
                                                                                                 dtype=int)
@@ -45,7 +45,8 @@ class RunnerBaseline(Runner):
             episode_mask = np.zeros(np.array(rewards).shape)
             episode_agent_mask = np.array(dones) + 0
 
-            if all(dones) or t == self.args.episode_length - 1:
+            if dones or t == self.args.episode_length - 1:
+            # if all(dones) or t == self.args.episode_length - 1:
                 episode_mask = np.ones(np.array(rewards).shape)
 
 
