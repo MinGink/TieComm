@@ -40,7 +40,7 @@ class RunnerRandom(Runner):
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
-            if self.agent =="tiecomm_random":
+            if self.algo =="tiecomm_random":
                 set = self.agent.random_set()
             else:
                 set = [self.no_group]
