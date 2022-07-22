@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/ming/Documents/TieComm/main.py", line 175, in <module>
-    main(args)
-  File "/Users/ming/Documents/TieComm/main.py", line 99, in main
-    runner = MultiPeocessRunner(exp_config, lambda: run(exp_config, env, agent))
-  File "/Users/ming/Documents/TieComm/modules/multi_processing.py", line 65, in __init__
-    worker = MultiProcessWorker(i, runner, sender, seed=args.seed)
-NameError: name 'args' is not defined

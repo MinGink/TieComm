@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/popen_spawn_posix.py", line 47, in _launch
-    reduction.dump(process_obj, fp)
-  File "/opt/anaconda3/envs/tiecomm/lib/python3.8/multiprocessing/reduction.py", line 60, in dump
-    ForkingPickler(file, protocol).dump(obj)
-AttributeError: Can't pickle local object 'main.<locals>.<lambda>'

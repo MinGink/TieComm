@@ -1,9 +1,0 @@
-setup.py
-traffic_junction/__init__.py
-traffic_junction/traffic_helper.py
-traffic_junction/traffic_junction_env.py
-traffic_junction.egg-info/PKG-INFO
-traffic_junction.egg-info/SOURCES.txt
-traffic_junction.egg-info/dependency_links.txt
-traffic_junction.egg-info/requires.txt
-traffic_junction.egg-info/top_level.txt
