@@ -32,7 +32,7 @@ class TieCommAgent(nn.Module):
 
 
     def random_set(self):
-        G = nx.binomial_graph(self.n_agents, 0.5, seed= self.seed , directed=False)
+        G = nx.binomial_graph(self.n_agents, 0.8, seed= self.seed , directed=False)
         set = algorithms.louvain(G).communities
         return set
 
