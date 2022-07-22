@@ -139,3 +139,20 @@ class RunnerDual(Runner):
 
 
         return log
+
+
+
+    def collect_epoch_data(self, epoch_size):
+        epoch_data = []
+        epoch_log = dict()
+        num_episodes = 0
+        for i in range(epoch_size):
+            episode_data, episode_log = self.run_an_episode()
+            epoch_data += episode_data
+            merge_dict(episode_log, epoch_log)
+            num_episodes += 1
+
+        epoch_data = Transition(*zip(*epoch_data))
+        epoch_log['num_episodes'] = num_episodes
+
+        return epoch_data, epoch_log
