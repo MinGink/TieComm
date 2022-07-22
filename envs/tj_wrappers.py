@@ -2,10 +2,25 @@ import time
 import numpy as np
 import gym
 import argparse
+from traffic_junction import easy_dict, medium_dict, hard_dict
+
+
+
 
 class TJ_Wrapper(object):
     def __init__(self, config):
         env = gym.make('TrafficJunction-v0')
+
+
+        if config['map'] == 'easy':
+            config.update(easy_dict)
+        elif config['map'] == 'medium':
+            config.update(medium_dict)
+        elif config['map'] == 'hard':
+            config.update(hard_dict)
+        else:
+            raise RuntimeError("wrong map name")
+
         self.args = argparse.Namespace(**config)
         env.multi_agent_init(self.args)
         self.env = env

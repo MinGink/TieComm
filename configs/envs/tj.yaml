@@ -1,11 +1,2 @@
 env: "tj"
-n_agents: 10
-dim: 14
-episode_length: 40
-add_rate_min: 0.2
-add_rate_max: 0.2
-difficulty: medium
-vision: 1
-vocab_type: bool
-curr_start: 0
-curr_end: 0
+map: 'easy'
