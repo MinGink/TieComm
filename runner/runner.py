@@ -182,7 +182,7 @@ class Runner(object):
 
         #self.agent_optimiser.zero_grad()
         total_loss.backward()
-        #nn.utils.clip_grad_norm_(self.params, self.args.grad_norm_clip)
+        nn.utils.clip_grad_norm_(self.params, self.args.grad_norm_clip)
         #self.agent_optimiser.step()
 
 
