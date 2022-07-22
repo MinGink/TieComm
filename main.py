@@ -118,13 +118,12 @@ def main(args):
                        'success_rate':log['success_rate']
                        })
 
-        print('current epoch: {}/{}'.format(epoch, args.total_epoches))
+        print('current epoch: {}/{}'.format(epoch+1, args.total_epoches))
 
 
 
     if sys.flags.interactive == 0 and args.use_multiprocessing:
         runner.quit()
-        os._exit(0)
 
     print("=====Done!!!=====")
 
