@@ -98,7 +98,7 @@ class MultiPeocessRunner():
                 self.grads[i] += g[i]
             self.grads[i] /= main_log['num_steps']
 
-        nn.utils.clip_grad_norm_(self.runner.params, self.args.grad_norm_clip)
+        #nn.utils.clip_grad_norm_(self.runner.params, self.args.grad_norm_clip)
         self.runner.optimizer.step()
         return main_log
 
