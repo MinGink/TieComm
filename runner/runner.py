@@ -66,7 +66,7 @@ class Runner(object):
         memory = []
         info = dict()
         log = dict()
-        episode_return = 0
+        episode_return = np.zeros(self.args.n_agents)
 
         self.reset()
         obs = self.env.get_obs()
@@ -95,16 +95,16 @@ class Runner(object):
             memory.append(trans)
 
             obs = next_obs
-            episode_return += float(sum(rewards))
+            episode_return += rewards
             step += 1
 
-        log['episode_return'] = [episode_return]
+        log['episode_return'] = episode_return
         log['episode_steps'] = [step-1]
 
         if self.args.env == 'tj':
-            log['success'] = self.env.get_success()
+            merge_dict(self.env.get_stat(),log)
 
-        return memory ,log
+        return memory, log
 
 
 

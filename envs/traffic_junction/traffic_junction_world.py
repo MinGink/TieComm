@@ -60,6 +60,8 @@ class TrafficJunctionEnv(gym.Env):
         curses.init_pair(4, curses.COLOR_GREEN, -1)
         curses.init_pair(5, curses.COLOR_BLUE, -1)
 
+
+
     def init_args(self, parser):
         env = parser.add_argument_group('Traffic Junction task')
         env.add_argument('--dim', type=int, default=5,
