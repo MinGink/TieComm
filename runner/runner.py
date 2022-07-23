@@ -191,8 +191,8 @@ class Runner(object):
     def choose_action(self, log_p_a):
         log_p_a = [log_p_a.unsqueeze(0)]
         p_a = [[z.exp() for z in x] for x in log_p_a]
-        action = torch.stack([torch.stack([torch.multinomial(x, 1).detach() for x in p]) for p in p_a])
-        action = [x.squeeze().data.numpy() for x in action][0]
+        ret = torch.stack([torch.stack([torch.multinomial(x, 1).detach() for x in p]) for p in p_a])
+        action = [x.squeeze().data.numpy() for x in ret][0]
         return action
 
 

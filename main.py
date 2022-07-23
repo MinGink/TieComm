@@ -98,12 +98,14 @@ def main(args):
         total_num_episodes += log['num_episodes']
         total_num_steps += log['num_steps']
 
+        #print('episode_return',(log['episode_return']/log['num_episodes']))
+
         epoch_time = time.time() - epoch_begin_time
         wandb.log({'epoch': epoch,
                    'episode': total_num_episodes,
                    'epoch_time': epoch_time,
                    'total_steps': total_num_steps,
-                   'episode_return': np.mean(log['episode_return']),
+                   'episode_return': np.mean(log['episode_return']/log['num_episodes']),
                    "episode_steps": np.mean(log['episode_steps']),
                    'action_loss': log['action_loss'],
                    'value_loss': log['value_loss'],
