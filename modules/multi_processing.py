@@ -28,13 +28,13 @@ class MultiProcessWorker(mp.Process):
             task = self.worker.recv()
 
             if type(task) == list:
-                task, epoch_size = task
+                task, batch_size = task
 
             if task == 'quit':
                 return
 
             elif task == 'train_batch':
-                batch_data, batch_log = self.runner.collect_epoch_data(epoch_size)
+                batch_data, batch_log = self.runner.collect_batch_data(batch_size)
                 self.runner.optimizer.zero_grad()
                 train_log = self.runner.compute_grad(batch_data)
                 merge_dict(batch_log, train_log)
@@ -55,6 +55,7 @@ class MultiPeocessRunner():
     def __init__(self, config, runner):
 
         self.args = argparse.Namespace(**config)
+        self.batch_size = self.args.batch_size
         self.runner = runner()
         self.n_workers = self.args.epoch_size -1
 
@@ -74,12 +75,12 @@ class MultiPeocessRunner():
             self.pool[i].send('quit')
 
 
-    def train_batch(self,epoch_size):
+    def train_batch(self,batch_size):
         for worker in self.pool:
-            worker.send(['train_batch', epoch_size])
+            worker.send(['train_batch', batch_size])
 
         # run its own trainer
-        batch_data, batch_log = self.runner.collect_epoch_data(epoch_size)
+        batch_data, batch_log = self.runner.collect_batch_data(batch_size)
         self.runner.optimizer.zero_grad()
         main_log = self.runner.compute_grad(batch_data)
         merge_dict(batch_log, main_log)
