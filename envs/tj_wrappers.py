@@ -129,7 +129,7 @@ class TJ_Wrapper(object):
                     }
         return env_info
 
-    def get_success_rate(self):
+    def get_success(self):
         return self.env.stat['success']
 
 

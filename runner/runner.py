@@ -27,9 +27,9 @@ class Runner(object):
 
 
 
-    def train_batch(self, epoch_size):
-        batch_data, batch_log = self.collect_batch_data(epoch_size)
+    def train_batch(self, batch_size):
 
+        batch_data, batch_log = self.collect_batch_data(batch_size)
         self.optimizer.zero_grad()
         train_log = self.compute_grad(batch_data)
         merge_dict(batch_log, train_log)
@@ -50,8 +50,6 @@ class Runner(object):
         num_episodes = 0
 
         while len(batch_data) < batch_size:
-            # if batch_size - len(batch_data) <= self.args.episode_length:
-            #     self.last_step = True
             episode_data, episode_log = self.run_an_episode()
             batch_data += episode_data
             merge_dict(episode_log, batch_log)
@@ -59,6 +57,7 @@ class Runner(object):
 
         batch_data = Transition(*zip(*batch_data))
         batch_log['num_episodes'] = num_episodes
+        batch_log['num_steps'] = len(batch_data)
 
         return batch_data, batch_log
 
@@ -76,7 +75,7 @@ class Runner(object):
 
         step = 1
         done = False
-        while not done and step < self.args.episode_length:
+        while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
@@ -103,10 +102,9 @@ class Runner(object):
 
         log['episode_return'] = [episode_return]
         log['episode_steps'] = [step]
-        log['num_steps'] = step
 
         if self.args.env == 'tj':
-            log['success'] = self.env.get_success_rate()
+            log['success'] = self.env.get_success()
 
         return memory ,log
 

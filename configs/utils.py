@@ -6,10 +6,6 @@ import torch
 import numbers
 import sys
 
-def merge_config_dict(src, dest):
-
-        #return (dict2.update(dict1))
-    return dest.update(src)
 
 def merge_dict(src, dest):
     for k, v in src.items():
@@ -26,8 +22,6 @@ def merge_dict(src, dest):
                 dest[k].append(v)
             else:
                 dest[k] = [dest[k], v]
-    return dest
-
 
 
 
