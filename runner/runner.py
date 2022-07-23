@@ -144,7 +144,7 @@ class Runner(object):
         log = dict()
 
         n = self.n_agents
-        batch_size = len(batch.state)
+        batch_size = len(batch.obs)
 
 
         rewards = torch.Tensor(batch.rewards)
