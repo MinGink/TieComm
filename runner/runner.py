@@ -16,8 +16,6 @@ class Runner(object):
         self.env = env
         self.agent = agent
 
-        self.total_steps = 0
-
         self.gamma = self.args.gamma
         # self.lamda = self.args.lamda
 
@@ -98,10 +96,9 @@ class Runner(object):
             obs = next_obs
             episode_return += float(sum(rewards))
             step += 1
-            self.total_steps += 1
 
         log['episode_return'] = [episode_return]
-        log['episode_steps'] = [step]
+        log['episode_steps'] = [step-1]
 
         if self.args.env == 'tj':
             log['success'] = self.env.get_success()
