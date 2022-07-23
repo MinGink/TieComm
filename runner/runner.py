@@ -53,9 +53,10 @@ class Runner(object):
             merge_dict(episode_log, batch_log)
             num_episodes += 1
 
-        batch_data = Transition(*zip(*batch_data))
         batch_log['num_episodes'] = num_episodes
         batch_log['num_steps'] = len(batch_data)
+
+        batch_data = Transition(*zip(*batch_data))
 
         return batch_data, batch_log
 
