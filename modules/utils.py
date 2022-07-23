@@ -101,3 +101,10 @@ def translate_action(args, env, action):
                 actual[i] = action[i].data.squeeze()[0] * (high - low) / (args.naction_heads[i] - 1) + low
             action = [x.squeeze().data[0] for x in action]
             return action, actual
+
+
+def multinomials_log_density(actions, log_probs):
+    log_prob = 0
+    for i in range(len(log_probs)):
+        log_prob += log_probs[i].gather(1, actions[:, i].long().unsqueeze(1))
+    return log_prob

@@ -66,6 +66,7 @@ def main(args):
     agent_config['n_agents'] = env_info["n_agents"]
     exp_config['episode_length'] = env_info["episode_length"]
     exp_config['n_agents'] = env_info["n_agents"]
+    exp_config['n_actions'] = env_info["n_actions"]
     agent = agent_REGISTRY[args.agent](agent_config)
 
     #wandb.watch(agent)
@@ -90,8 +91,10 @@ def main(args):
 
         log = {}
         for i in range(epoch_size):
-            epoch_log = runner.train_batch(batch_size)
-            merge_dict(epoch_log, log)
+            batch_log = runner.train_batch(batch_size)
+            merge_dict(batch_log, log)
+            print(i,batch_log['success'])
+
         total_num_episodes += log['num_episodes']
         total_num_steps += log['num_steps']
 

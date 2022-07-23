@@ -82,7 +82,7 @@ class TJ_Wrapper(object):
 
     def step(self, action):
         # instead of doing this
-        action = action.numpy().tolist()
+        action = action.tolist()
         #if self.dim_actions == 1:
         #action = action[0]
         obs, r, done, info = self.env.step(action)
