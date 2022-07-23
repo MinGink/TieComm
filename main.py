@@ -71,6 +71,7 @@ def main(args):
     #wandb.watch(agent)
 
     epoch_size = exp_config['epoch_size']
+    batch_size = exp_config['batch_size']
     run = runner_REGISTRY[args.agent]
     if args.use_multiprocessing:
         for p in agent.parameters():
@@ -84,11 +85,13 @@ def main(args):
     total_num_episodes = 0
     total_num_steps = 0
 
-    for epoch in range(args.total_epoches):
+    for epoch in range(1, args.total_epoches+1):
         epoch_begin_time = time.time()
 
-        log = runner.train_batch(epoch_size)
-
+        log = {}
+        for i in range(epoch_size):
+            epoch_log = runner.train_batch(batch_size)
+            merge_dict(epoch_log, log)
         total_num_episodes += log['num_episodes']
         total_num_steps += log['num_steps']
 
@@ -115,7 +118,7 @@ def main(args):
         if args.env == 'tj':
             wandb.log({'epoch': epoch,
                        'episode': total_num_episodes,
-                       'success_rate':log['success_rate']/log['num_episodes'],
+                       'success_rate':log['success']/log['num_episodes'],
                        })
 
         print('current epoch: {}/{}'.format(epoch+1, args.total_epoches))
@@ -142,6 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
     parser.add_argument('--total_epoches', type=int, default=200, help='total number of training epochs')
     parser.add_argument('--epoch_size', type=int, default=10, help='epoch size')
+    parser.add_argument('--batch_size', type=int, default=10, help='batch size')
     args = parser.parse_args()
 
     training_begin_time = time.time()

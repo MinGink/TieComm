@@ -28,35 +28,39 @@ class Runner(object):
 
 
     def train_batch(self, epoch_size):
+        batch_data, batch_log = self.collect_batch_data(epoch_size)
 
-        batch_data, batch_log = self.collect_epoch_data(epoch_size)
         self.optimizer.zero_grad()
         train_log = self.compute_grad(batch_data)
+        merge_dict(batch_log, train_log)
+
         for p in self.params:
             if p._grad is not None:
                 p._grad.data /= batch_log['num_steps']
-
-        merge_dict(batch_log, train_log)
         self.optimizer.step()
         return train_log
 
 
 
 
-    def collect_epoch_data(self, epoch_size):
-        epoch_data = []
-        epoch_log = dict()
+    def collect_batch_data(self, batch_size):
+
+        batch_data = []
+        batch_log = dict()
         num_episodes = 0
-        for i in range(epoch_size):
+
+        while len(batch_data) < batch_size:
+            # if batch_size - len(batch_data) <= self.args.episode_length:
+            #     self.last_step = True
             episode_data, episode_log = self.run_an_episode()
-            epoch_data += episode_data
-            merge_dict(episode_log, epoch_log)
+            batch_data += episode_data
+            merge_dict(episode_log, batch_log)
             num_episodes += 1
 
-        epoch_data = Transition(*zip(*epoch_data))
-        epoch_log['num_episodes'] = num_episodes
+        batch_data = Transition(*zip(*batch_data))
+        batch_log['num_episodes'] = num_episodes
 
-        return epoch_data, epoch_log
+        return batch_data, batch_log
 
 
     def run_an_episode(self):
@@ -102,7 +106,7 @@ class Runner(object):
         log['num_steps'] = step
 
         if self.args.env == 'tj':
-            log['success_rate'] = self.env.get_success_rate()
+            log['success'] = self.env.get_success_rate()
 
         return memory ,log
 
