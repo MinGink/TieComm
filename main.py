@@ -145,7 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
     parser.add_argument('--total_epoches', type=int, default=200, help='total number of training epochs')
     parser.add_argument('--epoch_size', type=int, default=10, help='epoch size')
-    parser.add_argument('--batch_size', type=int, default=10, help='batch size')
+    parser.add_argument('--batch_size', type=int, default=500, help='batch size')
     args = parser.parse_args()
 
     training_begin_time = time.time()
