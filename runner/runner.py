@@ -69,7 +69,7 @@ class Runner(object):
         memory = []
         info = dict()
         log = dict()
-        episode_return = np.zeros(self.args.n_agents)
+        episode_return = 0
 
         self.reset()
         obs = self.env.get_obs()
