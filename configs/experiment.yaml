@@ -9,4 +9,5 @@ normalize_rewards: False
 gamma: 1.0
 lr: 0.001 #learning rate
 value_coeff: 0.01 #coeff for value loss term in the loss function
-batch_size: 500 #batch size for training
+batch_size: 500
+n_processes: 1 #number of processes to use for training

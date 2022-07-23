@@ -78,7 +78,6 @@ def main(args):
         for p in agent.parameters():
             p.data.share_memory_()
         runner = MultiPeocessRunner(exp_config, lambda: run(exp_config, env, agent))
-        epoch_size = 1
     else:
         runner = run(exp_config, env, agent)
 

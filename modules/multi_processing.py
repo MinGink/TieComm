@@ -57,7 +57,7 @@ class MultiPeocessRunner():
         self.args = argparse.Namespace(**config)
         self.batch_size = self.args.batch_size
         self.runner = runner()
-        self.n_workers = self.args.epoch_size -1
+        self.n_workers = self.args.n_processes -1
 
         self.pool = []
         for i in range(self.n_workers):
