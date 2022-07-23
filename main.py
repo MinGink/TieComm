@@ -93,7 +93,7 @@ def main(args):
         for i in range(epoch_size):
             batch_log = runner.train_batch(batch_size)
             merge_dict(batch_log, log)
-            #print(i,batch_log['success'])
+            print(i,batch_log['success'])
 
         total_num_episodes += log['num_episodes']
         total_num_steps += log['num_steps']

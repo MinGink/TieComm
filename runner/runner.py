@@ -86,6 +86,8 @@ class Runner(object):
 
             next_obs = self.env.get_obs()
 
+
+
             episode_mask = np.zeros(np.array(rewards).shape)
             if done or step == self.args.episode_length-1:
                 episode_mask = np.ones(np.array(rewards).shape)
@@ -191,6 +193,7 @@ class Runner(object):
     def choose_action(self, log_p_a):
         log_p_a = [log_p_a.unsqueeze(0)]
         p_a = [[z.exp() for z in x] for x in log_p_a]
+        torch.manual_seed(666)
         ret = torch.stack([torch.stack([torch.multinomial(x, 1).detach() for x in p]) for p in p_a])
         action = [x.squeeze().data.numpy() for x in ret][0]
         return action
