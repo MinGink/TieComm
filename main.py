@@ -121,7 +121,7 @@ def main(args):
                        'success_rate':log['success']/log['num_episodes'],
                        })
 
-        print('current epoch: {}/{}'.format(epoch+1, args.total_epoches))
+        print('current epoch: {}/{}'.format(epoch, args.total_epoches))
 
 
 
