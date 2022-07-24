@@ -62,7 +62,7 @@ class RunnerRandom(Runner):
             step += 1
 
 
-        log['episode_return'] = [episode_return]
+        log['episode_return'] = episode_return
         log['episode_steps'] = [step-1]
 
         if self.args.env == 'tj':
