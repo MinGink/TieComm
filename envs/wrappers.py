@@ -89,7 +89,8 @@ class Wrapper(object):
 
     def step(self, actions):
         """ Returns reward, terminated, info """
-        actions = [int(a) for a in actions]
+        actions = actions[0].tolist()
+        #actions = [int(a) for a in actions]
         self._obs, reward, done, info = self._env.step(actions)
         self._obs = [
             np.pad(
@@ -101,7 +102,12 @@ class Wrapper(object):
             for o in self._obs
         ]
 
-        return reward, done, info
+        info = {'is_completed': np.array(done).astype(int)}
+        if sum(done) == self.n_agents:
+            done = True
+        else:
+            done = False
+        return np.array(reward), done, info
 
     def get_obs(self):
         """ Returns all agent observations in a list """
