@@ -48,12 +48,14 @@ def main(args):
 
     #======================================wandb==============================================
     results_path = os.path.join(dirname(abspath(__file__)), "results")
-    args.exp_id = f"{args.env}_{args.map}_{args.agent}" #_{datetime.datetime.now().strftime('%d_%H_%M')}"
+    args.exp_id = f"{args.env}_{args.map}_{args.agent}_{args.memo}" #_{datetime.datetime.now().strftime('%d_%H_%M')}"
 
     if args.use_offline_wandb:
         os.environ['WANDB_MODE'] = 'dryrun'
 
-    wandb.init(project='AAAI', name=args.exp_id, tags=['Ming'], dir=results_path)
+    tags = ['Ming',args.env, args.map, args.agent]
+
+    wandb.init(project='AAAI', name=args.exp_id, tags=tags, dir=results_path)
     wandb.config.update(args)
 
 
@@ -138,7 +140,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="debug", help='memo')
+    parser.add_argument('--memo', type=str, default="debug", help='memo name')
     parser.add_argument('--env', type=str, default="rware", help='environment name',
                         choices=['mpe','lbforaging','rware','tj'])
     parser.add_argument('--map', type=str, default="rware-1color-medium-6ag-hard-v1", help='environment map name')
