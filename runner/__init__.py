@@ -6,12 +6,11 @@ from .runner_baselines import RunnerBaseline
 
 
 REGISTRY = {}
-REGISTRY["ac_basic"] = Runner
+REGISTRY["ac_mlp"] = Runner
+REGISTRY["ac_att"] = Runner
 
 REGISTRY["tiecomm"] = RunnerDual
-
 REGISTRY["tiecomm_random"] = RunnerRandom
-REGISTRY["tiecomm_no"] = RunnerRandom
 
 REGISTRY["magic"] = RunnerMagic
 REGISTRY["commnet"] = RunnerBaseline
