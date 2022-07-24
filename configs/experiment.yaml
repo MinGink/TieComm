@@ -2,12 +2,12 @@ memo: defalut
 total_epoches: 10000 #number of training epochs
 epoch_size: 2 #number of update iterations in an epoch = How many processes to run
 use_multiprocessing: False #use multiprocessing to parallelize the process
+n_processes: 8 #number of processes to use for training
 use_offline_wandb: False # Log results to wandb
 grad_norm_clip: 10 # Reduce magnitude of gradients above this L2 norm
 use_cuda: False # Use GPU
-normalize_rewards: False
-gamma: 1.0
+normalize_rewards: True
+gamma: 0.9
 lr: 0.001 #learning rate
 value_coeff: 0.01 #coeff for value loss term in the loss function
 batch_size: 500
-n_processes: 16 #number of processes to use for training

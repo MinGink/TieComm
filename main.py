@@ -154,7 +154,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     training_begin_time = time.time()
-
     signal.signal(signal.SIGINT, signal_handler)
     main(args)
     training_time = time.time() - training_begin_time
