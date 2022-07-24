@@ -16,11 +16,6 @@ class RunnerRandom(Runner):
         super(RunnerRandom, self).__init__(config, env, agent)
 
 
-        self.n_agents = self.args.n_agents
-        self.no_group = list(range(self.n_agents))
-        self.algo = self.args.agent
-
-
 
     def run_an_episode(self):
 
@@ -66,7 +61,7 @@ class RunnerRandom(Runner):
         log['episode_steps'] = [step-1]
 
         if self.args.env == 'tj':
-            merge_dict(self.env.get_stat(),log)
+            merge_dict(self.env.get_stat(), log)
 
 
         return memory ,log

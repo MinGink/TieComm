@@ -1,0 +1,1 @@
+python main.py --agent ac_basic --env tj --map easy
