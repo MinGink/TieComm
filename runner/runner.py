@@ -9,7 +9,7 @@ import time
 import argparse
 
 Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
-                                        'episode_masks', 'episode_mini_masks', 'values'))
+                                        'episode_masks', 'episode_agent_masks', 'values'))
 
 class Runner(object):
     def __init__(self, config, env, agent):
@@ -59,7 +59,6 @@ class Runner(object):
     def run_an_episode(self):
 
         memory = []
-        info = dict()
         log = dict()
         episode_return = 0
 
@@ -71,25 +70,24 @@ class Runner(object):
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-            action_outs, values = self.agent(obs_tensor,info)
-            actuals = self.choose_action(action_outs)
-            rewards, done, env_info = self.env.step(actuals)
+            action_outs, values = self.agent(obs_tensor)
+            actions = self.choose_action(action_outs)
+            rewards, done, env_info = self.env.step(actions)
             next_obs = self.env.get_obs()
 
             done = done or step == self.args.episode_length
 
-
             episode_mask = np.ones(rewards.shape)
-            episode_mini_mask = np.ones(rewards.shape)
+            episode_agent_mask = np.ones(rewards.shape)
             if done:
                 episode_mask = np.zeros(rewards.shape)
             else:
-                if 'is_completed' in info:
-                    episode_mini_mask = 1 - info['is_completed'].reshape(-1)
+                if 'is_completed' in env_info:
+                    episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
 
 
-            trans = Transition(np.array(obs), action_outs, actuals, np.array(rewards),
-                               episode_mask, episode_mini_mask, values)
+            trans = Transition(np.array(obs), action_outs, actions, np.array(rewards),
+                               episode_mask, episode_agent_mask, values)
             memory.append(trans)
 
             obs = next_obs
@@ -130,7 +128,7 @@ class Runner(object):
         actions = actions.transpose(1, 2).view(-1, n, 1)
 
         episode_masks = torch.Tensor(batch.episode_masks)
-        episode_mini_masks = torch.Tensor(batch.episode_mini_masks)
+        episode_agent_masks = torch.Tensor(batch.episode_mini_masks)
 
 
         values = torch.cat(batch.values, dim=0)  # (batch, n, 1)
@@ -144,7 +142,7 @@ class Runner(object):
         prev_ncoop_return = 0
 
         for i in reversed(range(rewards.size(0))):
-            ncoop_returns[i] = rewards[i] + self.args.gamma * prev_ncoop_return * episode_masks[i] * episode_mini_masks[i]
+            ncoop_returns[i] = rewards[i] + self.args.gamma * prev_ncoop_return * episode_masks[i] * episode_agent_masks[i]
             prev_ncoop_return = ncoop_returns[i].clone()
             returns[i] =  ncoop_returns[i]
 

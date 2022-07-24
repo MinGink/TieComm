@@ -145,7 +145,7 @@ if __name__ == '__main__':
                         choices=['mpe','lbforaging','rware','tj'])
     parser.add_argument('--map', type=str, default="rware-1color-medium-6ag-hard-v1", help='environment map name')
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
-                        choices=['tiecomm','tiecomm_random','tiecomm_no', 'ac_basic','commnet'])
+                        choices=['tiecomm','tiecomm_random','ac_basic','commnet'])
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
