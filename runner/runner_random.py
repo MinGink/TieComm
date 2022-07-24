@@ -6,7 +6,7 @@ from .runner import Runner
 from modules.utils import merge_dict, multinomials_log_density
 
 
-Transition = namedtuple('Transition', ('obs', 'actions', 'action_outs', 'rewards',
+Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
                                        'episode_masks', 'episode_agent_masks', 'values'))
 
 
@@ -19,7 +19,6 @@ class RunnerRandom(Runner):
         self.n_agents = self.args.n_agents
         self.no_group = list(range(self.n_agents))
         self.algo = self.args.agent
-        self.random_prob = self.args.random_prob
 
 
 
@@ -38,7 +37,7 @@ class RunnerRandom(Runner):
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-            set = self.agent.random_set(self.random_prob)
+            set = self.agent.random_set()
             after_comm = self.agent.communicate(obs_tensor, set)
             action_outs, values = self.agent.agent(after_comm)
             actions = self.choose_action(action_outs)
@@ -53,7 +52,7 @@ class RunnerRandom(Runner):
                 if 'is_completed' in env_info:
                     episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
 
-            trans = Transition(np.array(obs), actions, action_outs, np.array(rewards),
+            trans = Transition(np.array(obs), action_outs, actions, np.array(rewards),
                                     episode_mask, episode_agent_mask, values)
             memory.append(trans)
 

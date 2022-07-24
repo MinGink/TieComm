@@ -30,9 +30,12 @@ class TieCommAgent(nn.Module):
         self.agent = AgentAC(self.args)
         self.god = GodAC(self.args)
 
+        if hasattr(self.args, 'random_prob'):
+            self.random_prob = self.args.random_prob
+
 
     def random_set(self):
-        G = nx.binomial_graph(self.n_agents, 0.8, seed=self.seed , directed=False)
+        G = nx.binomial_graph(self.n_agents, self.random_prob, seed=self.seed , directed=False)
         set = algorithms.louvain(G).communities
         return set
 
