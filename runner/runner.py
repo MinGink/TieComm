@@ -128,7 +128,7 @@ class Runner(object):
         actions = actions.transpose(1, 2).view(-1, n, 1)
 
         episode_masks = torch.Tensor(batch.episode_masks)
-        episode_agent_masks = torch.Tensor(batch.episode_mini_masks)
+        episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
 
 
         values = torch.cat(batch.values, dim=0)  # (batch, n, 1)
