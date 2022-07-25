@@ -134,17 +134,15 @@ class Runner(object):
         values = torch.cat(batch.values, dim=0)  # (batch, n, 1)
         action_outs = torch.stack(batch.action_outs, dim=0)
 
-        ncoop_returns = torch.Tensor(batch_size, n)
         returns = torch.Tensor(batch_size, n)
         advantages = torch.Tensor(batch_size, n)
         values = values.view(batch_size, n)
-
-        prev_ncoop_return = 0
+        prev_returns = 0
 
         for i in reversed(range(rewards.size(0))):
-            ncoop_returns[i] = rewards[i] + self.args.gamma * prev_ncoop_return * episode_masks[i] * episode_agent_masks[i]
-            prev_ncoop_return = ncoop_returns[i].clone()
-            returns[i] =  ncoop_returns[i]
+            returns[i] = rewards[i] + self.args.gamma * prev_returns * episode_masks[i] * episode_agent_masks[i]
+            prev_returns = returns[i].clone()
+
 
 
         for i in reversed(range(rewards.size(0))):

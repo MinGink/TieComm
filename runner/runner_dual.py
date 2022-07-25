@@ -87,6 +87,7 @@ class RunnerDual(Runner):
 
 
     def compute_god_grad(self, batch):
+
         log = dict()
         batch_size = len(batch.actions)
         n = self.n_nodes
@@ -121,17 +122,13 @@ class RunnerDual(Runner):
         log_actions_taken = torch.log(actions_taken + 1e-10)
 
         action_loss = (-advantages.detach().view(-1) * log_actions_taken.view(-1)).sum()
-
-
         value_loss = ((god_values - returns).pow(2).view(-1)).sum()
 
         total_loss = action_loss + self.args.value_coeff * value_loss
-
         total_loss.backward()
 
         log['god_action_loss'] = action_loss.item()
         log['god_value_loss'] = value_loss.item()
         log['god_total_loss'] = total_loss.item()
-
 
         return log
