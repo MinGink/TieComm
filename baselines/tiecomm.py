@@ -77,7 +77,7 @@ class TieCommAgent(nn.Module):
         # hidden = self.agent.intra_fc(input)
         # score = torch.softmax(hidden, dim=0)
         # weighted_emb = score * hidden
-        weighted_emb,_ = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
+        weighted_emb, _  = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
         return weighted_emb.squeeze(0)
 
 
@@ -141,12 +141,13 @@ class AgentAC(nn.Module):
 
     def forward(self, after_comm):
 
-        final_obs = self.attention(after_comm)
+        #final_obs = self.attention(after_comm)
+        final_obs = after_comm.flatten(start_dim=1, end_dim=-1)
         x = F.tanh(self.final_fc1(final_obs))
-        action_out = F.softmax(self.final_fc2(x), dim=-1)
+        action_out = F.log_softmax(self.final_fc2(x), dim=-1)
 
         v = F.tanh(self.value_fc1(final_obs))
-        value = F.tanh(self.value_fc2(v))
+        value = self.value_fc2(v)
 
         return action_out, value
 
