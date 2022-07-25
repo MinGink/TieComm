@@ -45,12 +45,17 @@ class Attention(nn.Module):
         self.value_head = nn.Linear(self.hid_size, 1)
         self.tanh = nn.Tanh()
 
+        encoder_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
+                                                         batch_first=True)
+        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=1)
+
 
 
 
     def forward(self, x, info={}):
         x = self.tanh(self.affine1(x))
-        h, _ = self.attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
+        #h, _ = self.attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
+        h = self.transformer(x.unsqueeze(0)).squeeze(0)
         y = self.tanh(sum([h.squeeze(0), x]))
 
         a = F.log_softmax(self.head(y), dim=-1)
