@@ -9,6 +9,8 @@ from .models import MLP, Attention
 REGISTRY = {}
 REGISTRY["tiecomm"] = TieCommAgent
 REGISTRY["tiecomm_random"] = TieCommAgent
+REGISTRY["tiecomm_one"] = TieCommAgent
+
 REGISTRY["commnet"] = CommNetAgent
 REGISTRY["ic3net"] = CommNetAgent
 # REGISTRY["gacomm"] = GACommAgent
