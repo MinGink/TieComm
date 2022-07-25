@@ -53,7 +53,7 @@ def main(args):
     if args.use_offline_wandb:
         os.environ['WANDB_MODE'] = 'dryrun'
 
-    tags = ['Ming',args.env, args.map, args.agent]
+    tags = ['Ming',args.env, args.map, args.agent, args.memo]
 
     wandb.init(project='AAAI', name=args.exp_id, tags=tags, dir=results_path)
     wandb.config.update(args)
