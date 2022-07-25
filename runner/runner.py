@@ -60,7 +60,7 @@ class Runner(object):
 
         memory = []
         log = dict()
-        episode_return = 0
+        episode_return = np.zeros(self.n_agents)
 
         self.reset()
         obs = self.env.get_obs()
@@ -91,7 +91,7 @@ class Runner(object):
             memory.append(trans)
 
             obs = next_obs
-            episode_return += rewards
+            episode_return += rewards.astype(episode_return.dtype)
             step += 1
 
 

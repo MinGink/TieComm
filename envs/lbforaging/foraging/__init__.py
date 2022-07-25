@@ -1,1 +1,1 @@
-from lbforaging.foraging.environment import ForagingEnv
+from envs.lbforaging.foraging.environment import ForagingEnv

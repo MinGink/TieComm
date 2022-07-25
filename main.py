@@ -141,9 +141,9 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="debug", help='memo name')
-    parser.add_argument('--env', type=str, default="rware", help='environment name',
+    parser.add_argument('--env', type=str, default="lbf", help='environment name',
                         choices=['mpe','lbforaging','rware','tj'])
-    parser.add_argument('--map', type=str, default="rware-1color-medium-6ag-hard-v1", help='environment map name')
+    parser.add_argument('--map', type=str, default="Foraging-2s-10x10-3p-3f-v2", help='environment map name')
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
                         choices=['tiecomm','tiecomm_random','tiecomm_one','ac_mlp','ac_att','commnet'])
     parser.add_argument('--seed', type=int, default=666, help='random seed')
