@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from collections import namedtuple
 import numpy as np
-from torch.optim import Adam
+from torch.optim import Adam,RMSprop
 from modules.utils import merge_dict, multinomials_log_density
 import time
 
@@ -22,7 +22,9 @@ class Runner(object):
         self.gamma = self.args.gamma
 
         self.params = [p for p in self.agent.parameters()]
-        self.optimizer = Adam(params=self.agent.parameters(), lr=self.args.lr)
+        #self.optimizer = Adam(params=self.agent.parameters(), lr=self.args.lr)
+        self.optimizer = RMSprop(self.agent.parameters(),
+            lr = self.args.lrate, alpha=0.97, eps=1e-6)
 
 
 
