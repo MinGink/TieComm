@@ -56,7 +56,7 @@ class Attention(nn.Module):
     def forward(self, x, info={}):
         x = self.tanh(self.affine1(x))
         #h, _ = self.attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
-        h = self.transformer(x.unsqueeze(0)).squeeze(0)
+        h = self.transformer(x.unsqueeze(0))
         #y = self.tanh(self.affine2(h))
         y = self.tanh(self.affine2(sum([h.squeeze(0), x])))
 
