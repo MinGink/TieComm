@@ -57,8 +57,8 @@ class Attention(nn.Module):
         x = self.tanh(self.affine1(x))
         #h, _ = self.attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
         h = self.transformer(x.unsqueeze(0)).squeeze(0)
-        y = self.tanh(self.affine2(h))
-        #y = self.tanh(sum([h.squeeze(0), x]))
+        #y = self.tanh(self.affine2(h))
+        y = self.tanh(self.affine2(sum([h.squeeze(0), x])))
 
         a = F.log_softmax(self.head(y), dim=-1)
         v = self.value_head(y)
