@@ -40,7 +40,7 @@ class Attention(nn.Module):
         self.n_actions = self.args.n_actions
 
         self.affine1 = nn.Linear(self.obs_shape, self.hid_size)
-        self.affine2 = nn.Linear(self.obs_shape, self.hid_size)
+        self.affine2 = nn.Linear(self.hid_size, self.hid_size)
         self.attn = nn.MultiheadAttention(self.hid_size, self.att_head, batch_first=True)
         self.head = nn.Linear(self.hid_size,self.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)
