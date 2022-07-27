@@ -24,7 +24,7 @@ class Runner(object):
         self.params = [p for p in self.agent.parameters()]
         #self.optimizer = Adam(params=self.agent.parameters(), lr=self.args.lr)
         self.optimizer = RMSprop(self.agent.parameters(),
-            lr = self.args.lrate, alpha=0.97, eps=1e-6)
+            lr = self.args.lr, alpha=0.97, eps=1e-6)
 
 
 
