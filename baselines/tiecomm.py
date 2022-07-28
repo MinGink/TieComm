@@ -67,8 +67,8 @@ class TieCommAgent(nn.Module):
               for index, group_ids in enumerate (set):
                   inter_obs[group_ids, :] = group_emd_list[index,:].repeat(len(group_ids), 1)
 
-        #after_comm = torch.stack((local_obs, inter_obs, intra_obs), dim=1)
-        after_comm = torch.stack((local_obs, intra_obs), dim=1)
+        after_comm = torch.stack((local_obs, inter_obs, intra_obs), dim=1)
+        #after_comm = torch.stack((local_obs, intra_obs), dim=1)
         #after_comm = local_obs
 
         return after_comm
@@ -123,7 +123,7 @@ class AgentAC(nn.Module):
         self.inter_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
 
         self.final_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
-        self.final_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
+        self.final_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
 
         self.head = nn.Linear(self.hid_size, args.n_actions)
 
