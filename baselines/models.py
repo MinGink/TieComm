@@ -40,7 +40,7 @@ class Attention(nn.Module):
         self.n_actions = self.args.n_actions
 
         self.affine1 = nn.Linear(self.obs_shape, self.hid_size)
-        self.affine2 = nn.Linear(self.hid_size, self.hid_size)
+        self.affine2 = nn.Linear(self.hid_size*2, self.hid_size)
         self.attn = nn.MultiheadAttention(self.hid_size, self.att_head, batch_first=True)
         self.head = nn.Linear(self.hid_size,self.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)
@@ -58,6 +58,7 @@ class Attention(nn.Module):
         h, _ = self.attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
         #h = self.transformer(x.unsqueeze(0))
         #y = self.tanh(self.affine2(sum([h.squeeze(0), x])))
+        y = torch.cat([h.squeeze(0), x], dim=-1)
         y = self.tanh(self.affine2(h.squeeze(0)))
 
         a = F.log_softmax(self.head(y), dim=-1)
