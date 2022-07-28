@@ -137,8 +137,9 @@ class AgentAC(nn.Module):
 
 
 
-    def attention(self, after_comm):
+    def final_attn(self, after_comm):
         attn_output, attn_output_weights = self.final_attn(after_comm, after_comm, after_comm)
+        attn_output = sum([attn_output,after_comm])
         final_obs = torch.flatten(attn_output, start_dim=1, end_dim=-1)
         return final_obs
 
@@ -150,7 +151,7 @@ class AgentAC(nn.Module):
         #h, _ = self.intra_attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
 
         #h = h.squeeze(0)
-        final_obs = self.attention(after_comm)
+        final_obs = self.final_attn(after_comm)
         #final_obs =after_comm.flatten(start_dim=1, end_dim=-1)
         y = self.tanh(self.final_fc1(final_obs))
 
