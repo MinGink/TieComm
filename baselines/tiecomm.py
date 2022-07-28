@@ -145,10 +145,11 @@ class AgentAC(nn.Module):
         #final_obs = self.attention(after_comm)
         #final_obs = after_comm.flatten(start_dim=1, end_dim=-1)
         x = F.tanh(self.final_fc1(final_obs))
+
         action_out = F.log_softmax(self.final_fc2(x), dim=-1)
 
-        v = F.tanh(self.value_fc1(final_obs))
-        value = self.value_fc2(v)
+        #v = F.tanh(self.value_fc1(finxal_obs))
+        value = self.value_fc2(x)
 
         return action_out, value
 
