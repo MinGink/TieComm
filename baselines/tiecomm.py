@@ -111,7 +111,7 @@ class AgentAC(nn.Module):
         self.hid_size = args.hid_size
 
 
-        self.emb_fc = nn.Linear(args.obs_shape, self.hid_size, bias=False)
+        self.emb_fc = nn.Linear(args.obs_shape, self.hid_size, bias=True)
 
         self.intra_fc = nn.Linear(self.hid_size, self.hid_size, bias=False)
         self.intra_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
@@ -123,12 +123,12 @@ class AgentAC(nn.Module):
         self.final_fc1 = nn.Linear(self.hid_size * 1, self.hid_size)
         self.final_fc2 = nn.Linear(self.hid_size, args.n_actions)
 
-        self.value_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
+        self.value_fc1 = nn.Linear(self.hid_size * 1, self.hid_size)
         self.value_fc2 = nn.Linear(self.hid_size, 1)
 
 
     def local_emb(self, input):
-        local_obs = self.emb_fc(input)
+        local_obs = F.tanh(self.emb_fc(input))
         return local_obs
 
 
