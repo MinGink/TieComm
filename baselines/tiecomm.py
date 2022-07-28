@@ -151,7 +151,7 @@ class AgentAC(nn.Module):
         h = h.squeeze(0)
         #final_obs = self.attention(after_comm)
         #final_obs =after_comm.flatten(start_dim=1, end_dim=-1)
-        y = self.tanh(self.final_fc1(sum([h,x])))
+        y = self.tanh(self.final_fc1(h))
 
         #v = F.tanh(self.value_fc1(finxal_obs))
         a = F.log_softmax(self.head(y), dim=-1)
