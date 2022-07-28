@@ -42,33 +42,33 @@ class TieCommAgent(nn.Module):
 
     def communicate(self, local_obs, set):
 
-        local_obs = self.agent.local_emb(local_obs)
-
-        num_coms = len(set)
-
-        intra_obs = torch.zeros_like(local_obs)
-        inter_obs = torch.zeros_like(local_obs)
-
-        # inter_obs
-        if num_coms == 1:
-            intra_obs = self.intra_com(local_obs)
-        else:
-             group_emd_list = []
-             for i in range (num_coms):
-                 group_emd_list = []
-                 for i in range(num_coms):
-                     group_id_list = set[i]
-                     group_obs = local_obs[group_id_list, :]
-                     group_att = self.intra_com(group_obs)
-                     group_emd = torch.sum(group_att, dim=0).unsqueeze(0)
-                     group_emd_list.append(group_emd)
-                     intra_obs[group_id_list, :] = group_att
-             group_emd_list = self.inter_com(torch.cat(group_emd_list,dim=0))
-             for index, group_ids in enumerate (set):
-                 inter_obs[group_ids, :] = group_emd_list[index,:].repeat(len(group_ids), 1)
+        # local_obs = self.agent.local_emb(local_obs)
+        #
+        # num_coms = len(set)
+        #
+        # intra_obs = torch.zeros_like(local_obs)
+        # inter_obs = torch.zeros_like(local_obs)
+        #
+        # # inter_obs
+        # if num_coms == 1:
+        #     intra_obs = self.intra_com(local_obs)
+        # else:
+        #      group_emd_list = []
+        #      for i in range (num_coms):
+        #          group_emd_list = []
+        #          for i in range(num_coms):
+        #              group_id_list = set[i]
+        #              group_obs = local_obs[group_id_list, :]
+        #              group_att = self.intra_com(group_obs)
+        #              group_emd = torch.sum(group_att, dim=0).unsqueeze(0)
+        #              group_emd_list.append(group_emd)
+        #              intra_obs[group_id_list, :] = group_att
+        #      group_emd_list = self.inter_com(torch.cat(group_emd_list,dim=0))
+        #      for index, group_ids in enumerate (set):
+        #          inter_obs[group_ids, :] = group_emd_list[index,:].repeat(len(group_ids), 1)
 
         #after_comm = torch.stack((local_obs, inter_obs, intra_obs), dim=1)
-        after_comm = intra_obs
+        after_comm = local_obs
 
         return after_comm
 
@@ -145,16 +145,13 @@ class AgentAC(nn.Module):
 
     def forward(self, after_comm):
 
-        #h = self.tanh(self.(after_comm))
-        #h, _ = self.intra_attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
+        x = self.tanh(self.emb_fc(after_comm))
+        h, _ = self.intra_attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
 
-        #final_obs = h.squeeze(0)
+        h = h.squeeze(0)
         #final_obs = self.attention(after_comm)
         #final_obs =after_comm.flatten(start_dim=1, end_dim=-1)
-
-
-        y = self.tanh(self.final_fc1(after_comm))
-
+        y = self.tanh(self.final_fc1(h))
 
         #v = F.tanh(self.value_fc1(finxal_obs))
         a = F.log_softmax(self.head(y), dim=-1)
