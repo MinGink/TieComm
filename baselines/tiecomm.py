@@ -141,8 +141,8 @@ class AgentAC(nn.Module):
 
     def forward(self, after_comm):
 
-        final_obs = self.attention(after_comm)
-        #final_obs = after_comm.flatten(start_dim=1, end_dim=-1)
+        #final_obs = self.attention(after_comm)
+        final_obs = after_comm.flatten(start_dim=1, end_dim=-1)
         x = F.tanh(self.final_fc1(final_obs))
         action_out = F.log_softmax(self.final_fc2(x), dim=-1)
 
