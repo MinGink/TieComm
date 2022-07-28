@@ -155,7 +155,7 @@ class AgentAC(nn.Module):
 
 
         #v = F.tanh(self.value_fc1(finxal_obs))
-        a = F.log_softmax(self.head( ), dim=-1)
+        a = F.log_softmax(self.head(y), dim=-1)
         v = self.value_head(y)
 
         return a, v
