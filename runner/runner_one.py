@@ -3,6 +3,7 @@ import torch.nn as nn
 from collections import namedtuple
 import numpy as np
 from .runner import Runner
+from torch.optim import Adam,RMSprop
 from modules.utils import merge_dict, multinomials_log_density
 
 
@@ -18,9 +19,12 @@ class RunnerOne(Runner):
         self.onegroup = [list(range(self.n_agents))]
         self.no_group = [[i] for i in range(self.n_agents)]
 
+        self.params = [p for p in self.agent.agent.parameters()]
+        # self.optimizer = Adam(params=self.agent.parameters(), lr=self.args.lr)
+        self.optimizer = RMSprop(self.agent.agent.parameters(), lr=self.args.lr, alpha=0.97, eps=1e-6)
 
 
-    def run_an_episode(self):
+def run_an_episode(self):
 
         memory = []
         log = dict()
