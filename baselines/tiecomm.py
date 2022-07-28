@@ -110,6 +110,8 @@ class AgentAC(nn.Module):
         self.n_agents = args.n_agents
         self.hid_size = args.hid_size
 
+        self.tanh = nn.Tanh()
+
 
         self.emb_fc = nn.Linear(args.obs_shape, self.hid_size, bias=True)
 
@@ -143,20 +145,20 @@ class AgentAC(nn.Module):
 
     def forward(self, after_comm):
 
-        x = F.tanh(self.emb_fc(after_comm))
-        x, _ = self.intra_attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
+        x = self.tanh(self.emb_fc(after_comm))
+        h, _ = self.intra_attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
 
-        final_obs = x.squeeze(0)
+        #final_obs = h.squeeze(0)
         #final_obs = self.attention(after_comm)
-        #final_obs = after_comm.flatten(start_dim=1, end_dim=-1)
-        h = F.tanh(self.final_fc1(final_obs))
+        #final_obs =after_comm.flatten(start_dim=1, end_dim=-1)
+        y = self.tanh(self.final_fc1(sum([h.squeeze(0),x])))
 
 
         #v = F.tanh(self.value_fc1(finxal_obs))
-        action_out = F.log_softmax(self.head(h), dim=-1)
-        value = self.value_head(h)
+        a = F.log_softmax(self.head( ), dim=-1)
+        v = self.value_head(y)
 
-        return action_out, value
+        return a, v
 
 
 
