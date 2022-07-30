@@ -76,9 +76,9 @@ class TieCommAgent(nn.Module):
 
 
     def intra_com(self, input):
-        hidden = self.agent.intra_fc(input)
-        score = torch.softmax(hidden, dim=0)
-        weighted_emb = score * hidden
+        #hidden = self.agent.intra_fc(input)
+        #score = torch.softmax(hidden, dim=0)
+        #weighted_emb = score * hidden
         #weighted_emb, _  = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0)).squeeze(0)
         return weighted_emb
 
