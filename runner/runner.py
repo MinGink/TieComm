@@ -11,6 +11,7 @@ import argparse
 Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
                                         'episode_masks', 'episode_agent_masks', 'values'))
 
+
 class Runner(object):
     def __init__(self, config, env, agent):
 

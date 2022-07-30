@@ -8,10 +8,9 @@ from .runner import Runner
 import time
 
 Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
-                                            'episode_masks', 'episode_agent_masks', 'values',
-                                            'god_action_out', 'god_value', 'god_action', 'god_reward'
-                                            ))
-
+                                       'episode_masks', 'episode_agent_masks', 'values',
+                                       'god_action_out', 'god_value', 'god_action', 'god_reward'
+                                       ))
 
 class RunnerDual(Runner):
     def __init__(self,  config, env, agent):
@@ -132,3 +131,20 @@ class RunnerDual(Runner):
         log['god_total_loss'] = total_loss.item()
 
         return log
+
+    def collect_batch_data(self, batch_size):
+        batch_data = []
+        batch_log = dict()
+        num_episodes = 0
+
+        while len(batch_data) < batch_size:
+            episode_data, episode_log = self.run_an_episode()
+            batch_data += episode_data
+            merge_dict(episode_log, batch_log)
+            num_episodes += 1
+
+        batch_log['num_episodes'] = num_episodes
+        batch_log['num_steps'] = len(batch_data)
+        batch_data = Transition(*zip(*batch_data))
+
+        return batch_data, batch_log
