@@ -188,26 +188,27 @@ class GodAC(nn.Module):
 
         self.i_lower = np.tril_indices(self.n_agents, -1)
 
+        self.tanh = nn.Tanh()
+
         # self.batch_size = args.batch_size
 
 
     def forward(self, inputs):
 
-        hid = F.relu(self.fc1(inputs)).unsqueeze(0)
+        hid = self.tanh(self.fc1(inputs)).unsqueeze(0)
         attn_output, attn_output_weights = self.multihead_attn(hid, hid, hid)
-
         h = attn_output.squeeze(0)
 
         matrixs = torch.cat([h.repeat(1, self.n_agents).view(self.n_agents * self.n_agents, -1),
                                      h.repeat(self.n_agents, 1)], dim=1)
         matrixs = matrixs[self.index, :]
 
-        x = F.relu(self.fc2(matrixs))
+        x = self.tanh(self.fc2(matrixs))
         #score = F.sigmoid(self.fc3(x))
         action_out  = F.softmax(self.fc3(x), dim=-1)
 
 
-        value = F.relu(self.value_fc2(hid.flatten(start_dim=1, end_dim=-1)))
+        value = self.tanh(self.value_fc2(hid.flatten(start_dim=1, end_dim=-1)))
         value = self.value_fc3(value).repeat(action_out.shape[0], 1)
 
         dist = torch.distributions.Categorical(action_out)
@@ -225,7 +226,7 @@ class GodAC(nn.Module):
 
 
     def _generate_adj(self, relation):
-        adj_matrixs = torch.zeros(self.n_agents * self.n_agents,1,dtype=torch.long)
+        adj_matrixs = torch.zeros(self.n_agents * self.n_agents,1, dtype=torch.long)
         adj_matrixs[self.index,:] = relation.unsqueeze(-1)
         adj_matrixs = adj_matrixs.view(self.n_agents, self.n_agents).detach().numpy()
         return adj_matrixs
