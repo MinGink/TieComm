@@ -108,3 +108,14 @@ def multinomials_log_density(actions, log_probs):
     for i in range(len(log_probs)):
         log_prob += log_probs[i].gather(1, actions[:, i].long().unsqueeze(1))
     return log_prob
+
+
+
+def multinomials_log_densities(actions, log_probs):
+    dim_action = actions.size()[1]
+    log_probs = log_probs.permute(1, 0, 2)
+    log_prob = [0] * dim_action
+    for i in range(dim_action):
+        log_prob[i] += log_probs[i].gather(1, actions[:, i].long().unsqueeze(1))
+    log_prob = torch.cat(log_prob, dim=-1)
+    return log_prob

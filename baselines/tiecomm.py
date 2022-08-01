@@ -172,11 +172,12 @@ class GodAC(nn.Module):
         self.hid_size = args.hid_size
 
         self.fc1 = nn.Linear(args.obs_shape, self.hid_size)
-        self.multihead_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
-        self.fc2 = nn.Linear(self.hid_size * 2, self.hid_size)
+        self.multihead_attn = nn.MultiheadAttention(self.hid_size, 8, batch_first=True)
+        self.fc2 = nn.Linear(self.hid_size * 4, self.hid_size)
         self.fc3 = nn.Linear(self.hid_size, 2)
 
-        self.value_fc2 = nn.Linear(self.hid_size * self.n_agents, self.hid_size)
+        self.value_fc1 = nn.Linear(self.hid_size * self.n_agents, self.hid_size * 2)
+        self.value_fc2 = nn.Linear(self.hid_size * 2, self.hid_size)
         self.value_fc3 = nn.Linear(self.hid_size, 1)
 
 
@@ -195,33 +196,38 @@ class GodAC(nn.Module):
 
     def forward(self, inputs):
 
-        hid = self.tanh(self.fc1(inputs)).unsqueeze(0)
-        attn_output, attn_output_weights = self.multihead_attn(hid, hid, hid)
-        h = attn_output.squeeze(0)
+        hid = self.tanh(self.fc1(inputs))
+        attn_output, attn_weights = self.multihead_attn(hid.unsqueeze(0), hid.unsqueeze(0), hid.unsqueeze(0))
+
+        h = torch.cat([attn_output.squeeze(0), hid], dim=1)
 
         matrixs = torch.cat([h.repeat(1, self.n_agents).view(self.n_agents * self.n_agents, -1),
                                      h.repeat(self.n_agents, 1)], dim=1)
         matrixs = matrixs[self.index, :]
 
         x = self.tanh(self.fc2(matrixs))
+
+
         #score = F.sigmoid(self.fc3(x))
-        action_out  = F.softmax(self.fc3(x), dim=-1)
+        #action_out  = F.softmax(self.fc3(x), dim=-1)
+        #dist = torch.distributions.Categorical(action_out)
+        #relation = dist.sample()
 
-
-        value = self.tanh(self.value_fc2(hid.flatten(start_dim=1, end_dim=-1)))
-        value = self.value_fc3(value).repeat(action_out.shape[0], 1)
-
-        dist = torch.distributions.Categorical(action_out)
-        relation = dist.sample()
-
-        # probs = torch.distributions.Bernoulli(score)
-        # relation = probs.sample().long()
+        log_action_out = F.log_softmax(self.fc3(x), dim=-1)
+        relation = torch.multinomial(log_action_out .exp(), 1).squeeze(-1).detach()
         adj_matrix = self._generate_adj(relation)
         adj_matrix[self.i_lower] = adj_matrix.T[self.i_lower]
-
         G = nx.from_numpy_matrix(adj_matrix)
         set = algorithms.louvain(G).communities
-        return set, action_out, value, relation
+
+
+        value = self.tanh(self.value_fc1(hid.unsqueeze(0).flatten(start_dim=1, end_dim=-1)))
+        value = self.tanh(self.value_fc2(value))
+        value = self.value_fc3(value)
+        #value = value.repeat(log_action_out.shape[0], 1)
+
+
+        return set, log_action_out, value, relation
 
 
 

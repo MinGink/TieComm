@@ -3,12 +3,13 @@ import torch.nn as nn
 from collections import namedtuple
 import numpy as np
 from torch.optim import Adam
-from modules.utils import merge_dict
+from modules.utils import merge_dict, multinomials_log_densities
 from .runner import Runner
 import time
 
 Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
-                                       'episode_masks', 'episode_agent_masks', 'values',
+                                       'episode_masks', 'episode_agent_masks', 'god_episode_masks',
+                                       'values',
                                        'god_action_out', 'god_value', 'god_action', 'god_reward'
                                        ))
 
@@ -48,15 +49,18 @@ class RunnerDual(Runner):
             next_obs = self.env.get_obs()
 
             episode_mask = np.ones(rewards.shape)
+            god_episode_mask = np.ones(god_value.shape)
             episode_agent_mask = np.ones(rewards.shape)
             if done:
                 episode_mask = np.zeros(rewards.shape)
+                god_episode_mask = np.zeros(god_value.shape)
             else:
                 if 'is_completed' in env_info:
                     episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
 
             trans = Transition(np.array(obs),  action_outs, actions, np.array(rewards),
-                                    episode_mask, episode_agent_mask, values, god_action_out, god_value, god_action, god_reward)
+                                    episode_mask, episode_agent_mask, god_episode_mask,
+                               values, god_action_out, god_value, god_action, god_reward)
             memory.append(trans)
 
 
@@ -85,11 +89,73 @@ class RunnerDual(Runner):
 
 
 
+
+
     def compute_god_grad(self, batch):
 
         log = dict()
-        batch_size = len(batch.actions)
+
+        dim_actions = self.n_nodes
+        batch_size = len(batch.obs)
+
+
+        episode_masks = torch.Tensor(batch.god_episode_masks).squeeze(-1)
+        values = torch.cat(batch.god_value, dim=0)
+        rewards = torch.Tensor(batch.god_reward).unsqueeze(-1)
+        actions = torch.stack(batch.god_action, dim=0)
+        action_outs = torch.stack(batch.god_action_out, dim=0)
+
+
+
+        returns = torch.Tensor(batch_size, 1)
+        advantages = torch.Tensor(batch_size, 1)
+        values = values.view(batch_size, 1)
+        prev_returns = 0
+
+        for i in reversed(range(batch_size)):
+            returns[i] = rewards[i] + self.args.gamma * prev_returns * episode_masks[i]
+            prev_returns = returns[i].clone()
+
+        for i in reversed(range(batch_size)):
+            advantages[i] = returns[i] - values.data[i]
+
+        if self.args.normalize_rewards:
+            advantages = (advantages - advantages.mean()) / advantages.std()
+
+
+
+        log_p_a = action_outs
+        # actions: [(batch_size*n) * dim_actions]
+        actions = actions.contiguous().view(-1, dim_actions)
+        log_prob = multinomials_log_densities(actions, log_p_a)
+        # the log prob of each action head is multiplied by the advantage
+        action_loss = -advantages.view(-1).unsqueeze(-1) * log_prob
+        actor_loss = action_loss.sum()
+
+
+        targets = returns
+        value_loss = (values - targets).pow(2).view(-1)
+        critic_loss = value_loss.sum()
+
+        total_loss = actor_loss + self.args.value_coeff * critic_loss
+        total_loss.backward()
+
+        log['god_action_loss'] = actor_loss.item()
+        log['god_value_loss'] = critic_loss.item()
+        log['god_total_loss'] = total_loss.item()
+
+        return log
+
+
+
+
+    def compute_god_grad_tmp(self, batch):
+
+        log = dict()
+
         n = self.n_nodes
+        batch_size = len(batch.actions)
+
 
         episode_masks = torch.Tensor(batch.episode_masks)[:,:1].repeat(1,n)
         #episode_agent_masks = torch.Tensor(batch.episode_agent_masks)

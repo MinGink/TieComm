@@ -161,11 +161,9 @@ class Runner(object):
         action_loss = -advantages.view(-1) * log_prob.squeeze()
         actor_loss = action_loss.sum()
 
-        # actions_taken = torch.gather(action_outs, dim=-1, index = actions.unsqueeze(-1)).squeeze(-1)
-        # log_actions_taken = torch.log(actions_taken + 1e-10)
+
         targets = returns
         value_loss = (values - targets).pow(2).view(-1)
-        # action_loss = (-advantages.detach().view(-1) * log_actions_taken.view(-1)).sum()
         critic_loss = value_loss.sum()
 
 
