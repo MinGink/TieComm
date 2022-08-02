@@ -30,6 +30,9 @@ class MLP(nn.Module):
         return a, v
 
 
+
+
+
 class Attention(nn.Module):
     def __init__(self, agent_config):
         super(Attention, self).__init__()
@@ -58,9 +61,9 @@ class Attention(nn.Module):
         h, _ = self.attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
         h = h.squeeze(0)
         #h = self.transformer(x.unsqueeze(0))
-        y = self.tanh(self.affine2(sum([h.squeeze(0), x])))
+        #y = self.tanh(self.affine2(sum([h.squeeze(0), x])))
         #h = torch.cat([h.squeeze(0), x], dim=-1)
-        #y = self.tanh(self.affine2(h))
+        y = self.tanh(self.affine2(h))
         a = F.log_softmax(self.head(y), dim=-1)
         v = self.value_head(y)
         return a, v

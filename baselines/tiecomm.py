@@ -62,7 +62,7 @@ class TieCommAgent(nn.Module):
                       group_id_list = set[i]
                       group_obs = local_obs[group_id_list, :]
                       group_att = self.intra_com(group_obs)
-                      group_emd = torch.sum(group_att, dim=0).unsqueeze(0)
+                      group_emd = self.group_pooling(group_obs, mode='mean')
                       group_emd_list.append(group_emd)
                       intra_obs[group_id_list, :] = group_att
               group_emd_list = self.inter_com(torch.cat(group_emd_list,dim=0))
@@ -78,6 +78,18 @@ class TieCommAgent(nn.Module):
         else:
             raise ValueError('block must be one of no, inter, intra')
         return after_comm
+
+
+    def group_pooling(self, input, mode):
+        if mode == 'mean':
+            group_emb = torch.mean(input, dim=0).unsqueeze(0)
+        elif mode == 'max':
+            group_emb = torch.max(input, dim=0).values.unsqueeze(0)
+        elif mode == 'sum':
+            group_emb = torch.sum(input, dim=0).unsqueeze(0)
+        else:
+            raise ValueError('mode must be one of mean, max, sum')
+        return group_emb
 
 
 

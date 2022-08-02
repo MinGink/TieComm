@@ -1,6 +1,7 @@
 import os
 import yaml
 import collections
+from collections.abc import Mapping
 import numpy as np
 import torch
 import numbers
@@ -60,7 +61,7 @@ def get_config(arg_name, subfolder=None):
 
 def recursive_dict_update(d, u):
     for k, v in u.items():
-        if isinstance(v, collections.Mapping):
+        if isinstance(v, Mapping):
             d[k] = recursive_dict_update(d.get(k, {}), v)
         else:
             d[k] = v
