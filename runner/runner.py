@@ -265,6 +265,14 @@ class Runner(object):
         action = [x.squeeze().data.numpy() for x in ret]
         return action
 
+    def choose_action2(self, log_p_a):
+        log_p_a = [a.unsqueeze(0) for a in log_p_a]
+        p_a = [[z.exp() for z in x] for x in log_p_a]
+        ret = torch.stack([torch.stack([torch.multinomial(x, 1).detach() for x in p]) for p in p_a])
+        action = [x.squeeze().data.numpy() for x in ret]
+        return action
+
+
 
     def save_model(self):
         return self.agent.save_model()
