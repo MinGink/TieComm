@@ -33,6 +33,8 @@ class TieCommAgent(nn.Module):
         if hasattr(self.args, 'random_prob'):
             self.random_prob = self.args.random_prob
 
+        self.block = self.args.block
+
 
     def random_set(self):
         G = nx.binomial_graph(self.n_agents, self.random_prob, seed=self.seed , directed=False)
@@ -67,10 +69,14 @@ class TieCommAgent(nn.Module):
               for index, group_ids in enumerate (set):
                   inter_obs[group_ids, :] = group_emd_list[index,:].repeat(len(group_ids), 1)
 
-        after_comm = torch.stack((local_obs, inter_obs, intra_obs), dim=1)
-        #after_comm = torch.stack((local_obs, intra_obs), dim=1)
-        #after_comm = local_obs
-
+        if self.block == 'no':
+            after_comm = torch.stack((local_obs, inter_obs, intra_obs), dim=1)
+        elif self.block == 'inter':
+            after_comm = torch.stack((local_obs, intra_obs), dim=1)
+        elif self.block == 'intra':
+            after_comm = torch.stack((local_obs, inter_obs), dim=1)
+        else:
+            raise ValueError('block must be one of no, inter, intra')
         return after_comm
 
 
@@ -124,7 +130,11 @@ class AgentAC(nn.Module):
         self.inter_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
 
         self.final_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
-        self.final_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
+
+        if self.args.block == 'no':
+            self.final_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
+        else:
+            self.final_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
 
         self.head = nn.Linear(self.hid_size, args.n_actions)
 

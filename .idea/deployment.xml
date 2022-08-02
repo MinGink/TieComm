@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="ming@10.113.178.78:22" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="jueming@10.113.164.100:22" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
-      <paths name="ming@10.113.178.78:22">
+      <paths name="jueming@10.113.164.100:22">
         <serverdata>
           <mappings>
             <mapping deploy="/ming" local="$PROJECT_DIR$" web="/" />
