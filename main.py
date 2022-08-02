@@ -55,7 +55,7 @@ def main(args):
 
     tags = ['Ming',args.env, args.map, args.agent, args.memo]
 
-    wandb.init(project='AAAI', name=args.exp_id, tags=tags, dir=results_path)
+    wandb.init(project='Fight', name=args.exp_id, tags=tags, dir=results_path)
     wandb.config.update(args)
 
 
@@ -69,6 +69,7 @@ def main(args):
     exp_config['episode_length'] = env_info["episode_length"]
     exp_config['n_agents'] = env_info["n_agents"]
     exp_config['n_actions'] = env_info["n_actions"]
+
     agent = agent_REGISTRY[args.agent](agent_config)
     if args.agent=='ic3net':
         exp_config['hard_attn']=True
@@ -165,15 +166,14 @@ if __name__ == '__main__':
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="easy", help='environment map name')
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
-                        choices=['tiecomm','tiecomm_random','tiecomm_one','ac_mlp','ac_att','commnet'])
+                        choices=['tiecomm','tiecomm_random','tiecomm_one','ac_mlp','ac_att','commnet','ic3net','tarmac','magic'])
     parser.add_argument('--block', type=str, default='no',choices=['no','inter','intra'], help='only works for tiecomm')
-    parser.add_argument('--seed', type=int, default=666, help='random seed')
+    parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
-    parser.add_argument('--total_epoches', type=int, default=5000, help='total number of training epochs')
-    parser.add_argument('--epoch_size', type=int, default=2, help='epoch size')
+    parser.add_argument('--total_epoches', type=int, default=10000, help='total number of training epochs')
     parser.add_argument('--batch_size', type=int, default=200, help='batch size')
-    parser.add_argument('--n_processes', type=int, default=2, help='number of processes')
+    parser.add_argument('--n_processes', type=int, default=3, help='number of processes')
     args = parser.parse_args()
 
     training_begin_time = time.time()
