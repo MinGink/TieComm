@@ -5,6 +5,7 @@ from .runner_dual import RunnerDual
 from .runner_magic import RunnerMagic
 from .runner_baselines import RunnerBaseline
 from collections import namedtuple
+from .runner_ic3net import RunnerIcnet
 
 
 
@@ -23,7 +24,7 @@ REGISTRY["tiecomm_one"] = RunnerOne
 
 REGISTRY["magic"] = RunnerMagic
 REGISTRY["commnet"] = RunnerBaseline
-REGISTRY["ic3net"] = RunnerBaseline
+REGISTRY["ic3net"] = RunnerIcnet
 REGISTRY["tarmac"] = RunnerBaseline
 
 

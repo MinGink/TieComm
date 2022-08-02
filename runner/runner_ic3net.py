@@ -3,16 +3,17 @@ import torch.nn as nn
 from collections import namedtuple
 import numpy as np
 from torch.optim import Adam
-from modules.utils import merge_dict
+
+from modules.utils import merge_dict, multinomials_log_density
 import time
 import argparse
 from .runner import Runner
 
 Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
                                         'episode_masks', 'episode_agent_masks', 'values'))
-class RunnerBaseline(Runner):
+class RunnerIcnet(Runner):
     def __init__(self, config, env, agent):
-        super(RunnerBaseline, self).__init__(config, env, agent)
+        super(RunnerIcnet, self).__init__(config, env, agent)
 
 
     def run_an_episode(self):
@@ -27,9 +28,9 @@ class RunnerBaseline(Runner):
         step = 1
         done = False
         while not done and step <= self.args.episode_length:
-            if step == 1 and self.args.hard_attn and self.args.commnet:
+            if step == 1:
                 info['comm_action'] = np.zeros(self.args.n_agents, dtype=int)
-            if self.args.commnet and self.args.recurrent:
+            if self.args.recurrent:
 
                 self.args.rnn_type = 'LSTM'
             if self.args.recurrent:
@@ -57,17 +58,16 @@ class RunnerBaseline(Runner):
             else:
                 obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
                 action_outs, values = self.agent(obs_tensor,info)#
-            if self.args.hard_attn:
-                actions = self.choose_action2(action_outs)
+
+            actions = self.choose_action(action_outs)
                 # action_outs = action_outs.unsqueeze(0)
-            else:
-                actions = self.choose_action(action_outs)
+
 
             rewards, done, env_info = self.env.step(actions)
 
             next_obs = self.env.get_obs()
-            if self.args.hard_attn and self.args.commnet:
-                info['comm_action'] = actions[-1] if not self.args.comm_action_one else np.ones(self.args.n_agents,
+
+            info['comm_action'] = actions[-1] if not self.args.comm_action_one else np.ones(self.args.n_agents,
                                                                                                 dtype=int)
 
             # episode_mask = np.zeros(np.array(rewards).shape)
@@ -114,3 +114,86 @@ class RunnerBaseline(Runner):
 
 
 
+
+    def compute_grad(self, batch):
+        return self.compute_agent_grad(batch)
+
+
+
+    def compute_agent_grad(self, batch):
+
+        log = dict()
+
+        n = self.n_agents
+        batch_size = len(batch.obs)
+        rewards = torch.Tensor(batch.rewards)
+        actions = torch.Tensor(batch.actions)
+        actions = actions.transpose(1, 2).view(-1, n, 2)
+
+        episode_masks = torch.Tensor(batch.episode_masks)
+        episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
+
+
+        values = torch.cat(batch.values, dim=0)  # (batch, n, 1)
+        action_outs = list(zip(*batch.action_outs))
+        # action_outs = torch.Tensor(batch.action_outs)
+        # # action_outs = batch.action_outs
+        # action_outs = action_outs.transpose(1, 2).view(-1, n, 2)
+        # for tnsr in action_outs:
+        #     tnsr=list(tnsr)
+        #     for b in tnsr:
+        #         b=b.unsqueeze(0)
+        #         c=tnsr
+        action_outs = [torch.cat(a, dim=0) for a in action_outs]
+        action_outs = [a.view(batch_size, -1, 2) for a in action_outs]
+
+        returns = torch.Tensor(batch_size, n)
+        advantages = torch.Tensor(batch_size, n)
+        values = values.view(batch_size, n)
+        prev_returns = 0
+
+        for i in reversed(range(rewards.size(0))):
+            returns[i] = rewards[i] + self.args.gamma * prev_returns * episode_masks[i] * episode_agent_masks[i]
+            prev_returns = returns[i].clone()
+
+
+
+        for i in reversed(range(rewards.size(0))):
+            advantages[i] = returns[i] - values.data[i]
+
+        if self.args.normalize_rewards:
+            advantages = (advantages - advantages.mean()) / advantages.std()
+
+        # element of log_p_a: [(batch_size*n) * num_actions[i]]
+        # log_p_a = [action_outs.view(-1, self.n_actions)]
+        log_p_a = [a.view(-1, self.n_actions) for a in action_outs]
+        # actions: [(batch_size*n) * dim_actions]
+        actions = actions.contiguous().view(-1, 2)
+        log_prob = multinomials_log_density(actions, log_p_a)
+        action_loss = -advantages.view(-1) * log_prob.squeeze()
+        actor_loss = action_loss.sum()
+
+
+        targets = returns
+        value_loss = (values - targets).pow(2).view(-1)
+        critic_loss = value_loss.sum()
+
+
+        total_loss = actor_loss + self.args.value_coeff * critic_loss
+        total_loss.backward()
+
+
+        log['action_loss'] = actor_loss.item()
+        log['value_loss'] = critic_loss.item()
+        log['total_loss'] = total_loss.item()
+
+        return log
+
+
+
+    def choose_action(self, log_p_a):
+        log_p_a = [a.unsqueeze(0) for a in log_p_a]
+        p_a = [[z.exp() for z in x] for x in log_p_a]
+        ret = torch.stack([torch.stack([torch.multinomial(x, 1).detach() for x in p]) for p in p_a])
+        action = [x.squeeze().data.numpy() for x in ret]
+        return action
