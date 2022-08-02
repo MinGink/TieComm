@@ -31,9 +31,16 @@ class CommNetAgent(nn.Module):
         # self.hid_size = args.hid_size
         # self.comm_passes = args.comm_passes
         # self.recurrent = args.recurrent
-        # self.heads = nn.ModuleList([nn.Linear(args.hid_size, o)
-        #                             for o in args.naction_heads])
-        self.head = nn.Linear(self.args.hid_size, self.args.n_actions)
+        if self.args.hard_attn:
+            if not isinstance(self.args.n_actions, (list, tuple)):  # single action case
+                self.args.n_actions = [self.args.n_actions]
+            # self.dim_actions = self.args.env.dim_actions+1
+            self.args.n_actions = [*self.args.n_actions, 2]
+            self.n_action_heads = [int(self.args.n_actions[i]) for i in range(2)]
+            self.heads = nn.ModuleList([nn.Linear(self.args.hid_size, o)
+                                    for o in self.n_action_heads])
+        else:
+            self.head = nn.Linear(self.args.hid_size, self.args.n_actions)
         self.init_std = self.args.init_std if hasattr(self.args, 'comm_init_std') else 0.2
 
         # Mask for communication
@@ -67,7 +74,7 @@ class CommNetAgent(nn.Module):
                                                 for _ in range(self.comm_passes)])
             else:
                 self.f_modules = nn.ModuleList([nn.Linear(self.args.hid_size, self.args.hid_size)
-                                                for _ in range(self.comm_passes)])
+                                                for _ in range(self.args.comm_passes)])
         # else:
             # raise RuntimeError("Unsupported RNN type.")
 
@@ -97,14 +104,14 @@ class CommNetAgent(nn.Module):
 
 
     def get_agent_mask(self, batch_size, info):
-        n = self.n_agents
-
-        if 'alive_mask' in info:
-            agent_mask = torch.from_numpy(info['alive_mask'])
-            num_agents_alive = agent_mask.sum()
-        else:
-            agent_mask = torch.ones(n)
-            num_agents_alive = n
+        n = self.args.n_agents
+        #
+        # if 'alive_mask' in info:
+        #     agent_mask = torch.from_numpy(info['alive_mask'])
+        #     num_agents_alive = agent_mask.sum()
+        # else:
+        agent_mask = torch.ones(n)
+        num_agents_alive = n
 
         agent_mask = agent_mask.view(1, 1, n)
         agent_mask = agent_mask.expand(batch_size, n, n).unsqueeze(-1).clone() # clone gives the full tensor and avoid the error
@@ -113,17 +120,18 @@ class CommNetAgent(nn.Module):
 
     def forward_state_encoder(self, x):
         hidden_state, cell_state = None, None
-        x = x.unsqueeze(0)
+
         if self.args.recurrent:
             x, extras = x
             x = self.encoder(x)
 
-            if self.args.rnn_type == 'LSTM':
-                hidden_state, cell_state = extras
-            else:
-                hidden_state = extras
+            # if self.args.rnn_type == 'LSTM':
+            hidden_state, cell_state = extras
+            # else:
+            #     hidden_state = extras
             # hidden_state = self.tanh( self.hidd_encoder(prev_hidden_state) + x)
         else:
+            x = x.unsqueeze(0)  #
             x = self.encoder(x)
             x = self.tanh(x)
             hidden_state = x
@@ -163,7 +171,7 @@ class CommNetAgent(nn.Module):
         x, hidden_state, cell_state = self.forward_state_encoder(x)
 
         batch_size = x.size()[0]
-        n = self.n_agents
+        n = self.args.n_agents
 
         num_agents_alive, agent_mask = self.get_agent_mask(batch_size, info)
 
@@ -176,7 +184,7 @@ class CommNetAgent(nn.Module):
 
         agent_mask_transpose = agent_mask.transpose(1, 2)
 
-        for i in range(self.comm_passes):
+        for i in range(self.args.comm_passes):
             # Choose current or prev depending on recurrent
             comm = hidden_state.view(batch_size, n, self.args.hid_size) if self.args.recurrent else hidden_state
             #comm = comm.unsqueeze(0)
@@ -222,12 +230,13 @@ class CommNetAgent(nn.Module):
                 # and Add skip connection from start and sum them
                 hidden_state = sum([x, self.f_modules[i](hidden_state), c])
                 hidden_state = self.tanh(hidden_state)
-        hidden_state= hidden_state.squeeze(0)
+        hidden_state= hidden_state.squeeze(0)#
         # v = torch.stack([self.value_head(hidden_state[:, i, :]) for i in range(n)])
         # v = v.view(hidden_state.size(0), n, -1)
         value_head = self.value_head(hidden_state)
         #h = hidden_state.view(batch_size, n, self.hid_size)
-        h = hidden_state.view(n, self.args.hid_size)
+        h = hidden_state.view(n, self.args.hid_size)#
+        #h = hidden_state.view(batch_size, n, self.hid_size)
         # if self.continuous:
         #     action_mean = self.action_mean(h)
         #     action_log_std = self.action_log_std.expand_as(action_mean)
@@ -236,7 +245,11 @@ class CommNetAgent(nn.Module):
         #     action = (action_mean, action_log_std, action_std)
         # else:
             # discrete actions
-        action = F.log_softmax(self.head(h), dim=-1)
+        if self.args.hard_attn:
+            action = [F.log_softmax(head(h), dim=-1) for head in self.heads]
+        else:
+            action = F.log_softmax(self.head(h), dim=-1)#
+        #action = [F.log_softmax(head(h), dim=-1) for head in self.heads]
 
         if self.args.recurrent:
             return action, value_head, (hidden_state.clone(), cell_state.clone())

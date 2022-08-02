@@ -118,6 +118,9 @@ class Runner(object):
     def compute_grad(self, batch):
         return self.compute_agent_grad(batch)
 
+    def compute_grad2(self, batch):
+        return self.compute_agent_grad2(batch)
+
 
     def compute_agent_grad(self, batch):
 
@@ -177,6 +180,74 @@ class Runner(object):
 
         return log
 
+    def compute_agent_grad2(self, batch):
+
+        log = dict()
+
+        n = self.n_agents
+        batch_size = len(batch.obs)
+        rewards = torch.Tensor(batch.rewards)
+        actions = torch.Tensor(batch.actions)
+        actions = actions.transpose(1, 2).view(-1, n, 1)
+
+        episode_masks = torch.Tensor(batch.episode_masks)
+        episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
+
+
+        values = torch.cat(batch.values, dim=0)  # (batch, n, 1)
+        action_outs = list(zip(*batch.action_outs))
+        # action_outs = torch.Tensor(batch.action_outs)
+        # # action_outs = batch.action_outs
+        # action_outs = action_outs.transpose(1, 2).view(-1, n, 2)
+        # for tnsr in action_outs:
+        #     tnsr=list(tnsr)
+        #     for b in tnsr:
+        #         b=b.unsqueeze(0)
+        #         c=tnsr
+        action_outs = [torch.cat(a, dim=0) for a in action_outs]
+        action_outs = [a.view(batch_size, -1, 2) for a in action_outs]
+
+        returns = torch.Tensor(batch_size, n)
+        advantages = torch.Tensor(batch_size, n)
+        values = values.view(batch_size, n)
+        prev_returns = 0
+
+        for i in reversed(range(rewards.size(0))):
+            returns[i] = rewards[i] + self.args.gamma * prev_returns * episode_masks[i] * episode_agent_masks[i]
+            prev_returns = returns[i].clone()
+
+
+
+        for i in reversed(range(rewards.size(0))):
+            advantages[i] = returns[i] - values.data[i]
+
+        if self.args.normalize_rewards:
+            advantages = (advantages - advantages.mean()) / advantages.std()
+
+        # element of log_p_a: [(batch_size*n) * num_actions[i]]
+        # log_p_a = [action_outs.view(-1, self.n_actions)]
+        log_p_a = [a.view(-1, self.n_actions) for a in action_outs]
+        # actions: [(batch_size*n) * dim_actions]
+        actions = actions.contiguous().view(-1, 2)
+        log_prob = multinomials_log_density(actions, log_p_a)
+        action_loss = -advantages.view(-1) * log_prob.squeeze()
+        actor_loss = action_loss.sum()
+
+
+        targets = returns
+        value_loss = (values - targets).pow(2).view(-1)
+        critic_loss = value_loss.sum()
+
+
+        total_loss = actor_loss + self.args.value_coeff * critic_loss
+        total_loss.backward()
+
+
+        log['action_loss'] = actor_loss.item()
+        log['value_loss'] = critic_loss.item()
+        log['total_loss'] = total_loss.item()
+
+        return log
 
 
     def reset(self):

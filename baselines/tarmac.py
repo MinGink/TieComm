@@ -63,10 +63,10 @@ class TarCommAgent(nn.Module):
             if self.args.share_weights:
                 self.f_module = nn.Linear(self.args.hid_size, self.args.hid_size)
                 self.f_modules = nn.ModuleList([self.f_module
-                                                for _ in range(self.comm_passes)])
+                                                for _ in range(self.args.comm_passes)])
             else:
                 self.f_modules = nn.ModuleList([nn.Linear(self.args.hid_size, self.args.hid_size)
-                                                for _ in range(self.comm_passes)])
+                                                for _ in range(self.args.comm_passes)])
         # else:
         # raise RuntimeError("Unsupported RNN type.")
 
@@ -118,17 +118,18 @@ class TarCommAgent(nn.Module):
 
     def forward_state_encoder(self, x):
         hidden_state, cell_state = None, None
-        x = x.unsqueeze(0)
+
         if self.args.recurrent:
             x, extras = x
             x = self.encoder(x)
 
-            if self.args.rnn_type == 'LSTM':
-                hidden_state, cell_state = extras
-            else:
-                hidden_state = extras
+            # if self.args.rnn_type == 'LSTM':
+            hidden_state, cell_state = extras
+            # else:
+            #     hidden_state = extras
             # hidden_state = self.tanh( self.hidd_encoder(prev_hidden_state) + x)
         else:
+            x = x.unsqueeze(0)  #
             x = self.encoder(x)
             x = self.tanh(x)
             hidden_state = x
@@ -181,7 +182,7 @@ class TarCommAgent(nn.Module):
 
         agent_mask_transpose = agent_mask.transpose(1, 2)
 
-        for i in range(self.aegs.comm_passes):
+        for i in range(self.args.comm_passes):
             # Choose current or prev depending on recurrent
             comm = hidden_state.view(batch_size, n, self.args.hid_size) if self.args.recurrent else hidden_state
 
@@ -275,13 +276,15 @@ class TarCommAgent(nn.Module):
                 # and Add skip connection from start and sum them
                 hidden_state = sum([x, self.f_modules[i](hidden_state), c])
                 hidden_state = self.tanh(hidden_state)
-        hidden_state = hidden_state.squeeze(0)
+        hidden_state = hidden_state.squeeze(0)#
         # v = torch.stack([self.value_head(hidden_state[:, i, :]) for i in range(n)])
         # v = v.view(hidden_state.size(0), n, -1)
         value_head = self.value_head(hidden_state)
-        h = hidden_state.view(n, self.args.hid_size)
+        h = hidden_state.view(n, self.args.hid_size)#
+        #h = hidden_state.view(batch_size, n, self.args.hid_size)
 
         action = F.log_softmax(self.head(h), dim=-1)
+        #action = [F.log_softmax(self.head(h), dim=-1) for head in self.heads}
 
         if self.args.recurrent:
             return action, value_head, (hidden_state.clone(), cell_state.clone())

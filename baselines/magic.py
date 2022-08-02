@@ -60,11 +60,11 @@ class MAGICAgent(nn.Module):
                     nn.Linear(self.args.gat_encoder_out_size // 2, 2))
             else:
                 self.sub_scheduler_mlp1 = nn.Sequential(
-                    nn.Linear(self.hid_size * 2, self.hid_size // 2),
+                    nn.Linear(self.args.hid_size * 2, self.args.hid_size // 2),
                     nn.ReLU(),
-                    nn.Linear(self.hid_size // 2, self.hid_size // 8),
+                    nn.Linear(self.args.hid_size // 2, self.args.hid_size // 8),
                     nn.ReLU(),
-                    nn.Linear(self.hid_size // 8, 2))
+                    nn.Linear(self.self.args.hid_size // 8, 2))
 
         if self.args.learn_second_graph and not self.args.second_graph_complete:
             if self.args.use_gat_encoder:
@@ -76,11 +76,11 @@ class MAGICAgent(nn.Module):
                     nn.Linear(self.args.gat_encoder_out_size // 2, 2))
             else:
                 self.sub_scheduler_mlp2 = nn.Sequential(
-                    nn.Linear(self.hid_size * 2, self.hid_size // 2),
+                    nn.Linear(self.args.hid_size * 2, self.args.hid_size // 2),
                     nn.ReLU(),
-                    nn.Linear(self.hid_size // 2, self.hid_size // 8),
+                    nn.Linear(self.args.hid_size // 2, self.args.hid_size // 8),
                     nn.ReLU(),
-                    nn.Linear(self.hid_size // 8, 2))
+                    nn.Linear(self.args.hid_size // 8, 2))
 
         if self.args.message_encoder:
             self.message_encoder = nn.Linear(self.args.hid_size, self.args.hid_size)
@@ -101,7 +101,7 @@ class MAGICAgent(nn.Module):
         # initialize the action head (in practice, one action head is used)
         # self.action_heads = nn.ModuleList([nn.Linear(2*args.hid_size, o)
         #                                 for o in args.naction_heads])
-        self.action_heads = nn.Linear(2 * self.args.hid_size, self.args.n_actions)
+        self.action_heads = nn.Linear(2 * self.args.hid_size, self.args.n_actions)#
         # initialize the value head
         self.value_head = nn.Linear(2 * self.args.hid_size, 1)
 
@@ -129,7 +129,7 @@ class MAGICAgent(nn.Module):
         hidden_state, cell_state = extras
 
         batch_size = encoded_obs.size()[0]
-        n = self.n_agents
+        n = self.args.n_agents
 
         num_agents_alive, agent_mask = self.get_agent_mask(batch_size, info)
 
@@ -190,10 +190,10 @@ class MAGICAgent(nn.Module):
 
         value_head = self.value_head(torch.cat((hidden_state, comm), dim=-1))
 
-        h = hidden_state.view(n, self.hid_size)
-        c = comm.view(n, self.hid_size)
+        h = hidden_state.view(n, self.args.hid_size)
+        c = comm.view(n, self.args.hid_size)
 
-        action_out = F.log_softmax(self.action_heads(torch.cat((h, c), dim=-1)), dim=-1)
+        action_out = F.log_softmax(self.action_heads(torch.cat((h, c), dim=-1)), dim=-1)#
 
         return action_out, value_head, (hidden_state.clone(), cell_state.clone())
 
@@ -206,7 +206,7 @@ class MAGICAgent(nn.Module):
             agent_mask (tensor): [n, 1]
         """
 
-        n = self.n_agents
+        n = self.args.n_agents
 
         if 'alive_mask' in info:
             agent_mask = torch.from_numpy(info['alive_mask'])

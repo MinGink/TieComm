@@ -70,6 +70,26 @@ def main(args):
     exp_config['n_agents'] = env_info["n_agents"]
     exp_config['n_actions'] = env_info["n_actions"]
     agent = agent_REGISTRY[args.agent](agent_config)
+    if args.agent=='ic3net':
+        exp_config['hard_attn']=True
+        exp_config['commnet']=True
+        exp_config['detach_gap'] = 10
+        exp_config['comm_action_one'] = True
+    elif args.agent=='commnet':
+        exp_config['hard_attn']=False
+        exp_config['commnet']=True
+        exp_config['detach_gap'] = 1
+    elif args.agent=='tarmac':
+        exp_config['hard_attn']=False
+        exp_config['commnet']=True
+        exp_config['detach_gap'] = 10
+    elif args.agent=='magic':
+        exp_config['hard_attn']=False
+        exp_config['hid_size']=128
+        exp_config['detach_gap'] = 10
+    else:
+        pass
+
 
     #wandb.watch(agent)
 
