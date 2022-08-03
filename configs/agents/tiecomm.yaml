@@ -1,6 +1,7 @@
 name: "tiecomm"
 hid_size: 64
 block: 'no'
+time_interval: 10
 
 
 

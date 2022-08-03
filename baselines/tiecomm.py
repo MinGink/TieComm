@@ -62,7 +62,7 @@ class TieCommAgent(nn.Module):
                       group_id_list = set[i]
                       group_obs = local_obs[group_id_list, :]
                       group_att = self.intra_com(group_obs)
-                      group_emd = self.group_pooling(group_obs, mode='mean')
+                      group_emd = self.group_pooling(group_obs, mode='sum')
                       group_emd_list.append(group_emd)
                       intra_obs[group_id_list, :] = group_att
               group_emd_list = self.inter_com(torch.cat(group_emd_list,dim=0))
