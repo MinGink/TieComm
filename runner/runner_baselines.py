@@ -57,11 +57,8 @@ class RunnerBaseline(Runner):
             else:
                 obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
                 action_outs, values = self.agent(obs_tensor,info)#
-            if self.args.hard_attn:
-                actions = self.choose_action2(action_outs)
-                # action_outs = action_outs.unsqueeze(0)
-            else:
-                actions = self.choose_action(action_outs)
+
+            actions = self.choose_action(action_outs)
 
             rewards, done, env_info = self.env.step(actions)
 
