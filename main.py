@@ -163,7 +163,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="inter-4", help='memo name')
+    parser.add_argument('--memo', type=str, default="attset", help='memo name')
     parser.add_argument('--env', type=str, default="tj", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="easy", help='environment map name')
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
-    parser.add_argument('--total_epoches', type=int, default=2000, help='total number of training epochs')
+    parser.add_argument('--total_epoches', type=int, default=10000, help='total number of training epochs')
     parser.add_argument('--batch_size', type=int, default=200, help='batch size')
     parser.add_argument('--n_processes', type=int, default=3, help='number of processes')
     args = parser.parse_args()

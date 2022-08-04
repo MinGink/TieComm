@@ -2,9 +2,10 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 import numpy as np
-from cdlib import algorithms
+# from cdlib import algorithms
 import networkx as nx
 import argparse
+import cmath
 
 # from torch.nn import TransformerEncoder, TransformerEncoderLayer
 # import math
@@ -94,22 +95,22 @@ class TieCommAgent(nn.Module):
 
 
     def intra_com(self, input):
-        #hidden = self.agent.intra_fc(input)
-        #score = torch.softmax(hidden, dim=0)
-        #weighted_emb = score * hidden
-        weighted_emb, _  = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
-        return weighted_emb.squeeze(0)
-        #return weighted_emb
+        hidden = self.agent.intra_fc(input)
+        score = torch.softmax(hidden, dim=0)
+        weighted_emb = score * input
+        #weighted_emb, _  = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
+        #return weighted_emb.squeeze(0)
+        return weighted_emb
 
 
 
     def inter_com(self, input):
-        #embeding = self.agent.inter_fc(input)
-        #score = torch.softmax(embeding, dim=0)
-        #weighted_emb = score * input
-        weighted_emb,_ = self.agent.inter_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
-        return weighted_emb.squeeze(0)
-        #return weighted_emb
+        hidden = self.agent.inter_fc(input)
+        score = torch.softmax(hidden, dim=0)
+        weighted_emb = score * input
+        #weighted_emb,_ = self.agent.inter_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
+        #return weighted_emb.squeeze(0)
+        return weighted_emb
 
 
 
@@ -230,18 +231,11 @@ class GodAC(nn.Module):
         x = self.tanh(self.fc2(matrixs))
 
 
-        #score = F.sigmoid(self.fc3(x))
-        #action_out  = F.softmax(self.fc3(x), dim=-1)
-        #dist = torch.distributions.Categorical(action_out)
-        #relation = dist.sample()
 
         log_action_out = F.log_softmax(self.fc3(x), dim=-1)
         relation = torch.multinomial(log_action_out .exp(), 1).squeeze(-1).detach()
         adj_matrix = self._generate_adj(relation)
-        adj_matrix[self.i_lower] = adj_matrix.T[self.i_lower]
-        G = nx.from_numpy_matrix(adj_matrix)
-        set = algorithms.louvain(G).communities
-
+        set = self._graph_partition(relation)
 
         value = self.tanh(self.value_fc1(hid.unsqueeze(0).flatten(start_dim=1, end_dim=-1)))
         value = self.tanh(self.value_fc2(value))
@@ -253,9 +247,45 @@ class GodAC(nn.Module):
 
 
 
+    # def _graph_partition(self, adj_matrix):
+    #     G = nx.from_numpy_matrix(adj_matrix)
+    #     set = algorithms.louvain(G).communities
+    #     return set
+
+
+    def _graph_partition(self, adj_matrix):
+        G = nx.from_numpy_matrix(adj_matrix)
+        for e in G.edges():
+            strength = self.measure_strength(G, e[0], e[1])
+            G[e[0]][e[1]]['weight'] = 1
+
+
+
+        return set
+
+
+
+
+
+    def measure_strength(self, G, node_i, node_j):
+        list1 = set([])
+        list2 = set([])
+        for i in G[node_i].neighbors():
+            list1.add(i)
+        strength =  len(list1 & list2) /  cmath.sqrt(len(list1)  * len(list2))
+        return strength
+
+
     def _generate_adj(self, relation):
         adj_matrixs = torch.zeros(self.n_agents * self.n_agents,1, dtype=torch.long)
         adj_matrixs[self.index,:] = relation.unsqueeze(-1)
         adj_matrixs = adj_matrixs.view(self.n_agents, self.n_agents).detach().numpy()
+        adj_matrixs[self.i_lower] = adj_matrixs.T[self.i_lower]
         return adj_matrixs
+
+
+
+
+
+
 
