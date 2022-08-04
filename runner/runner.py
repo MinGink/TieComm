@@ -127,12 +127,12 @@ class Runner(object):
 
         n = self.n_agents
         batch_size = len(batch.obs)
-        rewards = torch.Tensor(batch.rewards)
-        actions = torch.Tensor(batch.actions)
+        rewards = torch.Tensor(np.array(batch.rewards))
+        actions = torch.Tensor(np.array(batch.actions))
         actions = actions.transpose(1, 2).view(-1, n, 1)
 
-        episode_masks = torch.Tensor(batch.episode_masks)
-        episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
+        episode_masks = torch.Tensor(np.array(batch.episode_masks))
+        episode_agent_masks = torch.Tensor(np.array(batch.episode_agent_masks))
 
 
         values = torch.cat(batch.values, dim=0)  # (batch, n, 1)

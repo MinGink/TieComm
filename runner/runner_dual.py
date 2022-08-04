@@ -114,9 +114,9 @@ class RunnerDual(Runner):
         batch_size = len(batch.god_value)
 
 
-        episode_masks = torch.Tensor(batch.episode_masks).squeeze(-1)
+        episode_masks = torch.Tensor(np.array(batch.episode_masks)).squeeze(-1)
         values = torch.cat(batch.god_value, dim=0)
-        rewards = torch.Tensor(batch.god_reward).unsqueeze(-1)
+        rewards = torch.Tensor(np.array(batch.god_reward)).unsqueeze(-1)
         actions = torch.stack(batch.god_action, dim=0)
         action_outs = torch.stack(batch.god_action_out, dim=0)
 

@@ -2,18 +2,10 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 import numpy as np
-# from cdlib import algorithms
 import networkx as nx
 import argparse
-import cmath
+from modules.graph import measure_strength
 
-# from torch.nn import TransformerEncoder, TransformerEncoderLayer
-# import math
-# from sklearn.metrics.pairwise import cosine_similarity
-# import matplotlib.pyplot as plt
-# import random
-# from gym import spaces
-# from torch.distributions import Categorical
 
 
 
@@ -35,12 +27,14 @@ class TieCommAgent(nn.Module):
             self.random_prob = self.args.random_prob
 
         self.block = self.args.block
+        self.threshold = self.args.threshold
 
 
     def random_set(self):
         G = nx.binomial_graph(self.n_agents, self.random_prob, seed=self.seed , directed=False)
-        set = algorithms.louvain(G).communities
+        set = self.god.graph_partition(G)
         return set
+
 
 
     def communicate(self, local_obs, set):
@@ -193,6 +187,7 @@ class GodAC(nn.Module):
         self.args = args
         self.n_agents = args.n_agents
         self.hid_size = args.hid_size
+        self.threshold = self.args.threshold
 
         self.fc1 = nn.Linear(args.obs_shape, self.hid_size)
         self.multihead_attn = nn.MultiheadAttention(self.hid_size, 8, batch_first=True)
@@ -235,45 +230,29 @@ class GodAC(nn.Module):
         log_action_out = F.log_softmax(self.fc3(x), dim=-1)
         relation = torch.multinomial(log_action_out .exp(), 1).squeeze(-1).detach()
         adj_matrix = self._generate_adj(relation)
-        set = self._graph_partition(relation)
+        G = nx.from_numpy_matrix(adj_matrix)
+        set = self.graph_partition(G)
 
         value = self.tanh(self.value_fc1(hid.unsqueeze(0).flatten(start_dim=1, end_dim=-1)))
         value = self.tanh(self.value_fc2(value))
         value = self.value_fc3(value)
-        #value = value.repeat(log_action_out.shape[0], 1)
 
 
         return set, log_action_out, value, relation
 
 
+    def graph_partition(self, G):
+        g = nx.Graph()
+        g.add_nodes_from(G.nodes(data=False))
 
-    # def _graph_partition(self, adj_matrix):
-    #     G = nx.from_numpy_matrix(adj_matrix)
-    #     set = algorithms.louvain(G).communities
-    #     return set
-
-
-    def _graph_partition(self, adj_matrix):
-        G = nx.from_numpy_matrix(adj_matrix)
         for e in G.edges():
-            strength = self.measure_strength(G, e[0], e[1])
-            G[e[0]][e[1]]['weight'] = 1
+            strength = measure_strength(G, e[0], e[1])
+            if strength > self.threshold:
+                g.add_edge(e[0], e[1], weight=strength)
 
-
-
+        set = [list(c) for c in nx.connected_components(g)]
         return set
 
-
-
-
-
-    def measure_strength(self, G, node_i, node_j):
-        list1 = set([])
-        list2 = set([])
-        for i in G[node_i].neighbors():
-            list1.add(i)
-        strength =  len(list1 & list2) /  cmath.sqrt(len(list1)  * len(list2))
-        return strength
 
 
     def _generate_adj(self, relation):
