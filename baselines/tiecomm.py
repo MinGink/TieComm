@@ -89,6 +89,8 @@ class TieCommAgent(nn.Module):
 
 
     def intra_com(self, input):
+
+
         hidden = self.agent.intra_fc(input)
         score = torch.softmax(hidden, dim=0)
         weighted_emb = score * input
@@ -130,21 +132,40 @@ class AgentAC(nn.Module):
 
         self.emb_fc = nn.Linear(args.obs_shape, self.hid_size, bias=True)
 
+
+
         self.intra_fc = nn.Linear(self.hid_size, self.hid_size, bias=False)
         self.intra_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
+
+        intra_tf_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
+                                                         batch_first=True)
+        self.intra_tf = nn.TransformerEncoder(intra_tf_layer, num_layers=1)
+
 
         self.inter_fc = nn.Linear(self.hid_size, self.hid_size, bias=False)
         self.inter_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
 
+        inter_tf_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
+                                                         batch_first=True)
+        self.inter_tf = nn.TransformerEncoder(inter_tf_layer, num_layers=1)
+
+
         self.final_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
+
+        final_tf_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
+                                                         batch_first=True)
+        self.final_tf = nn.TransformerEncoder(final_tf_layer, num_layers=1)
+
+
+
 
         if self.args.block == 'no':
             self.final_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
         else:
             self.final_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
 
-        self.head = nn.Linear(self.hid_size, args.n_actions)
 
+        self.head = nn.Linear(self.hid_size, args.n_actions)
         self.value_fc1 = nn.Linear(self.hid_size * 1, self.hid_size)
         self.value_head = nn.Linear(self.hid_size, 1)
 
@@ -164,7 +185,6 @@ class AgentAC(nn.Module):
 
 
     def forward(self, after_comm):
-
         #x = self.tanh(self.emb_fc(after_comm))
         #h, _ = self.intra_attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
 

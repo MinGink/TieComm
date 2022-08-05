@@ -163,7 +163,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="attset", help='memo name')
+    parser.add_argument('--memo', type=str, default="newgrouping", help='memo name')
     parser.add_argument('--env', type=str, default="tj", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="easy", help='environment map name')

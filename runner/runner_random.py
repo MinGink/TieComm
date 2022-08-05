@@ -14,6 +14,8 @@ Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards
 class RunnerRandom(Runner):
     def __init__(self, config, env, agent):
         super(RunnerRandom, self).__init__(config, env, agent)
+        self.interval = self.args.interval
+
 
 
 
@@ -29,10 +31,13 @@ class RunnerRandom(Runner):
 
         step = 1
         done = False
+        set = 0
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-            set = self.agent.random_set()
+
+            if step % self.interval == 0:
+                set = self.agent.random_set()
             after_comm = self.agent.communicate(obs_tensor, set)
             action_outs, values = self.agent.agent(after_comm)
             actions = self.choose_action(action_outs)
