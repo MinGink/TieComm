@@ -142,7 +142,7 @@ def main(args):
                     'god_action_loss': log['god_action_loss'],
                     'god_value_loss': log['god_value_loss'],
                     'god_total_loss': log['god_total_loss'],
-                    'num_groups': log['num_groups'],
+                    'num_groups': log['num_groups']/log['num_episodes'],
                     })
 
         if args.env == 'tj':
