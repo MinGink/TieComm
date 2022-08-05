@@ -29,6 +29,9 @@ class TieCommAgent(nn.Module):
         self.block = self.args.block
         self.threshold = self.args.threshold
 
+        self.pooling_avg = nn.AdaptiveAvgPool1d(1)
+        self.pooling_max = nn.AdaptiveMaxPool1d(1)
+
 
     def random_set(self):
         G = nx.binomial_graph(self.n_agents, self.random_prob, seed=self.seed , directed=False)
@@ -57,7 +60,7 @@ class TieCommAgent(nn.Module):
                       group_id_list = set[i]
                       group_obs = local_obs[group_id_list, :]
                       group_att = self.intra_com(group_obs)
-                      group_emd = self.group_pooling(group_obs, mode='sum')
+                      group_emd = self.group_pooling(group_obs, mode='max')
                       group_emd_list.append(group_emd)
                       intra_obs[group_id_list, :] = group_att
               group_emd_list = self.inter_com(torch.cat(group_emd_list,dim=0))
@@ -77,8 +80,10 @@ class TieCommAgent(nn.Module):
 
     def group_pooling(self, input, mode):
         if mode == 'mean':
-            group_emb = torch.mean(input, dim=0).unsqueeze(0)
+            group_emb = self.pooling_avg(input)
+            #group_emb = torch.mean(input, dim=0).unsqueeze(0)
         elif mode == 'max':
+            #group_emb = self.pooling_max(input)
             group_emb = torch.max(input, dim=0).values.unsqueeze(0)
         elif mode == 'sum':
             group_emb = torch.sum(input, dim=0).unsqueeze(0)
@@ -89,24 +94,26 @@ class TieCommAgent(nn.Module):
 
 
     def intra_com(self, input):
+        weighted_emb = self.agent.intra_tf(input.unsqueeze(0))
 
 
-        hidden = self.agent.intra_fc(input)
-        score = torch.softmax(hidden, dim=0)
-        weighted_emb = score * input
+        # hidden = self.agent.intra_fc(input)
+        # score = torch.softmax(hidden, dim=0)
+        # weighted_emb = score * input
         #weighted_emb, _  = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
-        #return weighted_emb.squeeze(0)
-        return weighted_emb
+        return weighted_emb.squeeze(0)
+        #return weighted_emb
 
 
 
     def inter_com(self, input):
-        hidden = self.agent.inter_fc(input)
-        score = torch.softmax(hidden, dim=0)
-        weighted_emb = score * input
+        weighted_emb = self.agent.intra_tf(input.unsqueeze(0))
+        # hidden = self.agent.inter_fc(input)
+        # score = torch.softmax(hidden, dim=0)
+        # weighted_emb = score * input
         #weighted_emb,_ = self.agent.inter_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
-        #return weighted_emb.squeeze(0)
-        return weighted_emb
+        return weighted_emb.squeeze(0)
+        #return weighted_emb
 
 
 
