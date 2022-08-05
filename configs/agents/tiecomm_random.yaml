@@ -1,6 +1,7 @@
 name: "tiecomm_random"
 hid_size: 64
 random_prob: 0.0
+threshold: 0.7
 
 
 
