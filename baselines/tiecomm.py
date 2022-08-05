@@ -193,11 +193,11 @@ class AgentAC(nn.Module):
 
 
     def forward(self, after_comm):
-        h = self.final_tf(after_comm)
+        # h = self.final_tf(after_comm)
 
-        #h = h.squeeze(0)
-        #final_obs = self.final_attn(after_comm)
-        final_obs =h.flatten(start_dim=1, end_dim=-1)
+        final_obs = after_comm.flatten(start_dim=1, end_dim=-1)
+        # final_obs = self.final_attn(after_comm)
+        # final_obs =h.flatten(start_dim=1, end_dim=-1)
 
         a = self.tanh(self.actor_fc1(final_obs))
         a = F.log_softmax(self.actor_head(a), dim=-1)
@@ -276,7 +276,7 @@ class GodAC(nn.Module):
         for e in G.edges():
             strength = measure_strength(G, e[0], e[1])
             if strength > self.threshold:
-                g.add_edge(e[0], e[1], weight=strength)
+                g.add_edge(e[0], e[1])
 
         set = [list(c) for c in nx.connected_components(g)]
         return set

@@ -31,7 +31,8 @@ class RunnerRandom(Runner):
 
         step = 1
         done = False
-        set = 0
+        set = self.agent.random_set()
+        num_group = 0
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
@@ -60,10 +61,12 @@ class RunnerRandom(Runner):
             obs = next_obs
             episode_return += rewards.astype(episode_return.dtype)
             step += 1
+            num_group += len(set)
 
 
         log['episode_return'] = episode_return
         log['episode_steps'] = [step-1]
+        log['num_groups'] = num_group / (step-1)
 
         if self.args.env == 'tj':
             merge_dict(self.env.get_stat(), log)

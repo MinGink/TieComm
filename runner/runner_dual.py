@@ -41,6 +41,7 @@ class RunnerDual(Runner):
         obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
         set, god_action_out, god_value, god_action = self.agent.god(obs_tensor)
         god_reward = np.zeros(1)
+        num_group = 0
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
@@ -81,6 +82,7 @@ class RunnerDual(Runner):
             obs = next_obs
             episode_return += rewards.astype(episode_return.dtype)
             step += 1
+            num_group += len(set)
 
 
         god_trans = God_Transition(god_action_out, god_value, god_action, god_reward, np.zeros(god_value.shape))
@@ -89,6 +91,7 @@ class RunnerDual(Runner):
 
         log['episode_return'] = episode_return
         log['episode_steps'] = [step-1]
+        log['num_groups'] = num_group / (step-1)
 
         if self.args.env == 'tj':
             merge_dict(self.env.get_stat(), log)

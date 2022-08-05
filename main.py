@@ -88,7 +88,7 @@ def main(args):
         exp_config['hard_attn']=False
         exp_config['hid_size']=128
         exp_config['detach_gap'] = 10
-    elif args.agent=='tiecomm':
+    elif args.agent in ['tiecomm','tiecomm_random']:
         exp_config['interval']= agent_config['group_interval']
     else:
         pass
@@ -136,12 +136,13 @@ def main(args):
                    'total_loss': log['total_loss'],
                    })
 
-        if args.agent == 'tiecomm':
+        if args.agent in ['tiecomm','tiecomm_random']:
             wandb.log({'epoch': epoch,
                     'episode': total_num_episodes,
                     'god_action_loss': log['god_action_loss'],
                     'god_value_loss': log['god_value_loss'],
                     'god_total_loss': log['god_total_loss'],
+                    'num_groups': log['num_groups'],
                     })
 
         if args.env == 'tj':
@@ -174,7 +175,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
-    parser.add_argument('--total_epoches', type=int, default=10000, help='total number of training epochs')
+    parser.add_argument('--total_epoches', type=int, default=5000, help='total number of training epochs')
     parser.add_argument('--batch_size', type=int, default=200, help='batch size')
     parser.add_argument('--n_processes', type=int, default=3, help='number of processes')
     args = parser.parse_args()
