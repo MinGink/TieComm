@@ -167,13 +167,14 @@ class AgentAC(nn.Module):
 
 
         if self.args.block == 'no':
-            self.final_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
+            self.actor_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
+            self.value_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
         else:
-            self.final_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
+            self.actor_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
+            self.value_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
 
 
-        self.head = nn.Linear(self.hid_size, args.n_actions)
-        self.value_fc1 = nn.Linear(self.hid_size * 1, self.hid_size)
+        self.actor_head = nn.Linear(self.hid_size, args.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)
 
 
@@ -192,17 +193,17 @@ class AgentAC(nn.Module):
 
 
     def forward(self, after_comm):
-        #x = self.tanh(self.emb_fc(after_comm))
-        #h, _ = self.intra_attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
+        h = self.final_tf(after_comm)
 
         #h = h.squeeze(0)
         #final_obs = self.final_attn(after_comm)
-        final_obs =after_comm.flatten(start_dim=1, end_dim=-1)
-        y = self.tanh(self.final_fc1(final_obs))
+        final_obs =h.flatten(start_dim=1, end_dim=-1)
 
-        #v = F.tanh(self.value_fc1(finxal_obs))
-        a = F.log_softmax(self.head(y), dim=-1)
-        v = self.value_head(y)
+        a = self.tanh(self.actor_fc1(final_obs))
+        a = F.log_softmax(self.head(a), dim=-1)
+
+        v = F.tanh(self.value_fc1(final_obs))
+        v = self.value_head(v)
 
         return a, v
 
