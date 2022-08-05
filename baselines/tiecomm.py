@@ -200,9 +200,9 @@ class AgentAC(nn.Module):
         final_obs =h.flatten(start_dim=1, end_dim=-1)
 
         a = self.tanh(self.actor_fc1(final_obs))
-        a = F.log_softmax(self.head(a), dim=-1)
+        a = F.log_softmax(self.actor_head(a), dim=-1)
 
-        v = F.tanh(self.value_fc1(final_obs))
+        v = self.tanh(self.value_fc1(final_obs))
         v = self.value_head(v)
 
         return a, v
