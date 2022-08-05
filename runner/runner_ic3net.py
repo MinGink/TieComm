@@ -128,7 +128,8 @@ class RunnerIcnet(Runner):
         batch_size = len(batch.obs)
         rewards = torch.Tensor(batch.rewards)
         actions = torch.Tensor(batch.actions)
-        actions = actions.transpose(1, 2).view(-1, n, 2)
+        actions = actions.transpose(1, 2)
+        actions = actions.reshape(-1, n, self.args.n_actions)
 
         episode_masks = torch.Tensor(batch.episode_masks)
         episode_agent_masks = torch.Tensor(batch.episode_agent_masks)
@@ -145,7 +146,7 @@ class RunnerIcnet(Runner):
         #         b=b.unsqueeze(0)
         #         c=tnsr
         action_outs = [torch.cat(a, dim=0) for a in action_outs]
-        action_outs = [a.view(batch_size, -1, 2) for a in action_outs]
+        action_outs = [a.view(batch_size, -1, a.shape[1]) for a in action_outs]
 
         returns = torch.Tensor(batch_size, n)
         advantages = torch.Tensor(batch_size, n)
@@ -166,7 +167,9 @@ class RunnerIcnet(Runner):
 
         # element of log_p_a: [(batch_size*n) * num_actions[i]]
         # log_p_a = [action_outs.view(-1, self.n_actions)]
-        log_p_a = [a.view(-1, self.n_actions) for a in action_outs]
+        # log_p_a = [a.view(-1, self.n_actions) for a in action_outs]
+        num_actions=[self.n_actions, 2]
+        log_p_a = [action_outs[i].view(-1, num_actions[i]) for i in range(2)]
         # actions: [(batch_size*n) * dim_actions]
         actions = actions.contiguous().view(-1, 2)
         log_prob = multinomials_log_density(actions, log_p_a)
