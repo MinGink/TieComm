@@ -122,7 +122,7 @@ class TJ_Wrapper(object):
         #     return dict()
 
     def get_graph(self):
-        return self.env.get_graph
+        return self.env.get_graph()
 
     def get_env_info(self):
         env_info = {"obs_shape": self.observation_dim,

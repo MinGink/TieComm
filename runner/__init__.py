@@ -1,4 +1,5 @@
 from .runner import Runner
+from .runner_gnn import RunnerGNN
 from .runner_random import RunnerRandom
 from .runner_one import RunnerOne
 from .runner_dual import RunnerDual
@@ -18,6 +19,7 @@ from .runner_default import RunnerDefault
 REGISTRY = {}
 REGISTRY["ac_mlp"] = Runner
 REGISTRY["ac_att"] = Runner
+REGISTRY["gnn"] = RunnerGNN
 
 REGISTRY["tiecomm"] = RunnerDual
 REGISTRY["tiecomm_random"] = RunnerRandom

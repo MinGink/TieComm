@@ -162,6 +162,8 @@ class TrafficJunctionEnv(gym.Env):
         else:
             self._set_paths(difficulty)
 
+        self.obs = list()
+
         return
 
     def reset(self):
@@ -207,8 +209,8 @@ class TrafficJunctionEnv(gym.Env):
         #     self.epoch_last_update = epoch
 
         # Observation will be ncar * vision * vision ndarray
-        obs = self._get_obs()
-        return obs
+        self.obs = self._get_obs()
+        return self.obs
 
     def step(self, action):
         """
@@ -375,19 +377,24 @@ class TrafficJunctionEnv(gym.Env):
                 o = tuple((act, r_i, p_norm, v_sq))
             obs.append(o)
 
-        obs = tuple(obs)
-        return obs
+        self.obs = tuple(obs)
+        return self.obs
 
 
     def get_graph(self):
 
         G = nx.Graph()
-        G.add_nodes_from([i for i in range(self.n_car)])
+        G.add_nodes_from([i for i in range (self.ncar)])
+        # for i in range(self.ncar):
+        #     G.add_node(i, feature = np.array(self.obs[i]))
 
-        for i in range (self.n_car):
-            for j in range (self.n_car):
-                if np.sum(np.abs(self.grid[self.car_loc[i]] - self.grid[self.car_loc[j]])) <= 2:
+        for i in range (self.ncar):
+            for j in range (self.ncar):
+                if np.sum(np.abs(self.grid[self.car_loc[i]] - self.grid[self.car_loc[j]])) <= 4:
                     G.add_edge(i,j)
+
+        # g = nx.adjacency_matrix(G)
+
         return G
 
 

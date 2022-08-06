@@ -3,7 +3,10 @@ import torch.autograd as autograd
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
+from torch_geometric.nn import GCNConv, ChebConv, GATConv, GINConv, GATConv
+from torch_geometric.utils import from_networkx
 import argparse
+from torch_geometric.data import Data
 
 
 class MLP(nn.Module):
@@ -66,4 +69,36 @@ class Attention(nn.Module):
         #y = self.tanh(self.affine2(h))
         a = F.log_softmax(self.head(y), dim=-1)
         v = self.value_head(y)
+        return a, v
+
+
+
+class GNN(nn.Module):
+    def __init__(self, agent_config):
+        super(GNN, self).__init__()
+        self.args = argparse.Namespace(**agent_config)
+        self.hid_size = self.args.hid_size
+        self.obs_shape = self.args.obs_shape
+        self.n_actions = self.args.n_actions
+        self.tanh = nn.Tanh()
+
+
+        self.fnn1 = nn.Linear(self.obs_shape, self.hid_size)
+        self.conv2 = GCNConv(self.hid_size, self.hid_size)
+
+        self.head = nn.Linear(self.hid_size,self.n_actions)
+        self.value_head = nn.Linear(self.hid_size, 1)
+
+
+
+    def forward(self, obs, g):
+        x = self.tanh(self.fnn1(obs))
+
+        edge_index = torch.tensor(list(g.edges()), dtype=torch.long)
+        data = Data (x=x,edge_index=edge_index.t().contiguous())
+        h = self.tanh(self.conv2(data.x, data.edge_index))
+
+        a = F.log_softmax(self.head(h), dim=-1)
+        v = self.value_head(h)
+
         return a, v
