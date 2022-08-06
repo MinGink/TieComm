@@ -71,10 +71,10 @@ class RunnerDual(Runner):
             trans = Transition(np.array(obs),  action_outs, actions, np.array(rewards), values,
                                     episode_mask, episode_agent_mask)
 
-            if step % self.interval == 0:
-                god_trans = God_Transition(god_action_out, god_value, god_action, god_reward,np.ones(god_value.shape),)
-                god_memory.append(god_trans)
-                god_reward = np.zeros(1)
+            # if step % self.interval == 0:
+            #     god_trans = God_Transition(god_action_out, god_value, god_action, god_reward,np.ones(god_value.shape),)
+            #     god_memory.append(god_trans)
+            #     god_reward = np.zeros(1)
 
 
             memory.append(trans)
@@ -86,8 +86,8 @@ class RunnerDual(Runner):
             num_group += len(set)
 
 
-        god_trans = God_Transition(god_action_out, god_value, god_action, god_reward, np.zeros(god_value.shape))
-        god_memory.append(god_trans)
+        # god_trans = God_Transition(god_action_out, god_value, god_action, god_reward, np.zeros(god_value.shape))
+        # god_memory.append(god_trans)
 
 
         log['episode_return'] = episode_return

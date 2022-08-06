@@ -88,7 +88,7 @@ def main(args):
         exp_config['hard_attn']=False
         exp_config['hid_size']=128
         exp_config['detach_gap'] = 10
-    elif args.agent in ['tiecomm','tiecomm_random']:
+    elif args.agent in ['tiecomm','tiecomm_random','tiecomm_default']:
         exp_config['interval']= agent_config['group_interval']
     else:
         pass
@@ -136,12 +136,18 @@ def main(args):
                    'total_loss': log['total_loss'],
                    })
 
-        if args.agent in ['tiecomm','tiecomm_random']:
+        if args.agent == 'tiecomm':
             wandb.log({'epoch': epoch,
                     'episode': total_num_episodes,
                     'god_action_loss': log['god_action_loss'],
                     'god_value_loss': log['god_value_loss'],
                     'god_total_loss': log['god_total_loss'],
+                    'num_groups': log['num_groups']/log['num_episodes'],
+                    })
+
+        if args.agent in ['tiecomm_random','tiecomm_default']:
+            wandb.log({'epoch': epoch,
+                    'episode': total_num_episodes,
                     'num_groups': log['num_groups']/log['num_episodes'],
                     })
 
@@ -169,7 +175,7 @@ if __name__ == '__main__':
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="easy", help='environment map name')
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
-                        choices=['tiecomm','tiecomm_random','tiecomm_one','ac_mlp','ac_att','commnet','ic3net','tarmac','magic'])
+                        choices=['tiecomm','tiecomm_random','tiecomm_one','tiecomm_default','ac_mlp','ac_att','commnet','ic3net','tarmac','magic'])
     parser.add_argument('--block', type=str, default='no',choices=['no','inter','intra'], help='only works for tiecomm')
     parser.add_argument('--group_interval', type=int, default=4, help='only works for tiecomm')
     parser.add_argument('--seed', type=int, default=1234, help='random seed')

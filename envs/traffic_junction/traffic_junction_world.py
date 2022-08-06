@@ -26,6 +26,7 @@ import numpy as np
 from gym import spaces
 from .traffic_helper import *
 from gym.envs.registration import register
+import networkx as nx
 
 
 def nPr(n,r):
@@ -245,12 +246,14 @@ class TrafficJunctionEnv(gym.Env):
 
         obs = self._get_obs()
         reward = self._get_reward()
+        # graph = self._get_graph()
 
         debug = {'car_loc':self.car_loc,
                 'alive_mask': np.copy(self.alive_mask),
                 'wait': self.wait,
                 'cars_in_sys': self.cars_in_sys,
-                'is_completed': np.copy(self.is_completed)}
+                'is_completed': np.copy(self.is_completed),}
+                 #'graph': graph}
 
         self.stat['success'] = 1 - self.has_failed
         self.stat['add_rate'] = self.add_rate
@@ -325,11 +328,11 @@ class TrafficJunctionEnv(gym.Env):
         self.empty_bool_base_grid = self._onehot_initialization(self.pad_grid)
 
 
-    def get_obs(self):
-        return self._get_obs()
-
-
     def _get_obs(self):
+        return self.get_obs()
+
+
+    def get_obs(self):
         h, w = self.dims
         self.bool_base_grid = self.empty_bool_base_grid.copy()
 
@@ -374,6 +377,18 @@ class TrafficJunctionEnv(gym.Env):
 
         obs = tuple(obs)
         return obs
+
+
+    def get_graph(self):
+
+        G = nx.Graph()
+        G.add_nodes_from([i for i in range(self.n_car)])
+
+        for i in range (self.n_car):
+            for j in range (self.n_car):
+                if np.sum(np.abs(self.grid[self.car_loc[i]] - self.grid[self.car_loc[j]])) <= 2:
+                    G.add_edge(i,j)
+        return G
 
 
     def _add_cars(self):

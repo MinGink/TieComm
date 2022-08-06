@@ -121,6 +121,9 @@ class TJ_Wrapper(object):
         # else:
         #     return dict()
 
+    def get_graph(self):
+        return self.env.get_graph
+
     def get_env_info(self):
         env_info = {"obs_shape": self.observation_dim,
                     "n_actions": self.num_actions,

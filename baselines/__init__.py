@@ -4,12 +4,14 @@ from .tarmac import TarCommAgent
 from .magic import MAGICAgent
 # from .gacomm import GACommAgent
 from .models import MLP, Attention
+from .tiecomm_g import TieCommAgentG
 
 
 REGISTRY = {}
 REGISTRY["tiecomm"] = TieCommAgent
 REGISTRY["tiecomm_random"] = TieCommAgent
 REGISTRY["tiecomm_one"] = TieCommAgent
+REGISTRY["tiecomm_default"] = TieCommAgentG
 
 REGISTRY["commnet"] = CommNetAgent
 REGISTRY["ic3net"] = CommNetAgent
