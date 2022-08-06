@@ -56,3 +56,6 @@ class _parallel_env_wrapper(AECEnv):
 
     def close(self):
         self.env.close()
+
+    def get_graph(self):
+        return self.env.get_graph()

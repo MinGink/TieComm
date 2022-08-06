@@ -57,6 +57,12 @@ class to_parallel(ParallelEnv):
     def close(self):
         return self.aec_env.close()
 
+    def get_graph(self):
+        return self.aec_env.get_graph()
+
+
+
+
 
 def parallel_wrapper_fn(env_fn):
     def par_fn(**kwargs):

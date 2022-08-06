@@ -73,6 +73,10 @@ class BaseWrapper(AECEnv):
         return next_obs
 
 
+    def get_graph(self):
+        return self.env.get_graph()
+
+
 class AgentIterWrapper(BaseWrapper):
     def __init__(self, env):
         super().__init__(env)

@@ -6,7 +6,7 @@ n_processes: 8 #number of processes to use for training
 use_offline_wandb: False # Log results to wandb
 #grad_norm_clip: 10 # Reduce magnitude of gradients above this L2 norm
 use_cuda: False # Use GPU
-normalize_rewards: Flase
+normalize_rewards: False
 gamma: 0.9
 lr: 0.001 #learning rate
 value_coeff: 0.01 #coeff for value loss term in the loss function

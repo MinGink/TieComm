@@ -49,5 +49,9 @@ class PettingZooWrapper(Env):
     def close(self):
         return self._env.close()
 
+
+    def get_graph(self):
+        return self._env.get_graph()
+
 if __name__ == '__main__':
     print('test')

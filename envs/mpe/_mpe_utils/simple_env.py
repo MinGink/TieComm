@@ -6,7 +6,8 @@ from gym.utils import seeding
 from ..utils import wrappers
 import matplotlib.pyplot as plt
 import networkx as nx
-
+from modules.graph import measure_strength
+# import cdlib.algorithms as cd
 
 def make_env(raw_env):
     def env(**kwargs):
@@ -192,10 +193,37 @@ class SimpleEnv(AECEnv):
         for i in range (self.num_agents):
             for j in range (self.num_agents):
                 if i != j:
-                    if self.world.group_indices[i] == self.world.group_indices[j] or \
-                            np.sum(np.abs(np.array(self.agents[i].p_pos) - np.array(self.agents[j].p_pos))) <= 2:
-                        G.add_edge(i, j)
+                    # test = np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))
+                    # print(test)
+                    if np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<=1.0:
+                        G.add_edge(i,j)
+                    # if self.scenario.group_indices[i] == self.scenario.group_indices[j] or \
+                    #         np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<=1:
+                    #     G.add_edge(i, j)
 
+        # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
+        # plt.show()
+        #
+        # set = cd.louvain(G).communities
+        # print(set)
+        #
+        # g = nx.Graph()
+        # g.add_nodes_from(G.nodes(data=False))
+        #
+        # for e in G.edges():
+        #     strength = measure_strength(G, e[0], e[1])
+        #     print(strength)
+        #     if strength > 0.8:
+        #         g.add_edge(e[0], e[1])
+        #
+        # #set = [list(c) for c in nx.connected_components(g)]
+        #
+        # subax1 = plt.subplot(121)
+        # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
+        # subax2 = plt.subplot(122)
+        # nx.draw(g, pos=nx.spring_layout(g), with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2',
+        #         node_size=100, edge_cmap=plt.cm.Blues, width=1)
+        # plt.show()
         return G
 
 
