@@ -31,15 +31,15 @@ class RunnerDefault(Runner):
 
         step = 1
         done = False
-        adj_matrix = self.env.get_graph()
-        set = self.agent.god(adj_matrix)
+        group = self.env.get_graph()
+        set = self.agent.god(group)
         num_group = 0
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
             if step % self.interval == 0:
-                set = self.agent.god.graph_partition(adj_matrix)
+                set = self.agent.god.graph_partition(group)
             after_comm = self.agent.communicate(obs_tensor, set)
             action_outs, values = self.agent.agent(after_comm)
             actions = self.choose_action(action_outs)

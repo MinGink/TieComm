@@ -33,8 +33,8 @@ class RunnerGNN(Runner):
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-            adj_matrix = self.env.get_graph()
-            action_outs, values = self.agent(obs_tensor, adj_matrix)
+            graph = self.env.get_graph()
+            action_outs, values = self.agent(obs_tensor, graph)
             actions = self.choose_action(action_outs)
             rewards, done, env_info = self.env.step(actions)
             next_obs = self.env.get_obs()

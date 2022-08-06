@@ -19,6 +19,7 @@ Design Decisions:
 import random
 import math
 import curses
+import matplotlib.pyplot as plt
 
 # 3rd party modules
 import gym
@@ -162,7 +163,6 @@ class TrafficJunctionEnv(gym.Env):
         else:
             self._set_paths(difficulty)
 
-        self.obs = list()
 
         return
 
@@ -209,8 +209,8 @@ class TrafficJunctionEnv(gym.Env):
         #     self.epoch_last_update = epoch
 
         # Observation will be ncar * vision * vision ndarray
-        self.obs = self._get_obs()
-        return self.obs
+        obs = self._get_obs()
+        return obs
 
     def step(self, action):
         """
@@ -377,11 +377,13 @@ class TrafficJunctionEnv(gym.Env):
                 o = tuple((act, r_i, p_norm, v_sq))
             obs.append(o)
 
-        self.obs = tuple(obs)
-        return self.obs
+        obs = tuple(obs)
+        return obs
 
 
     def get_graph(self):
+
+        # G = nx.complete_graph(self.ncar)
 
         G = nx.Graph()
         G.add_nodes_from([i for i in range (self.ncar)])
@@ -389,11 +391,21 @@ class TrafficJunctionEnv(gym.Env):
         #     G.add_node(i, feature = np.array(self.obs[i]))
 
         for i in range (self.ncar):
-            for j in range (self.ncar):
-                if np.sum(np.abs(self.grid[self.car_loc[i]] - self.grid[self.car_loc[j]])) <= 4:
-                    G.add_edge(i,j)
+            if self.alive_mask[i] == 1:
+                for j in range (self.ncar):
+                    if self.alive_mask[j] == 1 and i != j:
+                        #if np.sum(np.abs(self.grid[self.car_loc[i]] - self.grid[self.car_loc[j]])) <= 3:
+                        if np.linalg.norm(np.array(self.grid[self.car_loc[i]]) - np.array(self.grid[self.car_loc[j]])) <= 4:
+                            G.add_edge(i, j)
 
-        # g = nx.adjacency_matrix(G)
+
+        # #G.add_edges_from([(0,1),(1,2),(2,3),(3,4),(4,0)])
+        #
+        # G.add_edges_from([(0,1),(0,2),(0,3),(0,4)])
+
+
+        # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
+        # plt.show()
 
         return G
 

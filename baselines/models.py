@@ -3,7 +3,7 @@ import torch.autograd as autograd
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv, ChebConv, GATConv, GINConv, GATConv
+from torch_geometric.nn import GCNConv, GATConv
 from torch_geometric.utils import from_networkx
 import argparse
 from torch_geometric.data import Data
@@ -84,7 +84,9 @@ class GNN(nn.Module):
 
 
         self.fnn1 = nn.Linear(self.obs_shape, self.hid_size)
-        self.conv2 = GCNConv(self.hid_size, self.hid_size)
+        self.conv2 = GATConv(self.hid_size, self.hid_size)
+        #self.conv3 = GATConv(self.hid_size, self.hid_size)
+        self.fnn3 = nn.Linear(self.hid_size*2, self.hid_size)
 
         self.head = nn.Linear(self.hid_size,self.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)
@@ -92,12 +94,18 @@ class GNN(nn.Module):
 
 
     def forward(self, obs, g):
+
         x = self.tanh(self.fnn1(obs))
+        if list(g.edges()) == []:
+            edge_index = torch.zeros((1,2), dtype=torch.long)
+        else:
+            edge_index = torch.tensor(list(g.edges()), dtype=torch.long)
 
-        edge_index = torch.tensor(list(g.edges()), dtype=torch.long)
-        data = Data (x=x,edge_index=edge_index.t().contiguous())
+        data = Data(x=x,edge_index=edge_index.t().contiguous())
         h = self.tanh(self.conv2(data.x, data.edge_index))
-
+        # h = self.conv3(h, data.edge_index)
+        h = self.tanh(self.fnn3(torch.cat([x,h], dim=-1)))
+        #h = self.tanh(self.fnn3(h))
         a = F.log_softmax(self.head(h), dim=-1)
         v = self.value_head(h)
 
