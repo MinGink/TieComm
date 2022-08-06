@@ -15,7 +15,7 @@ for e in envs:
     name = e.stem.replace("_", "-")
     lib = e.parent.stem
     filename = e.stem
-    gymkey = f"pz-{lib}-{name}"
+    gymkey = f"{lib}-{name}"
     register(
         gymkey,
         entry_point="envs.mpe:PettingZooWrapper",

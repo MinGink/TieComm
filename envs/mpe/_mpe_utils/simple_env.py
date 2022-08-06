@@ -4,6 +4,8 @@ from ..utils.env import AECEnv
 from ..utils.agent_selector import agent_selector
 from gym.utils import seeding
 from ..utils import wrappers
+import matplotlib.pyplot as plt
+import networkx as nx
 
 
 def make_env(raw_env):
@@ -178,6 +180,27 @@ class SimpleEnv(AECEnv):
         else:
             next_observation = None
         return next_observation
+
+
+
+    def get_graph(self):
+        G = nx.Graph()
+        G.add_nodes_from([i for i in range (self.num_agents)])
+        # for i in range(self.ncar):
+        #     G.add_node(i, feature = np.array(self.obs[i]))
+
+        for i in range (self.num_agents):
+            for j in range (self.num_agents):
+                if i != j:
+                    if self.world.group_indices[i] == self.world.group_indices[j] or \
+                            np.sum(np.abs(np.array(self.agents[i].p_pos) - np.array(self.agents[j].p_pos))) <= 2:
+                        G.add_edge(i, j)
+
+        return G
+
+
+
+
 
     def render(self, mode="human"):
         from . import rendering

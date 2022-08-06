@@ -394,13 +394,12 @@ class TrafficJunctionEnv(gym.Env):
             if self.alive_mask[i] == 1:
                 for j in range (self.ncar):
                     if self.alive_mask[j] == 1 and i != j:
-                        #if np.sum(np.abs(self.grid[self.car_loc[i]] - self.grid[self.car_loc[j]])) <= 3:
-                        if np.linalg.norm(np.array(self.grid[self.car_loc[i]]) - np.array(self.grid[self.car_loc[j]])) <= 4:
+                        if np.sum(np.abs(np.array(self.grid[self.car_loc[i]]) - np.array(self.grid[self.car_loc[j]]))) <= 6:
+                        #if np.linalg.norm(np.array(self.grid[self.car_loc[i]]) - np.array(self.grid[self.car_loc[j]])) <= 4:
                             G.add_edge(i, j)
 
 
         # #G.add_edges_from([(0,1),(1,2),(2,3),(3,4),(4,0)])
-        #
         # G.add_edges_from([(0,1),(0,2),(0,3),(0,4)])
 
 

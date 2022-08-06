@@ -3,7 +3,7 @@ import torch.autograd as autograd
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv, GATConv
+from torch_geometric.nn import GCNConv, GATConv, GATv2Conv
 from torch_geometric.utils import from_networkx
 import argparse
 from torch_geometric.data import Data
@@ -84,9 +84,9 @@ class GNN(nn.Module):
 
 
         self.fnn1 = nn.Linear(self.obs_shape, self.hid_size)
-        self.conv2 = GATConv(self.hid_size, self.hid_size)
-        #self.conv3 = GATConv(self.hid_size, self.hid_size)
-        self.fnn3 = nn.Linear(self.hid_size*2, self.hid_size)
+        #self.conv2 = GATConv(self.hid_size, self.hid_size, add_self_loops=False, heads=4)
+        self.conv2 = GATv2Conv(self.hid_size, self.hid_size, add_self_loops=False, heads=4)
+        self.fnn3 = nn.Linear(self.hid_size*5, self.hid_size)
 
         self.head = nn.Linear(self.hid_size,self.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)

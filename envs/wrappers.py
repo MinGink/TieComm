@@ -170,6 +170,9 @@ class Wrapper(object):
     def seed(self):
         return self._env.seed
 
+    def get_graph(self):
+        return self._env.get_graph()
+
 
     def get_env_info(self):
         env_info = {"state_shape": self.get_state_size(),

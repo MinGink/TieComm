@@ -39,6 +39,10 @@ class Scenario(BaseScenario):
             landmark.movable = False
         return world
 
+
+
+
+
     def reset_world(self, world, np_random):
         # random properties for agents
 

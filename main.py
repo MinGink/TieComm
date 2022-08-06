@@ -171,9 +171,9 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="gnn_test", help='memo name')
-    parser.add_argument('--env', type=str, default="tj", help='environment name',
+    parser.add_argument('--env', type=str, default="mpe", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
-    parser.add_argument('--map', type=str, default="easy", help='environment map name')
+    parser.add_argument('--map', type=str, default="mpe-large-spread-v1", help='environment map name')
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
                         choices=['tiecomm','tiecomm_random','tiecomm_one','tiecomm_default','ac_mlp','gnn','ac_att','commnet','ic3net','tarmac','magic'])
     parser.add_argument('--block', type=str, default='no',choices=['no','inter','intra'], help='only works for tiecomm')
