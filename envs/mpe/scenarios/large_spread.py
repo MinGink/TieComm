@@ -30,6 +30,9 @@ class Scenario(BaseScenario):
             agent.collide = False
             agent.silent = True
             agent.size = 0.15
+            agent.group_id = self.group_indices[i]
+            agent.id = np.zeros(num_agents)
+            agent.id[i] = 1
 
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
@@ -123,17 +126,18 @@ class Scenario(BaseScenario):
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
         entity_pos = []
-        for entity in world.landmarks:  # world.entities:
-            a = entity.state.p_pos - agent.state.p_pos
-            if abs(a[0]) + abs(a[1]) <= 2:
-                entity_pos.append(entity.state.p_pos - agent.state.p_pos)
+        tmp = []
+        for  entity_index, entity in enumerate (world.landmarks):  # world.entities:
+            related_pos = entity.state.p_pos - agent.state.p_pos
+            if np.linalg.norm(related_pos) <= 2 and agent.group_id != entity_index:
+                entity_pos.append(np.array(related_pos))
             else:
                 entity_pos.append(np.array([0,0]))
         # entity colors
-        # entity_color = []
-        # for entity in world.landmarks:  # world.entities:
-        #     entity_color.append(entity.color)
-        # communication of all other agents
+        entity_color = []
+        for entity in world.landmarks:  # world.entities:
+            entity_color.append(entity.color)
+        #communication of all other agents
         # comm = []
         # other_pos = []
         # for other in world.agents:
@@ -144,7 +148,9 @@ class Scenario(BaseScenario):
         # return np.concatenate(
         #     [agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + comm
         # )
-        x = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos)
+        #print(tmp)
+        y = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos)
+        x = np.append(y, np.array(agent.id))
         if self.shuffle_obs:
             x = list(x)
             random.Random(self.group_indices[world.agents.index(agent)]).shuffle(x)
