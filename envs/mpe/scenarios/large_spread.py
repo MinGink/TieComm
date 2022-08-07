@@ -33,7 +33,9 @@ class Scenario(BaseScenario):
             agent.silent = True
             agent.size = 0.15
             agent.group_id = self.group_indices[i]
-            agent.id = np.zeros(num_agents)
+            agent.group_one_hot =  [0] * num_landmarks
+            agent.group_one_hot[agent.group_id] = 1
+            agent.id = [0] * num_agents
             agent.id[i] = 1
 
         # add landmarks
@@ -136,9 +138,9 @@ class Scenario(BaseScenario):
             else:
                 entity_pos.append(np.array([0,0]))
         # entity colors
-        entity_color = []
-        for entity in world.landmarks:  # world.entities:
-            entity_color.append(entity.color)
+        # entity_color = []
+        # for entity in world.landmarks:  # world.entities:
+        #     entity_color.append(entity.color)
         #communication of all other agents
         # comm = []
         # other_pos = []
@@ -151,8 +153,7 @@ class Scenario(BaseScenario):
         #     [agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + comm
         # )
         #print(tmp)
-        y = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos)
-        x = np.append(y, np.array(agent.id))
+        x = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + [agent.group_one_hot])
         if self.shuffle_obs:
             x = list(x)
             random.Random(self.group_indices[world.agents.index(agent)]).shuffle(x)
