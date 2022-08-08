@@ -133,11 +133,16 @@ class Scenario(BaseScenario):
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
         entity_pos = []
+        # max = 2.5
         for  entity_index, entity in enumerate (world.landmarks):  # world.entities:
             related_pos = entity.state.p_pos - agent.state.p_pos
-            if np.linalg.norm(related_pos) <= 3 and agent.group_id != entity_index:
+
+            if np.linalg.norm(related_pos) <= 2.5 and agent.group_id != entity_index:
                 entity_pos.append(np.array(related_pos))
             else:
+                # if max < np.linalg.norm(related_pos):
+                #     max = np.linalg.norm(related_pos)
+                #     print(max)
                 entity_pos.append(np.array([0,0]))
         # entity colors
         # entity_color = []
