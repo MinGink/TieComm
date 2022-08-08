@@ -131,35 +131,14 @@ class Scenario(BaseScenario):
             return 0
 
     def observation(self, agent, world):
-        # get positions of all entities in this agent's reference frame
         entity_pos = []
-        # max = 2.5
         for  entity_index, entity in enumerate (world.landmarks):  # world.entities:
             related_pos = entity.state.p_pos - agent.state.p_pos
 
             if np.linalg.norm(related_pos) <= 2.5 and agent.group_id != entity_index:
                 entity_pos.append(np.array(related_pos))
             else:
-                # if max < np.linalg.norm(related_pos):
-                #     max = np.linalg.norm(related_pos)
-                #     print(max)
                 entity_pos.append(np.array([20,20]))
-        # entity colors
-        # entity_color = []
-        # for entity in world.landmarks:  # world.entities:
-        #     entity_color.append(entity.color)
-        #communication of all other agents
-        # comm = []
-        # other_pos = []
-        # for other in world.agents:
-        #     if other is agent:
-        #         continue
-        #     comm.append(other.state.c)
-        #     other_pos.append(other.state.p_pos - agent.state.p_pos)
-        # return np.concatenate(
-        #     [agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + comm
-        # )
-        #print(tmp)
         x = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + [agent.group_one_hot])
         if self.shuffle_obs:
             x = list(x)
