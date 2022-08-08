@@ -4,6 +4,9 @@ import numpy as np
 from .._mpe_utils.core import World, Agent, Landmark
 from .._mpe_utils.scenario import BaseScenario
 import random
+import matplotlib.pyplot as plt
+import networkx as nx
+from modules.graph import measure_strength
 
 class Scenario(BaseScenario):
     def make_world(self, groups, cooperative=False, shuffle_obs=False):
@@ -130,10 +133,9 @@ class Scenario(BaseScenario):
     def observation(self, agent, world):
         # get positions of all entities in this agent's reference frame
         entity_pos = []
-        tmp = []
         for  entity_index, entity in enumerate (world.landmarks):  # world.entities:
             related_pos = entity.state.p_pos - agent.state.p_pos
-            if np.linalg.norm(related_pos) <= 2 and agent.group_id != entity_index:
+            if np.linalg.norm(related_pos) <= 3 and agent.group_id != entity_index:
                 entity_pos.append(np.array(related_pos))
             else:
                 entity_pos.append(np.array([0,0]))
@@ -159,4 +161,8 @@ class Scenario(BaseScenario):
             random.Random(self.group_indices[world.agents.index(agent)]).shuffle(x)
             x = np.array(x)
         return x
+
+
+
+
 
