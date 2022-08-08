@@ -143,7 +143,7 @@ class Scenario(BaseScenario):
                 # if max < np.linalg.norm(related_pos):
                 #     max = np.linalg.norm(related_pos)
                 #     print(max)
-                entity_pos.append(np.array([0,0]))
+                entity_pos.append(np.array([20,20]))
         # entity colors
         # entity_color = []
         # for entity in world.landmarks:  # world.entities:
