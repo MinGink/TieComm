@@ -89,8 +89,8 @@ class ForagingEnv(Env):
         if type == "easy":
             players = [3,3]
             player_level = [1, 2]
-            foods = [2,2]
-            food_level = [1,1]
+            foods = [4]
+            food_level = [1]
             sight = 2
             field_size = (10,10)
             max_episode_steps = 50
@@ -177,9 +177,11 @@ class ForagingEnv(Env):
             grid_shape = (1 + 2 * self.sight, 1 + 2 * self.sight)
 
 
-            agents_min = np.zeros((self.field.shape[1],2), dtype=np.float32).reshape(-1,1)
-            agents_max = np.ones((self.field.shape[1],2), dtype=np.float32).reshape(-1,1)
+            loc_min = np.zeros((self.field.shape[1],2), dtype=np.float32).reshape(-1,1)
+            loc_max = np.ones((self.field.shape[1],2), dtype=np.float32).reshape(-1,1)
 
+            agents_min = np.zeros(grid_shape, dtype=np.float32).reshape(-1, 1)
+            agents_max = np.ones(grid_shape, dtype=np.float32).reshape(-1, 1) * max(self.player_list)
             # foods layer: foods level
             max_food_level = max(self.player_list)
             foods_min = np.zeros(grid_shape, dtype=np.float32).reshape(-1,1)
@@ -190,8 +192,8 @@ class ForagingEnv(Env):
             access_max = np.ones(grid_shape, dtype=np.float32).reshape(-1,1)
 
             # total layer
-            min_obs = np.concatenate([agents_min, foods_min, access_min])
-            max_obs = np.concatenate([agents_max, foods_max, access_max])
+            min_obs = np.concatenate([loc_min, agents_min, foods_min, access_min])
+            max_obs = np.concatenate([loc_max, agents_max, foods_max, access_max])
 
         return gym.spaces.Box(np.array(min_obs), np.array(max_obs), dtype=np.float32)
 
@@ -422,10 +424,10 @@ class ForagingEnv(Env):
             grid_shape_y += 2 * self.sight
             grid_shape = (grid_shape_x, grid_shape_y)
 
-            agents_layer = np.zeros(grid_shape, dtype=np.float32)
+            self.agents_layer = np.zeros(grid_shape, dtype=np.float32)
             for player in self.players:
                 player_x, player_y = player.position
-                agents_layer[player_x + self.sight, player_y + self.sight] = player.level
+                self.agents_layer[player_x + self.sight, player_y + self.sight] = player.level
             
             foods_layer = np.zeros(grid_shape, dtype=np.float32)
             foods_layer[self.sight:-self.sight, self.sight:-self.sight] = self.field.copy()
@@ -456,12 +458,22 @@ class ForagingEnv(Env):
 
 
 
-        def get_agent_position(agent_x, agent_y):
+        def get_agent_position(position, bounds, level):
+
+            start_x, end_x, start_y, end_y = bounds
+            agent_layer = self.agents_layer[start_x:end_x, start_y:end_y].copy()
+            np.where(agent_layer!=level, 0, agent_layer)
+            agent_layer = agent_layer.flatten()
+
+
+            (agent_x, agent_y) =  position
+
             one_hot_x = np.zeros((self.field_size[0]), dtype=np.float32)
             one_hot_x[agent_x] = 1
             one_hot_y = np.zeros((self.field_size[1]), dtype=np.float32)
             one_hot_y[agent_y] = 1
-            return np.array([one_hot_x, one_hot_y])
+
+            return np.concatenate([one_hot_x, one_hot_y, agent_layer])
         
         def get_player_reward(obs):
                     return obs.reward
@@ -472,8 +484,8 @@ class ForagingEnv(Env):
         layers = make_global_grid_arrays()
         agents_bounds = [get_agent_grid_bounds(*player.position) for player in self.players]
         raw_nobs = tuple([layers[:, start_x:end_x, start_y:end_y].reshape(-1, 1) for start_x, end_x, start_y, end_y in agents_bounds])
-        agents_postions = [get_agent_position(*player.position).reshape(-1,1) for player in self.players]
-        nobs = [np.concatenate((raw_nobs[i], agents_postions[i])) for i in range(len(raw_nobs))]
+        agents_obs = [get_agent_position(player.position, agents_bounds[index], player.level).reshape(-1,1) for index, player in enumerate(self.players)]
+        nobs = [np.concatenate((raw_nobs[i], agents_obs[i])) for i in range(len(raw_nobs))]
 
         # else:
         #     nobs = tuple([make_obs_array(obs) for obs in observations])
@@ -591,7 +603,6 @@ class ForagingEnv(Env):
 
         for p in self.players:
             p.score += p.reward
-
         return self._make_gym_obs()
 
     def _init_render(self):
