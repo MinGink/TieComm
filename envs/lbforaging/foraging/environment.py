@@ -90,18 +90,19 @@ class ForagingEnv(Env):
             players = [3,3]
             player_level = [1, 2]
             foods = [2,2]
-            food_level = [1,2]
+            food_level = [1,1]
             sight = 2
             field_size = (10,10)
             max_episode_steps = 50
             force_coop = False
+            normalize_reward = False
 
         elif type == 'medium':
-            players = [3,4]
+            players = [3,3]
             player_level = [1, 2]
             foods = [2, 2]
-            food_level = [1, 3]
-            field_size = (12,12)
+            food_level = [1, 2]
+            field_size = (10,10)
             sight = 2
             max_episode_steps = 100
             force_coop = False
@@ -110,7 +111,7 @@ class ForagingEnv(Env):
             raise ValueError("Invalid type")
 
 
-        normalize_reward=True
+
         grid_observation=True
 
         self.logger = logging.getLogger(__name__)
