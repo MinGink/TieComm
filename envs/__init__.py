@@ -39,23 +39,35 @@ partial_obs = [True]
 # for s, p, f, c, po in product(sizes, players, foods, coop, partial_obs):
 #     id = "Foraging{4}-{0}x{0}-{1}p-{2}f{3}-v2".format(s, p, f, "-coop" if c else "", "-2s" if po else "")
 #     print(id)
+# Foraging-2s- 10x10- 3player- 3food    -v2
 
+# for s, p, f, c, po in product(sizes, players, foods, coop, partial_obs):
+#     register(
+#         id="Foraging{4}-{0}x{0}-{1}p-{2}f{3}-v2".format(s, p, f, "-coop" if c else "", "-2s" if po else ""),
+#         entry_point="envs.lbforaging.foraging:ForagingEnv",
+#         kwargs={
+#             "players": p,
+#             "max_player_level": 3,
+#             "field_size": (s, s),
+#             "max_food": f,
+#             "sight": 2 if po else s,
+#             "max_episode_steps": 50,
+#             "force_coop": c,
+#             "grid_observation": False,
+#         },
+#     )
 
-for s, p, f, c, po in product(sizes, players, foods, coop, partial_obs):
+Type = ['easy', 'medium', 'hard']
+for t in Type:
     register(
-        id="Foraging{4}-{0}x{0}-{1}p-{2}f{3}-v2".format(s, p, f, "-coop" if c else "", "-2s" if po else ""),
+        id="Foraging-{0}-v0".format(t),
         entry_point="envs.lbforaging.foraging:ForagingEnv",
         kwargs={
-            "players": p,
-            "max_player_level": 3,
-            "field_size": (s, s),
-            "max_food": f,
-            "sight": 2 if po else s,
-            "max_episode_steps": 50,
-            "force_coop": c,
-            "grid_observation": False,
-        },
+            'type':t
+    },
     )
+
+
 
 
 
