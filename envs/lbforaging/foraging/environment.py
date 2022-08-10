@@ -300,7 +300,7 @@ class ForagingEnv(Env):
                     attempts += 1
                     continue
                 else:
-                    self.field[row, col] = food.level
+                    self.field[row, col] = self.food_list[i]
                     food.level = self.food_list[i]
                     food.position = (row, col)
                     break
