@@ -277,7 +277,7 @@ class SimpleEnv(AECEnv):
                 if i != j:
                     # test = np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))
                     # print(test)
-                    if np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<=2.0:
+                    if np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<=3.0:
                         G.add_edge(i,j)
                     # if self.scenario.group_indices[i] == self.scenario.group_indices[j] or \
                     #         np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<=1:
