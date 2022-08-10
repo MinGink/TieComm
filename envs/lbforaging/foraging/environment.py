@@ -461,9 +461,11 @@ class ForagingEnv(Env):
 
         def get_agent_position(position, bounds, level):
 
-            start_x, end_x, start_y, end_y = bounds
-            agent_layer = self.agents_layer[start_x:end_x, start_y:end_y].copy()
-            np.where(agent_layer!=level, 0, agent_layer)
+            # start_x, end_x, start_y, end_y = bounds
+            # agent_layer = self.agents_layer[start_x:end_x, start_y:end_y].copy()
+            # np.where(agent_layer!=level, 0, agent_layer)
+            grid_shape = (1 + 2 * self.sight, 1 + 2 * self.sight)
+            agent_layer = np.zeros(grid_shape, dtype=np.float32)
             agent_layer = agent_layer.flatten()
 
 
