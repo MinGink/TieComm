@@ -636,13 +636,9 @@ class ForagingEnv(Env):
                 if i != j:
                     # test = np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))
                     # print(test)
-                    # if self.players[i].level == self.players[j].level:
-                    #     G.add_edge(i, j)
-
-                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=4.0:
-                        G.add_edge(i,j)
-                    else:
-                        pass
+                    if self.players[i].level == self.players[j].level or \
+                         np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=2.0:
+                            G.add_edge(i,j)
                     # if self.scenario.group_indices[i] == self.scenario.group_indices[j] or \
                     #         np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<=1:
                     #     G.add_edge(i, j)
