@@ -7,6 +7,7 @@ import gym
 from gym.utils import seeding
 import numpy as np
 import networkx as nx
+import matplotlib.pyplot as plt
 
 
 class Action(Enum):
@@ -633,12 +634,12 @@ class ForagingEnv(Env):
         for i in range (self.n_agents):
             for j in range (self.n_agents):
                 if i != j:
-                    # test = np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))
+                    # test = np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))
                     # print(test)
-                    if self.players[i].level == self.players[j].level:
-                        G.add_edge(i, j)
+                    # if self.players[i].level == self.players[j].level:
+                    #     G.add_edge(i, j)
 
-                    elif np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[i].position))<=2.0:
+                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=4.0:
                         G.add_edge(i,j)
                     else:
                         pass
