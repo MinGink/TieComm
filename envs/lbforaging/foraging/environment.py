@@ -93,7 +93,7 @@ class ForagingEnv(Env):
             foods = [4]
             food_level = [1]
             sight = 2
-            field_size = (10,10)
+            field_size = (12,12)
             max_episode_steps = 50
             force_coop = False
             normalize_reward = False
@@ -559,7 +559,7 @@ class ForagingEnv(Env):
                     paly.reward = -1
                 continue
             v[0].position = k
-            v[0].reward= 0
+            v[0].reward = -0.1
 
         # finally process the loadings:
         while loading_players:

@@ -170,7 +170,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="baselines", help='memo name')
+    parser.add_argument('--memo', type=str, default="oooo", help='memo name')
     parser.add_argument('--env', type=str, default="lbf", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="Foraging-easy-v0", help='environment map name',
