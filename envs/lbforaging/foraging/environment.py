@@ -92,7 +92,7 @@ class ForagingEnv(Env):
             player_level = [1, 2]
             foods = [4]
             food_level = [1]
-            sight = 2
+            sight = 1
             field_size = (12,12)
             max_episode_steps = 50
             force_coop = False
@@ -104,7 +104,7 @@ class ForagingEnv(Env):
             foods = [2, 2]
             food_level = [1, 2]
             field_size = (10,10)
-            sight = 2
+            sight = 1
             max_episode_steps = 100
             force_coop = False
 
@@ -300,7 +300,7 @@ class ForagingEnv(Env):
                     attempts += 1
                     continue
                 else:
-                    self.field[row, col] = 1
+                    self.field[row, col] = food.level
                     food.level = self.food_list[i]
                     food.position = (row, col)
                     break
@@ -561,7 +561,7 @@ class ForagingEnv(Env):
                     paly.reward = -1
                 continue
             v[0].position = k
-            v[0].reward = -0.1
+            v[0].reward = -0.2
 
         # finally process the loadings:
         while loading_players:
@@ -569,11 +569,11 @@ class ForagingEnv(Env):
             player = loading_players.pop()
             frow, fcol = self.adjacent_food_location(*player.position)
             food = self.field[frow, fcol]
-            if food != 0:
-                for f in self.foods:
-                    if f.position == (frow, fcol):
-                        food = f.level
-                        break
+            # if food != 0:
+            #     for f in self.foods:
+            #         if f.position == (frow, fcol):
+            #             food = f.level
+            #             break
 
 
             adj_players = self.adjacent_players(frow, fcol)
@@ -593,15 +593,11 @@ class ForagingEnv(Env):
             for a in adj_players:
                 a.reward = float(a.level * food)
                 if self._normalize_reward:
-                    a.reward = a.reward / float(
-                        adj_player_level * self._food_spawned
-                    )  # normalize reward
+                    a.reward = a.reward / float(adj_player_level * self._food_spawned)  # normalize reward
             # and the food is removed
             self.field[frow, fcol] = 0
 
-        self._game_over = (
-            self.field.sum() == 0 or self._max_episode_steps <= self.current_step
-        )
+        self._game_over = (self.field.sum() == 0 or self._max_episode_steps <= self.current_step)
         self._gen_valid_moves()
 
         for p in self.players:
