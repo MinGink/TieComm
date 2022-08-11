@@ -90,6 +90,7 @@ class GNN(nn.Module):
         self.fnn1 = nn.Linear(self.obs_shape, self.hid_size)
         self.conv2 = GATConv(self.hid_size, self.hid_size, add_self_loops=False, heads=1)
         self.conv3 = GATConv(self.hid_size, self.hid_size, add_self_loops=False, heads=1)
+        self.conv4 = GATConv(self.hid_size, self.hid_size, add_self_loops=False, heads=1)
         self.fnn3 = nn.Linear(self.hid_size*2, self.hid_size)
 
         self.head = nn.Linear(self.hid_size,self.n_actions)
@@ -107,8 +108,10 @@ class GNN(nn.Module):
 
         data = Data(x=x,edge_index=edge_index.t().contiguous())
         h = self.tanh(self.conv2(data.x, data.edge_index))
-        # data = Data(x=h, edge_index=edge_index.t().contiguous())
-        # h = self.tanh(self.conv3(data.x, data.edge_index))
+        data = Data(x=h, edge_index=edge_index.t().contiguous())
+        h = self.tanh(self.conv3(data.x, data.edge_index))
+        data = Data(x=h, edge_index=edge_index.t().contiguous())
+        h = self.tanh(self.conv4(data.x, data.edge_index))
         h = self.tanh(self.fnn3(torch.cat([x,h], dim=-1)))
         #h = self.tanh(self.fnn3(h))
         a = F.log_softmax(self.head(h), dim=-1)

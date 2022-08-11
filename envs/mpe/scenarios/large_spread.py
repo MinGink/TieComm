@@ -104,14 +104,7 @@ class Scenario(BaseScenario):
         rew = 0
 
         i = world.agents.index(agent)
-        rew = -np.sqrt(
-            np.sum(
-                np.square(
-                    agent.state.p_pos
-                    - world.landmarks[self.group_indices[i]].state.p_pos
-                )
-            )
-        )
+        rew = -np.sqrt(np.sum(np.square(agent.state.p_pos- world.landmarks[self.group_indices[i]].state.p_pos)))
 
         if self.cooperative:
             return 0
@@ -138,7 +131,7 @@ class Scenario(BaseScenario):
             if np.linalg.norm(related_pos) <= 2.5 and agent.group_id != entity_index:
                 entity_pos.append(np.array(related_pos))
             else:
-                entity_pos.append(np.array([20,20]))
+                entity_pos.append(np.array([100,100 ]))
         x = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + [agent.group_one_hot])
         if self.shuffle_obs:
             x = list(x)

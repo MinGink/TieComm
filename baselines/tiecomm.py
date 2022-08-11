@@ -5,9 +5,9 @@ import numpy as np
 import networkx as nx
 import argparse
 from modules.graph import measure_strength
-
-
-
+from torch_geometric.data import Data
+from torch_geometric.nn import GCNConv, GATConv, GATv2Conv
+import cdlib.algorithms as algorithms
 
 class TieCommAgent(nn.Module):
 
@@ -35,47 +35,63 @@ class TieCommAgent(nn.Module):
 
     def random_set(self):
         G = nx.binomial_graph(self.n_agents, self.random_prob, seed=self.seed , directed=False)
-        set = self.god.graph_partition(G)
+        set = self.god.graph_partition(G, self.threshold)
         return set
 
 
 
-    def communicate(self, local_obs, set):
+
+
+
+    def communicate(self, local_obs, graph, set):
 
         local_obs = self.agent.local_emb(local_obs)
-        #
+
+        adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1,-1).repeat(self.n_agents,1)
+
+
         num_coms = len(set)
-        #
-        intra_obs = torch.zeros_like(local_obs)
-        inter_obs = torch.zeros_like(local_obs)
-        #
-        # # inter_obs
+
         if num_coms == 1:
-            intra_obs = self.intra_com(local_obs)
+            inter_obs = torch.zeros_like(local_obs)
+            intra_obs = self.agent.intra_com(local_obs)
         else:
-              group_emd_list = []
-              for i in range (num_coms):
-                  group_emd_list = []
-                  for i in range(num_coms):
-                      group_id_list = set[i]
-                      group_obs = local_obs[group_id_list, :]
-                      group_att = self.intra_com(group_obs)
-                      group_emd = self.group_pooling(group_obs, mode='max')
-                      group_emd_list.append(group_emd)
-                      intra_obs[group_id_list, :] = group_att
-              group_emd_list = self.inter_com(torch.cat(group_emd_list,dim=0))
-              for index, group_ids in enumerate (set):
-                  inter_obs[group_ids, :] = group_emd_list[index,:].repeat(len(group_ids), 1)
+            group_emd_list = []
+            for i in range (num_coms):
+                group_emd_list = []
+                intra_obs = torch.zeros_like(local_obs)
+                inter_obs = torch.zeros_like(local_obs)
+                for i in range(num_coms):
+                    group_id_list = set[i]
+                    group_obs = local_obs[group_id_list, :]
+                    group_emd = self.group_pooling(group_obs, mode='sum')
+                    group_emd_list.append(group_emd)
+            group_emd_list = self.agent.inter_com(torch.cat(group_emd_list,dim=0))
+            for index, group_ids in enumerate (set):
+                inter_obs[group_ids, :] = group_emd_list[index,:].repeat(len(group_ids), 1)
+
 
         if self.block == 'no':
-            after_comm = torch.stack((local_obs, inter_obs, intra_obs), dim=1)
+            after_comm = torch.concat((local_obs, inter_obs,  intra_obs), dim=1)
         elif self.block == 'inter':
-            after_comm = torch.stack((local_obs, intra_obs), dim=1)
+            after_comm = torch.concat((local_obs, intra_obs), dim=1)
         elif self.block == 'intra':
-            after_comm = torch.stack((local_obs, inter_obs), dim=1)
+            after_comm = torch.concat((local_obs, inter_obs), dim=1)
         else:
             raise ValueError('block must be one of no, inter, intra')
+
+
+        # if self.block == 'no':
+        #     after_comm = torch.concat((local_obs, inter_obs, intra_obs, adj_matrix), dim=1)
+        # elif self.block == 'inter':
+        #     after_comm = torch.concat((local_obs, intra_obs,adj_matrix), dim=1)
+        # elif self.block == 'intra':
+        #     after_comm = torch.concat((local_obs, inter_obs, adj_matrix), dim=1)
+        # else:
+        #     raise ValueError('block must be one of no, inter, intra')
+
         return after_comm
+
 
 
     def group_pooling(self, input, mode):
@@ -90,123 +106,6 @@ class TieCommAgent(nn.Module):
         else:
             raise ValueError('mode must be one of mean, max, sum')
         return group_emb
-
-
-
-    def intra_com(self, input):
-        weighted_emb = self.agent.intra_tf(input.unsqueeze(0))
-
-
-        # hidden = self.agent.intra_fc(input)
-        # score = torch.softmax(hidden, dim=0)
-        # weighted_emb = score * input
-        #weighted_emb, _  = self.agent.intra_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
-        return weighted_emb.squeeze(0)
-        #return weighted_emb
-
-
-
-    def inter_com(self, input):
-        weighted_emb = self.agent.intra_tf(input.unsqueeze(0))
-        # hidden = self.agent.inter_fc(input)
-        # score = torch.softmax(hidden, dim=0)
-        # weighted_emb = score * input
-        #weighted_emb,_ = self.agent.inter_attn(input.unsqueeze(0), input.unsqueeze(0), input.unsqueeze(0))
-        return weighted_emb.squeeze(0)
-        #return weighted_emb
-
-
-
-    # def group_embedding_sum(self, local_obs):
-    #     score = torch.sum(local_obs,dim=0).unsqueeze(0)
-    #     x = score.unsqueeze(0)
-    #     embedding = self.agent.group_embedding_layer(x)
-    #     return embedding
-
-
-
-
-
-class AgentAC(nn.Module):
-    def __init__(self, args):
-        super(AgentAC, self).__init__()
-        self.args = args
-        self.n_agents = args.n_agents
-        self.hid_size = args.hid_size
-
-        self.tanh = nn.Tanh()
-
-
-        self.emb_fc = nn.Linear(args.obs_shape, self.hid_size, bias=True)
-
-
-
-        self.intra_fc = nn.Linear(self.hid_size, self.hid_size, bias=False)
-        self.intra_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
-
-        intra_tf_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
-                                                         batch_first=True)
-        self.intra_tf = nn.TransformerEncoder(intra_tf_layer, num_layers=1)
-
-
-        self.inter_fc = nn.Linear(self.hid_size, self.hid_size, bias=False)
-        self.inter_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
-
-        inter_tf_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
-                                                         batch_first=True)
-        self.inter_tf = nn.TransformerEncoder(inter_tf_layer, num_layers=1)
-
-
-        self.final_attn = nn.MultiheadAttention(self.hid_size, 1, batch_first=True)
-
-        final_tf_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
-                                                         batch_first=True)
-        self.final_tf = nn.TransformerEncoder(final_tf_layer, num_layers=1)
-
-
-
-
-        if self.args.block == 'no':
-            self.actor_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
-            self.value_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
-        else:
-            self.actor_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
-            self.value_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
-
-
-        self.actor_head = nn.Linear(self.hid_size, args.n_actions)
-        self.value_head = nn.Linear(self.hid_size, 1)
-
-
-    def local_emb(self, input):
-        local_obs = self.tanh(self.emb_fc(input))
-        return local_obs
-
-
-
-    def final_attn(self, after_comm):
-        attn_output, attn_output_weights = self.final_attn(after_comm, after_comm, after_comm)
-        #attn_output = sum([attn_output,after_comm])
-        final_obs = torch.flatten(attn_output, start_dim=1, end_dim=-1)
-        return final_obs
-
-
-
-    def forward(self, after_comm):
-        # h = self.final_tf(after_comm)
-
-        final_obs = after_comm.flatten(start_dim=1, end_dim=-1)
-        # final_obs = self.final_attn(after_comm)
-        # final_obs =h.flatten(start_dim=1, end_dim=-1)
-
-        a = self.tanh(self.actor_fc1(final_obs))
-        a = F.log_softmax(self.actor_head(a), dim=-1)
-
-        v = self.tanh(self.value_fc1(final_obs))
-        v = self.value_head(v)
-
-        return a, v
-
 
 
 class GodAC(nn.Module):
@@ -259,28 +158,29 @@ class GodAC(nn.Module):
         relation = torch.multinomial(log_action_out .exp(), 1).squeeze(-1).detach()
         adj_matrix = self._generate_adj(relation)
         G = nx.from_numpy_matrix(adj_matrix)
-        set = self.graph_partition(G)
+        g, set = self.graph_partition(G, self.threshold)
 
         value = self.tanh(self.value_fc1(hid.unsqueeze(0).flatten(start_dim=1, end_dim=-1)))
         value = self.tanh(self.value_fc2(value))
         value = self.value_fc3(value)
 
 
-        return set, log_action_out, value, relation
+        return g, set, log_action_out, value, relation
 
 
-    def graph_partition(self, G):
-        g = nx.Graph()
-        g.add_nodes_from(G.nodes(data=False))
+    def graph_partition(self, G, thershold):
 
-        for e in G.edges():
-            strength = measure_strength(G, e[0], e[1])
-            if strength > self.threshold:
-                g.add_edge(e[0], e[1])
-
-        set = [list(c) for c in nx.connected_components(g)]
-        return set
-
+        cluster = algorithms.louvain(G)
+        set = cluster.communities
+        G = cluster.graph
+        # g = nx.Graph()
+        # g.add_nodes_from(G.nodes(data=False))
+        # for e in G.edges():
+        #     strength = measure_strength(G, e[0], e[1])
+        #     if strength > thershold:
+        #         g.add_edge(e[0], e[1])
+        # set = [list(c) for c in nx.connected_components(g)]
+        return G, set
 
 
     def _generate_adj(self, relation):
@@ -292,6 +192,95 @@ class GodAC(nn.Module):
 
 
 
+
+
+class AgentAC(nn.Module):
+    def __init__(self, args):
+        super(AgentAC, self).__init__()
+        self.args = args
+        self.n_agents = args.n_agents
+        self.hid_size = args.hid_size
+
+        self.tanh = nn.Tanh()
+
+
+        self.emb_fc = nn.Linear(args.obs_shape, self.hid_size)
+
+        self.intraGNN = GATConv(self.hid_size, self.hid_size, add_self_loops=False, heads=1)
+
+
+        inter_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
+                                                         batch_first=True)
+        self.inter = nn.TransformerEncoder(inter_layer, num_layers=1)
+
+        intra_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
+                                                         batch_first=True)
+        self.intra = nn.TransformerEncoder(intra_layer, num_layers=1)
+
+
+        final_layer = nn.TransformerEncoderLayer(d_model=self.hid_size * 3, nhead=4, dim_feedforward=self.hid_size,
+                                                         batch_first=True)
+        self.final = nn.TransformerEncoder(final_layer, num_layers=1)
+
+
+
+        # if self.args.block == 'no':
+        #     self.actor_fc1 = nn.Linear(self.hid_size * 3 + self.n_agents**2, self.hid_size)
+        #     self.value_fc1 = nn.Linear(self.hid_size * 3 + self.n_agents**2, self.hid_size)
+        # else:
+        #     self.actor_fc1 = nn.Linear(self.hid_size * 2 + self.n_agents**2, self.hid_size)
+        #     self.value_fc1 = nn.Linear(self.hid_size * 2 + self.n_agents**2, self.hid_size)
+
+        if self.args.block == 'no':
+            self.actor_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
+            self.value_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
+        else:
+            self.actor_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
+            self.value_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
+
+
+        self.actor_head = nn.Linear(self.hid_size, args.n_actions)
+        self.value_head = nn.Linear(self.hid_size, 1)
+
+
+    def local_emb(self, input):
+        local_obs = self.tanh(self.emb_fc(input))
+        return local_obs
+
+    def intra_GNN(self, x, graph):
+
+        if list(graph.edges()) == []:
+            edge_index = torch.zeros((1, 2), dtype=torch.long)
+        else:
+            edge_index = torch.tensor(list(graph.edges()), dtype=torch.long)
+
+        data = Data(x=x, edge_index=edge_index.t().contiguous())
+        h = self.tanh(self.intraGNN(data.x, data.edge_index))
+
+        return h
+
+
+    def inter_com(self, input):
+        h = self.tanh(self.inter(input.unsqueeze(0)))
+        return h.squeeze(0)
+
+
+    def intra_com(self, input):
+        h = self.tanh(self.intra(input.unsqueeze(0)))
+        return h.squeeze(0)
+
+
+
+
+    def forward(self, after_comm):
+
+        final_obs = self.final(after_comm.unsqueeze(0)).squeeze(0)
+        a = self.tanh(self.actor_fc1(final_obs))
+        a = F.log_softmax(self.actor_head(a), dim=-1)
+        v = self.tanh(self.value_fc1(final_obs))
+        v = self.value_head(v)
+
+        return a, v
 
 
 

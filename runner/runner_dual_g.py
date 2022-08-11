@@ -3,7 +3,7 @@ import torch.nn as nn
 from collections import namedtuple
 import numpy as np
 from torch.optim import Adam
-from modules.utils import merge_dict, multinomials_log_densities
+from modules.utils import merge_dict, multinomials_log_density
 from .runner import Runner
 import time
 
@@ -15,9 +15,9 @@ God_Transition = namedtuple('God_Transition', ('god_action_out', 'god_value', 'g
 
 
 
-class RunnerDual(Runner):
+class RunnerDualG(Runner):
     def __init__(self,  config, env, agent):
-        super(RunnerDual, self).__init__( config, env, agent)
+        super(RunnerDualG, self).__init__( config, env, agent)
         self.n_agents = self.args.n_agents
         self.n_nodes = int(self.n_agents * (self.n_agents - 1)/2)
         self.interval = self.args.interval
@@ -38,9 +38,14 @@ class RunnerDual(Runner):
         step = 1
         done = False
 
-
         graph = self.env.get_graph()
-        set = self.agent.god(graph)
+        obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
+        god_action_out, god_value = self.agent.god(obs_tensor, graph)
+        god_action = self.choose_action(god_action_out)
+
+        treashold = (god_action[0] + 1) * 0.1
+        g, set = self.agent.god.graph_partition(graph, float(treashold))
+
         god_reward = np.zeros(1)
         num_group = 0
         while not done and step <= self.args.episode_length:
@@ -48,9 +53,13 @@ class RunnerDual(Runner):
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
             if step % self.interval == 0:
-                set = self.agent.god(graph)
+                graph = self.env.get_graph()
+                god_action_out, god_value = self.agent.god(obs_tensor, graph)
+                god_action = self.choose_action(god_action_out)
+                treashold = (god_action[0] + 1) * 0.1
+                g, set = self.agent.god.graph_partition(graph, float(treashold))
 
-            after_comm = self.agent.communicate(obs_tensor, set)
+            after_comm = self.agent.communicate(obs_tensor, g, set)
             action_outs, values = self.agent.agent(after_comm)
 
             actions = self.choose_action(action_outs)
@@ -71,10 +80,10 @@ class RunnerDual(Runner):
             trans = Transition(np.array(obs),  action_outs, actions, np.array(rewards), values,
                                     episode_mask, episode_agent_mask)
 
-            # if step % self.interval == 0:
-            #     god_trans = God_Transition(god_action_out, god_value, god_action, god_reward,np.ones(god_value.shape),)
-            #     god_memory.append(god_trans)
-            #     god_reward = np.zeros(1)
+            if step % self.interval == 0:
+                god_trans = God_Transition(god_action_out, god_value, np.array(god_action), god_reward, np.ones(god_value.shape),)
+                god_memory.append(god_trans)
+                god_reward = np.zeros(1)
 
 
             memory.append(trans)
@@ -114,16 +123,15 @@ class RunnerDual(Runner):
 
         log = dict()
 
-        dim_actions = self.n_nodes
+
         batch_size = len(batch.god_value)
-
-
         episode_masks = torch.Tensor(np.array(batch.episode_masks)).squeeze(-1)
         values = torch.cat(batch.god_value, dim=0)
         rewards = torch.Tensor(np.array(batch.god_reward)).unsqueeze(-1)
-        actions = torch.stack(batch.god_action, dim=0)
-        action_outs = torch.stack(batch.god_action_out, dim=0)
 
+        actions = torch.Tensor(np.array(batch.god_action)).unsqueeze(-1)
+        actions = actions.transpose(1, 2).view(-1, 1, 1)
+        action_outs = torch.stack(batch.god_action_out, dim=0)
 
 
         returns = torch.Tensor(batch_size, 1)
@@ -143,13 +151,12 @@ class RunnerDual(Runner):
 
 
 
-        log_p_a = action_outs
-        # actions: [(batch_size*n) * dim_actions]
-        actions = actions.contiguous().view(-1, dim_actions)
-        log_prob = multinomials_log_densities(actions, log_p_a)
-        # the log prob of each action head is multiplied by the advantage
-        action_loss = -advantages.view(-1).unsqueeze(-1) * log_prob
+        log_p_a = [action_outs.view(-1, 10)]
+        actions = actions.contiguous().view(-1, 1)
+        log_prob = multinomials_log_density(actions, log_p_a)
+        action_loss = -advantages.view(-1) * log_prob.squeeze()
         actor_loss = action_loss.sum()
+
 
 
         targets = returns

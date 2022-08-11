@@ -15,6 +15,7 @@ class RunnerDefault(Runner):
     def __init__(self, config, env, agent):
         super(RunnerDefault, self).__init__(config, env, agent)
         self.interval = self.args.interval
+        self.treshold = self.args.treshold
 
 
 
@@ -31,15 +32,17 @@ class RunnerDefault(Runner):
 
         step = 1
         done = False
-        group = self.env.get_graph()
-        set = self.agent.god(group)
+        graph = self.env.get_graph()
+        set = self.agent.god.graph_partition(graph, self.treshold)
         num_group = 0
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
             if step % self.interval == 0:
-                set = self.agent.god.graph_partition(group)
+                graph = self.env.get_graph()
+                set = self.agent.god.graph_partition(graph, self.treshold)
+
             after_comm = self.agent.communicate(obs_tensor, set)
             action_outs, values = self.agent.agent(after_comm)
             actions = self.choose_action(action_outs)

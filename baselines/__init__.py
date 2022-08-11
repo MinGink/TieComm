@@ -12,6 +12,8 @@ REGISTRY["tiecomm"] = TieCommAgent
 REGISTRY["tiecomm_random"] = TieCommAgent
 REGISTRY["tiecomm_one"] = TieCommAgent
 REGISTRY["tiecomm_default"] = TieCommAgentG
+REGISTRY["tiecomm_g"] = TieCommAgentG
+
 
 REGISTRY["commnet"] = CommNetAgent
 REGISTRY["ic3net"] = CommNetAgent

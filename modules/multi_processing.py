@@ -95,7 +95,10 @@ class MultiPeocessRunner():
         self.obtain_grad_pointers()
         for i in range(len(self.grads)):
             for g in self.worker_grads:
-                self.grads[i] += g[i]
+                try:
+                    self.grads[i] += g[i]
+                except:
+                    pass
             self.grads[i] /= main_log['num_steps']
 
         #nn.utils.clip_grad_norm_(self.runner.params, self.args.grad_norm_clip)

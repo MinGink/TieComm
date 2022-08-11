@@ -40,7 +40,7 @@ class RunnerDual(Runner):
 
 
         obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-        set, god_action_out, god_value, god_action = self.agent.god(obs_tensor)
+        graph, set, god_action_out, god_value, god_action = self.agent.god(obs_tensor)
         god_reward = np.zeros(1)
         num_group = 0
         while not done and step <= self.args.episode_length:
@@ -48,9 +48,9 @@ class RunnerDual(Runner):
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
             if step % self.interval == 0:
-                set, god_action_out, god_value, god_action = self.agent.god(obs_tensor)
+                graph, set, god_action_out, god_value, god_action = self.agent.god(obs_tensor)
 
-            after_comm = self.agent.communicate(obs_tensor, set)
+            after_comm = self.agent.communicate(obs_tensor, graph, set)
             action_outs, values = self.agent.agent(after_comm)
 
             actions = self.choose_action(action_outs)
