@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch import nn
-from torch_geometric.nn import  GATConv
+from torch_geometric.nn import  GATConv, GATv2Conv
 import networkx as nx
 import argparse
 from modules.graph import measure_strength
@@ -134,7 +134,7 @@ class AgentAC(nn.Module):
 
         self.emb_fc = nn.Linear(args.obs_shape, self.hid_size)
 
-        self.intra = GATConv(self.hid_size, self.hid_size, heads=1)
+        self.intra = GATv2Conv(self.hid_size, self.hid_size, heads=1)
 
         inter_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
                                                  batch_first=True)
@@ -184,4 +184,3 @@ class AgentAC(nn.Module):
         v = self.value_head(v)
 
         return a, v
-
