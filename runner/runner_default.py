@@ -15,7 +15,8 @@ class RunnerDefault(Runner):
     def __init__(self, config, env, agent):
         super(RunnerDefault, self).__init__(config, env, agent)
         self.interval = self.args.interval
-        self.treshold = self.args.treshold
+        # self.treshold = self.args.treshold
+        self.treshold = 1.0
 
 
 
@@ -33,7 +34,7 @@ class RunnerDefault(Runner):
         step = 1
         done = False
         graph = self.env.get_graph()
-        set = self.agent.god.graph_partition(graph, self.treshold)
+        g, set = self.agent.god.graph_partition(graph, self.treshold)
         num_group = 0
         while not done and step <= self.args.episode_length:
 
@@ -41,9 +42,9 @@ class RunnerDefault(Runner):
 
             if step % self.interval == 0:
                 graph = self.env.get_graph()
-                set = self.agent.god.graph_partition(graph, self.treshold)
+                g, set = self.agent.god.graph_partition(graph, self.treshold)
 
-            after_comm = self.agent.communicate(obs_tensor, set)
+            after_comm = self.agent.communicate(obs_tensor, g, set)
             action_outs, values = self.agent.agent(after_comm)
             actions = self.choose_action(action_outs)
             rewards, done, env_info = self.env.step(actions)

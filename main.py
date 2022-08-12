@@ -53,7 +53,7 @@ def main(args):
     if args.use_offline_wandb:
         os.environ['WANDB_MODE'] = 'dryrun'
 
-    tags = ['Ming',args.env, args.map, args.agent, args.memo]
+    tags = ['Ming', args.env, args.map, args.agent, args.memo]
 
     wandb.init(project='Fight', name=args.exp_id, tags=tags, dir=results_path)
     wandb.config.update(args)
@@ -178,12 +178,12 @@ if __name__ == '__main__':
     parser.add_argument('--agent', type=str, default="tiecomm_g", help='algorithm name',
                         choices=['tiecomm','tiecomm_random','tiecomm_one','tiecomm_g','tiecomm_default','ac_mlp','gnn','ac_att','commnet','ic3net','tarmac','magic'])
     parser.add_argument('--block', type=str, default='no',choices=['no','inter','intra'], help='only works for tiecomm')
-    parser.add_argument('--group_interval', type=int, default=10, help='only works for tiecomm')
+    parser.add_argument('--group_interval', type=int, default=1, help='only works for tiecomm')
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
-    parser.add_argument('--total_epoches', type=int, default=500, help='total number of training epochs')
-    parser.add_argument('--batch_size', type=int, default=500, help='batch size')
+    parser.add_argument('--total_epoches', type=int, default=1000, help='total number of training epochs')
+    parser.add_argument('--batch_size', type=int, default=1500, help='batch size')
     parser.add_argument('--n_processes', type=int, default=6, help='number of processes')
     args = parser.parse_args()
 
