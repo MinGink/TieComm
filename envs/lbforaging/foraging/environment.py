@@ -90,24 +90,24 @@ class ForagingEnv(Env):
 
 
         if type == "easy":
-            players = [2,4]
+            players = [1,5]
             player_level = [0,1]
-            foods = [2]
+            foods = [1]
             food_level = [1]
             sight = 1
-            field_size = (8,8)
+            field_size = (10,10)
             max_episode_steps = 50
             force_coop = False
             normalize_reward = False
 
         elif type == 'medium':
-            players = [3,3]
-            player_level = [1, 2]
-            foods = [2, 2]
-            food_level = [1, 2]
-            field_size = (10,10)
+            players = [2, 4, 4]
+            player_level = [0, 2]
+            foods = [2]
+            food_level = [1]
+            field_size = (12,12)
             sight = 1
-            max_episode_steps = 100
+            max_episode_steps = 50
             force_coop = False
 
         else:
