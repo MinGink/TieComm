@@ -11,8 +11,8 @@
 
 #lbforaging:Foraging-10x10-3p-3f-v2
 
-python main.py --agent ac_mlp --env lbf --map Foraging-2s-10x10-3p-3f-v2 --use_multiprocessing --n_processes 2 --epoch_size 1 --batch_size 200
-python main.py --agent ac_att --env lbf --map Foraging-2s-10x10-3p-3f-v2 --use_multiprocessing --n_processes 2 --batch_size 200
-python main.py --agent tiecomm_random --env lbf --map Foraging-2s-10x10-3p-3f-v2 --use_multiprocessing --n_processes 2  --batch_size 200 &
-python main.py --agent tiecomm --env lbf --map Foraging-2s-10x10-3p-3f-v2 --use_multiprocessing --n_processes 2  --batch_size 200 &
+python main.py --agent ac_mlp --env mpe --map mpe-large-spread-v1 --use_multiprocessing --memo baselines
+python main.py --agent ac_att --env mpe --map mpe-large-spread-v1 --use_multiprocessing --memo baselines
+python main.py --agent tiecomm --env mpe --map mpe-large-spread-v1 --use_multiprocessing --memo baselines
+
 

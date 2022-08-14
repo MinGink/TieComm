@@ -8,7 +8,7 @@ from gym.utils import seeding
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-
+from modules.graph import measure_strength
 
 class Action(Enum):
     NONE = 0
@@ -35,7 +35,8 @@ class Food:
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, i):
+        self.id = i
         self.controller = None
         self.position = None
         self.level = None
@@ -89,12 +90,12 @@ class ForagingEnv(Env):
 
 
         if type == "easy":
-            players = [3,3]
-            player_level = [1, 2]
-            foods = [4]
+            players = [2,4]
+            player_level = [0,1]
+            foods = [2]
             food_level = [1]
             sight = 1
-            field_size = (12,12)
+            field_size = (8,8)
             max_episode_steps = 50
             force_coop = False
             normalize_reward = False
@@ -118,7 +119,7 @@ class ForagingEnv(Env):
 
         self.logger = logging.getLogger(__name__)
         self.seed()
-        self.players = [Player() for _ in range(sum(players))]
+        self.players = [Player(i) for i in range(sum(players))]
         self.player_list = [a * [player_level[i]] for i, a in enumerate(players)]
         self.player_list = [item for sublist in self.player_list for item in sublist]
 
@@ -127,6 +128,8 @@ class ForagingEnv(Env):
         self.food_list = [item for sublist in self.food_list for item in sublist]
 
         self.field = np.zeros(field_size, np.int32)
+
+        self.max_player_level = max(player_level)+1
 
 
         self._food_spawned = 0.0
@@ -141,12 +144,14 @@ class ForagingEnv(Env):
         self._normalize_reward = normalize_reward
         self._grid_observation = grid_observation
 
+        self.n_agents = len(self.players)
+
         self.action_space = gym.spaces.Tuple(tuple([gym.spaces.Discrete(6)] * len(self.players)))
         self.observation_space = gym.spaces.Tuple(tuple([self._get_observation_space()] * len(self.players)))
 
         self.viewer = None
 
-        self.n_agents = len(self.players)
+
 
         self.reset()
 
@@ -179,11 +184,14 @@ class ForagingEnv(Env):
             grid_shape = (1 + 2 * self.sight, 1 + 2 * self.sight)
 
 
-            loc_min = np.zeros((self.field.shape[1],2), dtype=np.float32).reshape(-1,1)
-            loc_max = np.ones((self.field.shape[1],2), dtype=np.float32).reshape(-1,1)
+            # loc_min = np.zeros((self.field.shape[1] + self.n_agents, 2), dtype=np.float32).reshape(-1,1)
+            # loc_max = np.ones((self.field.shape[1] + self.n_agents, 2), dtype=np.float32).reshape(-1,1)
 
-            agents_min = np.zeros(grid_shape, dtype=np.float32).reshape(-1, 1)
-            agents_max = np.ones(grid_shape, dtype=np.float32).reshape(-1, 1) * max(self.player_list)
+            loc_min = np.zeros((self.field.shape[1] + self.max_player_level, 2), dtype=np.float32).reshape(-1,1)
+            loc_max = np.ones((self.field.shape[1] + self.max_player_level, 2), dtype=np.float32).reshape(-1,1)
+
+            # agents_min = np.zeros(grid_shape, dtype=np.float32).reshape(-1, 1)
+            # agents_max = np.ones(grid_shape, dtype=np.float32).reshape(-1, 1) * max(self.player_list)
             # foods layer: foods level
             max_food_level = max(self.player_list)
             foods_min = np.zeros(grid_shape, dtype=np.float32).reshape(-1,1)
@@ -194,8 +202,8 @@ class ForagingEnv(Env):
             access_max = np.ones(grid_shape, dtype=np.float32).reshape(-1,1)
 
             # total layer
-            min_obs = np.concatenate([loc_min, agents_min, foods_min, access_min])
-            max_obs = np.concatenate([loc_max, agents_max, foods_max, access_max])
+            min_obs = np.concatenate([loc_min, foods_min, access_min])
+            max_obs = np.concatenate([loc_max, foods_max, access_max])
 
         return gym.spaces.Box(np.array(min_obs), np.array(max_obs), dtype=np.float32)
 
@@ -235,10 +243,11 @@ class ForagingEnv(Env):
     def _gen_valid_moves(self):
         self._valid_actions = {
             player: [
-                action for action in Action if self._is_valid_action(player, action)
+                action for action in Action if self._is_valid_action(player, action) or player.level == 0
             ]
             for player in self.players
         }
+
 
     def neighborhood(self, row, col, distance=1, ignore_diag=False):
         if not ignore_diag:
@@ -299,7 +308,6 @@ class ForagingEnv(Env):
                     or not self._is_empty_location(row, col)
                 ):
                     attempts += 1
-                    continue
                 else:
                     self.field[row, col] = self.food_list[i]
                     food.level = self.food_list[i]
@@ -308,17 +316,19 @@ class ForagingEnv(Env):
 
         self._food_spawned = self.field.sum()
 
+
+
     def _is_empty_location(self, row, col):
         if self.field[row, col] != 0:
             return False
         for a in self.players:
             if a.position and row == a.position[0] and col == a.position[1]:
                 return False
-
         return True
 
     def spawn_players(self):
 
+        spec_player_index = []
         for i, player in enumerate(self.players):
             attempts = 0
             player.reward = 0
@@ -332,8 +342,16 @@ class ForagingEnv(Env):
                         self.player_list[i],# self.np_random.randint(1, player_level),
                         self.field_size,
                     )
+                    if self.player_list[i]== 0:
+                        spec_player_index.append(i)
                     break
                 attempts += 1
+
+        for i, player_index in enumerate(spec_player_index):
+            self.players[player_index].position = self.foods[i].position
+            self.completed_agent += 1
+
+
 
     def _is_valid_action(self, player, action):
         if action == Action.NONE:
@@ -426,10 +444,10 @@ class ForagingEnv(Env):
             grid_shape_y += 2 * self.sight
             grid_shape = (grid_shape_x, grid_shape_y)
 
-            self.agents_layer = np.zeros(grid_shape, dtype=np.float32)
-            for player in self.players:
-                player_x, player_y = player.position
-                self.agents_layer[player_x + self.sight, player_y + self.sight] = player.level
+            # self.agents_layer = np.zeros(grid_shape, dtype=np.float32)
+            # for player in self.players:
+            #     player_x, player_y = player.position
+            #     self.agents_layer[player_x + self.sight, player_y + self.sight] = player.level
             
             foods_layer = np.zeros(grid_shape, dtype=np.float32)
             foods_layer[self.sight:-self.sight, self.sight:-self.sight] = self.field.copy()
@@ -444,11 +462,12 @@ class ForagingEnv(Env):
             access_layer[-self.sight:, :] = 0.0
             access_layer[:, :self.sight] = 0.0
             access_layer[:, -self.sight:] = 0.0
-            # agent locations are not accessible
-            # for player in self.players:
-            #     player_x, player_y = player.position
-            #     access_layer[player_x + self.sight, player_y + self.sight] = 0.0
-            # food locations are not accessible
+            #agent locations are not accessible
+            for player in self.players:
+                if player.level !=0:
+                    player_x, player_y = player.position
+                    access_layer[player_x + self.sight, player_y + self.sight] = 0.0
+            #food locations are not accessible
             foods_x, foods_y = self.field.nonzero()
             for x, y in zip(foods_x, foods_y):
                 access_layer[x + self.sight, y + self.sight] = 0.0
@@ -460,27 +479,29 @@ class ForagingEnv(Env):
 
 
 
-        def get_agent_position(position, bounds, level):
+        def get_agent_position(position, level):
 
             # start_x, end_x, start_y, end_y = bounds
             # agent_layer = self.agents_layer[start_x:end_x, start_y:end_y].copy()
             # np.where(agent_layer!=level, 0, agent_layer)
-            grid_shape = (1 + 2 * self.sight, 1 + 2 * self.sight)
-            agent_layer = np.zeros(grid_shape, dtype=np.float32)
-            agent_layer = agent_layer.flatten()
+            # grid_shape = (1 + 2 * self.sight, 1 + 2 * self.sight)
+            # agent_layer = np.zeros(grid_shape, dtype=np.float32)
+            # agent_layer = agent_layer.flatten()
 
 
             (agent_x, agent_y) =  position
+            one_hot_id = np.zeros(self.max_player_level, dtype=np.float32)
+            one_hot_id[level] = 1
 
             one_hot_x = np.zeros((self.field_size[0]), dtype=np.float32)
             one_hot_x[agent_x] = 1
             one_hot_y = np.zeros((self.field_size[1]), dtype=np.float32)
             one_hot_y[agent_y] = 1
 
-            return np.concatenate([one_hot_x, one_hot_y, agent_layer])
+            return np.concatenate([one_hot_x, one_hot_y])
         
         def get_player_reward(obs):
-                    return obs.reward
+                return obs.reward
 
 
         observations = [self._make_obs(player) for player in self.players]
@@ -488,7 +509,7 @@ class ForagingEnv(Env):
         layers = make_global_grid_arrays()
         agents_bounds = [get_agent_grid_bounds(*player.position) for player in self.players]
         raw_nobs = tuple([layers[:, start_x:end_x, start_y:end_y].reshape(-1, 1) for start_x, end_x, start_y, end_y in agents_bounds])
-        agents_obs = [get_agent_position(player.position, agents_bounds[index], player.level).reshape(-1,1) for index, player in enumerate(self.players)]
+        agents_obs = [get_agent_position(player.position, player.level).reshape(-1,1) for index, player in enumerate(self.players)]
         nobs = [np.concatenate((raw_nobs[i], agents_obs[i])) for i in range(len(raw_nobs))]
 
         # else:
@@ -496,14 +517,21 @@ class ForagingEnv(Env):
         nreward = [get_player_reward(obs) for obs in observations]
         ndone = [obs.game_over for obs in observations]
         # ninfo = [{'observation': obs} for obs in observations]
-        ninfo = {}
+        ninfo = {'num_collisions': self.num_collisions,
+                 'completed_agent': self.completed_agent_list}
 
         return nobs, nreward, ndone, ninfo
 
     def reset(self):
+        self.completed_agent = 0
         self.field = np.zeros(self.field_size, np.int32)
-        self.spawn_players()
+        self.num_collisions = 0
+        self.completed_agent_list = [0 for _ in range(self.n_agents)]
+
+
         self.spawn_food()
+        self.spawn_players()
+
 
         self.current_step = 0
         self._game_over = False
@@ -513,6 +541,8 @@ class ForagingEnv(Env):
         return nobs
 
     def step(self, actions):
+
+
         self.current_step += 1
 
         for p in self.players:
@@ -541,28 +571,32 @@ class ForagingEnv(Env):
 
         # so check for collisions
         for player, action in zip(self.players, actions):
-            if action == Action.NONE:
-                collisions[player.position].append(player)
-            elif action == Action.NORTH:
-                collisions[(player.position[0] - 1, player.position[1])].append(player)
-            elif action == Action.SOUTH:
-                collisions[(player.position[0] + 1, player.position[1])].append(player)
-            elif action == Action.WEST:
-                collisions[(player.position[0], player.position[1] - 1)].append(player)
-            elif action == Action.EAST:
-                collisions[(player.position[0], player.position[1] + 1)].append(player)
-            elif action == Action.LOAD:
-                collisions[player.position].append(player)
-                loading_players.add(player)
+            if player.level != 0:
+                if action == Action.NONE:
+                    collisions[player.position].append(player)
+                elif action == Action.NORTH:
+                    collisions[(player.position[0] - 1, player.position[1])].append(player)
+                elif action == Action.SOUTH:
+                    collisions[(player.position[0] + 1, player.position[1])].append(player)
+                elif action == Action.WEST:
+                    collisions[(player.position[0], player.position[1] - 1)].append(player)
+                elif action == Action.EAST:
+                    collisions[(player.position[0], player.position[1] + 1)].append(player)
+                elif action == Action.LOAD:
+                    collisions[player.position].append(player)
+                    loading_players.add(player)
+
 
         # and do movements for non colliding players
         for k, v in collisions.items():
-            if len(v) > 1:# make sure no more than an player will arrive at location
+            if len(v) > 1:  # make sure no more than an player will arrive at location
+                self.num_collisions += 1
                 for paly in v:
-                    paly.reward = -1
-                continue
-            v[0].position = k
-            v[0].reward = -0.2
+                    paly.reward = -2.0
+
+            else:
+                v[0].position = k
+                v[0].reward = -0.2
 
         # finally process the loadings:
         while loading_players:
@@ -594,15 +628,22 @@ class ForagingEnv(Env):
             for a in adj_players:
                 a.reward = float(a.level * food)
                 if self._normalize_reward:
-                    a.reward = a.reward / float(adj_player_level * self._food_spawned)  # normalize reward
-            # and the food is removed
-            self.field[frow, fcol] = 0
+                    a.reward = a.reward / float(adj_player_level * self._food_spawned)
+                a.level = 0
+                a.position = (frow, fcol)
+                self.completed_agent += 1
 
-        self._game_over = (self.field.sum() == 0 or self._max_episode_steps <= self.current_step)
+
+
+        self._game_over = (self.completed_agent == self.n_agents or self._max_episode_steps <= self.current_step)
         self._gen_valid_moves()
 
-        for p in self.players:
+
+        for index, p in enumerate(self.players):
+            if p.level == 0:
+                self.completed_agent_list[index] = 1
             p.score += p.reward
+
         return self._make_gym_obs()
 
     def _init_render(self):
@@ -634,28 +675,27 @@ class ForagingEnv(Env):
         for i in range (self.n_agents):
             for j in range (self.n_agents):
                 if i != j:
-                    # test = np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))
-                    # print(test)
-                    #if self.players[i].level == self.players[j].level or \
-                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=3.0:
-                            G.add_edge(i,j)
+                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position)) <= 2.0:
+                        G.add_edge(i, j)
+                    # if self.players[i].level == self.players[j].level or \
+                    #     np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=2.0:
+                    #         G.add_edge(i,j)
                     # if self.scenario.group_indices[i] == self.scenario.group_indices[j] or \
                     #         np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<=1:
                     #     G.add_edge(i, j)
-
+        #
         # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
         # plt.show()
-        #
-        # set = cd.louvain(G).communities
-        # print(set)
-        #
+
+
+
         # g = nx.Graph()
         # g.add_nodes_from(G.nodes(data=False))
         #
         # for e in G.edges():
         #     strength = measure_strength(G, e[0], e[1])
         #     print(strength)
-        #     if strength > 0.8:
+        #     if strength > 0.5:
         #         g.add_edge(e[0], e[1])
         #
         # #set = [list(c) for c in nx.connected_components(g)]

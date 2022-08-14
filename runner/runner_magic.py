@@ -32,7 +32,7 @@ class RunnerMagic(Runner):
         #
         #
         # self.params = list(self.agent.parameters())
-        # self.optimizer = Adam(params=self.params, lr=args.lr)
+        # self.optimizer_agent_ac = Adam(params=self.params, lr=args.lr)
 
 
 

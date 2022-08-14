@@ -128,10 +128,10 @@ class Scenario(BaseScenario):
         for  entity_index, entity in enumerate (world.landmarks):  # world.entities:
             related_pos = entity.state.p_pos - agent.state.p_pos
 
-            if np.linalg.norm(related_pos) <= 2.5 and agent.group_id != entity_index:
+            if np.linalg.norm(related_pos) <= 2 or agent.group_id != entity_index:
                 entity_pos.append(np.array(related_pos))
             else:
-                entity_pos.append(np.array([100,100 ]))
+                entity_pos.append(np.array([100,100]))
         x = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + [agent.group_one_hot])
         if self.shuffle_obs:
             x = list(x)

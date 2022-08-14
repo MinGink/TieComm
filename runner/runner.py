@@ -8,8 +8,7 @@ import time
 
 import argparse
 
-Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
-                                        'episode_masks', 'episode_agent_masks', 'values'))
+Transition = namedtuple('Transition', ('action_outs', 'actions', 'rewards', 'episode_masks', 'episode_agent_masks', 'values'))
 
 
 class Runner(object):
@@ -23,20 +22,29 @@ class Runner(object):
         self.gamma = self.args.gamma
 
         self.params = [p for p in self.agent.parameters()]
-        #self.optimizer = Adam(params=self.agent.parameters(), lr=self.args.lr)
-        self.optimizer = RMSprop(self.agent.parameters(), lr = self.args.lr, alpha=0.97, eps=1e-6)
+        #self.optimizer_agent_ac = Adam(params=self.agent.parameters(), lr=self.args.lr)
+        self.optimizer_agent_ac = RMSprop(self.agent.parameters(), lr = self.args.lr, alpha=0.97, eps=1e-6)
 
+
+
+
+    def optimizer_zero_grad(self):
+        self.optimizer_agent_ac.zero_grad()
+
+
+    def optimizer_step(self):
+        self.optimizer_agent_ac.step()
 
 
     def train_batch(self, batch_size):
         batch_data, batch_log = self.collect_batch_data(batch_size)
-        self.optimizer.zero_grad()
+        self.optimizer_zero_grad()
         train_log = self.compute_grad(batch_data)
         merge_dict(batch_log, train_log)
         for p in self.params:
             if p._grad is not None:
                 p._grad.data /= batch_log['num_steps']
-        self.optimizer.step()
+        self.optimizer_step()
         return train_log
 
 
@@ -62,7 +70,7 @@ class Runner(object):
 
         memory = []
         log = dict()
-        episode_return = np.zeros(self.n_agents)
+        episode_return = 0
 
         self.reset()
         obs = self.env.get_obs()
@@ -83,25 +91,26 @@ class Runner(object):
             episode_agent_mask = np.ones(rewards.shape)
             if done:
                 episode_mask = np.zeros(rewards.shape)
-            else:
-                if 'is_completed' in env_info:
-                    episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
+            elif 'completed_agent' in env_info:
+                episode_agent_mask = 1 - np.array(env_info['completed_agent']).reshape(-1)
 
 
-            trans = Transition(np.array(obs), action_outs, actions, np.array(rewards),
-                               episode_mask, episode_agent_mask, values)
+            trans = Transition(action_outs, actions, rewards, episode_mask, episode_agent_mask, values)
             memory.append(trans)
 
             obs = next_obs
-            episode_return += rewards.astype(episode_return.dtype)
+            episode_return += int(np.sum(rewards))
             step += 1
 
 
         log['episode_return'] = episode_return
         log['episode_steps'] = [step-1]
 
-        if self.args.env == 'tj':
-            merge_dict(self.env.get_stat(),log)
+        if 'num_collisions' in env_info:
+            log['num_collisions'] = env_info['num_collisions']
+
+        # if self.args.env == 'tj':
+        #     merge_dict(self.env.get_stat(),log)
 
         return memory, log
 
@@ -126,7 +135,8 @@ class Runner(object):
         log = dict()
 
         n = self.n_agents
-        batch_size = len(batch.obs)
+        batch_size = len(batch.actions)
+
         rewards = torch.Tensor(np.array(batch.rewards))
         actions = torch.Tensor(np.array(batch.actions))
         actions = actions.transpose(1, 2).view(-1, n, 1)
@@ -155,9 +165,8 @@ class Runner(object):
         if self.args.normalize_rewards:
             advantages = (advantages - advantages.mean()) / advantages.std()
 
-        # element of log_p_a: [(batch_size*n) * num_actions[i]]
+
         log_p_a = [action_outs.view(-1, self.n_actions)]
-        # actions: [(batch_size*n) * dim_actions]
         actions = actions.contiguous().view(-1, 1)
         log_prob = multinomials_log_density(actions, log_p_a)
         action_loss = -advantages.view(-1) * log_prob.squeeze()

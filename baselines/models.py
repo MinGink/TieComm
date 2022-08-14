@@ -56,7 +56,7 @@ class Attention(nn.Module):
 
 
 
-        self.attn = nn.MultiheadAttention(self.hid_size, self.att_head, batch_first=True)
+        self.attn = nn.MultiheadAttention(self.hid_size, num_heads=1, batch_first=True)
 
 
 
@@ -64,13 +64,12 @@ class Attention(nn.Module):
 
 
     def forward(self, x, info={}):
-        x = self.tanh(self.affine1(x))
-        #h, _ = self.attn(x.unsqueeze(0), x.unsqueeze(0), x.unsqueeze(0))
-        #h = h.squeeze(0)
-        h = self.transformer(x.unsqueeze(0))
-        y = self.tanh(self.affine2(torch.cat([h.squeeze(0), x],dim=-1)))
-        #h = torch.cat([h.squeeze(0), x], dim=-1)
-        #y = self.tanh(self.affine2(h))
+        x = self.tanh(self.affine1(x)).unsqueeze(0)
+        h, _ = self.attn(x,x,x)
+        # h = self.transformer(x.unsqueeze(0))
+        # y = self.tanh(self.affine2(torch.cat([h.squeeze(0), x],dim=-1)))
+        h = torch.cat([h.squeeze(0), x.squeeze(0)], dim=-1)
+        y = self.tanh(self.affine2(h))
         a = F.log_softmax(self.head(y), dim=-1)
         v = self.value_head(y)
         return a, v

@@ -9,8 +9,7 @@ from .runner import Runner
 
 import argparse
 
-Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
-                                        'episode_masks', 'episode_agent_masks', 'values'))
+Transition = namedtuple('Transition', ('action_outs', 'actions', 'rewards', 'episode_masks', 'episode_agent_masks', 'values'))
 
 
 class RunnerGNN(Runner):
@@ -45,13 +44,12 @@ class RunnerGNN(Runner):
             episode_agent_mask = np.ones(rewards.shape)
             if done:
                 episode_mask = np.zeros(rewards.shape)
-            else:
-                if 'is_completed' in env_info:
-                    episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
+            # else:
+            #     if 'is_completed' in env_info:
+            #         episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
 
 
-            trans = Transition(np.array(obs), action_outs, actions, np.array(rewards),
-                               episode_mask, episode_agent_mask, values)
+            trans = Transition(action_outs, actions, np.array(rewards), episode_mask, episode_agent_mask, values)
             memory.append(trans)
 
             obs = next_obs
@@ -62,8 +60,8 @@ class RunnerGNN(Runner):
         log['episode_return'] = episode_return
         log['episode_steps'] = [step-1]
 
-        if self.args.env == 'tj':
-            merge_dict(self.env.get_stat(),log)
+        # if self.args.env == 'tj':
+        #     merge_dict(self.env.get_stat(),log)
 
         return memory, log
 

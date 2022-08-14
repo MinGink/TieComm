@@ -29,6 +29,13 @@ register(
 )
 
 
+
+register(
+    id='PredatorPrey-v0',
+    entry_point='envs.pp.predator_prey_env:PredatorPreyEnv',
+)
+
+
 sizes = range(5, 20)
 players = range(2, 20)
 foods = range(1, 10)

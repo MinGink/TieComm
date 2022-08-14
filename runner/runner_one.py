@@ -20,8 +20,8 @@ class RunnerOne(Runner):
         self.no_group = [[i] for i in range(self.n_agents)]
 
         # self.params = [p for p in self.agent.agent.parameters()]
-        # # self.optimizer = Adam(params=self.agent.parameters(), lr=self.args.lr)
-        # self.optimizer = RMSprop(self.agent.agent.parameters(), lr=self.args.lr, alpha=0.97, eps=1e-6)
+        # # self.optimizer_agent_ac = Adam(params=self.agent.parameters(), lr=self.args.lr)
+        # self.optimizer_agent_ac = RMSprop(self.agent.agent.parameters(), lr=self.args.lr, alpha=0.97, eps=1e-6)
 
 
     def run_an_episode(self):

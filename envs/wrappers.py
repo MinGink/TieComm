@@ -102,7 +102,7 @@ class Wrapper(object):
             for o in self._obs
         ]
 
-        info = {'is_completed': np.array(done).astype(int)}
+        #info = {'is_completed': np.array(done).astype(int)}
         if sum(done) == self.n_agents:
             done = True
         else:

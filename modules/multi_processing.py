@@ -35,7 +35,7 @@ class MultiProcessWorker(mp.Process):
 
             elif task == 'train_batch':
                 batch_data, batch_log = self.runner.collect_batch_data(batch_size)
-                self.runner.optimizer.zero_grad()
+                self.runner.optimizer_zero_grad()
                 train_log = self.runner.compute_grad(batch_data)
                 merge_dict(batch_log, train_log)
                 self.worker.send(train_log)
@@ -81,7 +81,7 @@ class MultiPeocessRunner():
 
         # run its own trainer
         batch_data, batch_log = self.runner.collect_batch_data(batch_size)
-        self.runner.optimizer.zero_grad()
+        self.runner.optimizer_zero_grad()
         main_log = self.runner.compute_grad(batch_data)
         merge_dict(batch_log, main_log)
 
@@ -102,7 +102,7 @@ class MultiPeocessRunner():
             self.grads[i] /= main_log['num_steps']
 
         #nn.utils.clip_grad_norm_(self.runner.params, self.args.grad_norm_clip)
-        self.runner.optimizer.step()
+        self.runner.optimizer_step()
         return main_log
 
 

@@ -88,8 +88,8 @@ def main(args):
         exp_config['hard_attn']=False
         exp_config['hid_size']=128
         exp_config['detach_gap'] = 10
-    elif args.agent in ['tiecomm','tiecomm_g','tiecomm_random','tiecomm_default']:
-        exp_config['interval']= agent_config['group_interval']
+    # elif args.agent in ['tiecomm','tiecomm_g','tiecomm_random','tiecomm_default']:
+    #     exp_config['interval']= agent_config['group_interval']
     else:
         pass
 
@@ -129,16 +129,16 @@ def main(args):
                    'episode': total_num_episodes,
                    'epoch_time': epoch_time,
                    'total_steps': total_num_steps,
-                   'episode_return': np.mean(log['episode_return']/log['num_episodes']),
+                   'episode_return': log['episode_return']/log['num_episodes'],
                    "episode_steps": np.mean(log['episode_steps']),
                    'action_loss': log['action_loss'],
                    'value_loss': log['value_loss'],
                    'total_loss': log['total_loss'],
                    })
 
-        if args.agent in ['tiecomm','tiecomm_g']:
+        if args.agent =='tiecomm':
             wandb.log({'epoch': epoch,
-                    'episode': total_num_episodes,
+                    #'episode': total_num_episodes,
                     'god_action_loss': log['god_action_loss'],
                     'god_value_loss': log['god_value_loss'],
                     'god_total_loss': log['god_total_loss'],
@@ -147,15 +147,21 @@ def main(args):
 
         if args.agent in ['tiecomm_random','tiecomm_default']:
             wandb.log({'epoch': epoch,
-                    'episode': total_num_episodes,
                     'num_groups': log['num_groups']/log['num_episodes'],
                     })
 
-        if args.env == 'tj':
+        # if args.env == 'tj':
+        #     wandb.log({'epoch': epoch,
+        #                'episode': total_num_episodes,
+        #                'success_rate':log['success']/log['num_episodes'],
+        #                })
+
+        if args.env == 'lbf':
             wandb.log({'epoch': epoch,
                        'episode': total_num_episodes,
-                       'success_rate':log['success']/log['num_episodes'],
+                       'num_collisions':np.mean(log['num_collisions']),
                        })
+
 
         print('current epoch: {}/{}'.format(epoch, args.total_epoches))
 
@@ -170,20 +176,18 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="new", help='memo name')
+    parser.add_argument('--memo', type=str, default="please", help='memo name')
     parser.add_argument('--env', type=str, default="lbf", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="Foraging-easy-v0", help='environment map name',
                         choices=['easy','medium','hard','mpe-large-spread-v1','Foraging-easy-v0'])
-    parser.add_argument('--agent', type=str, default="tiecomm_g", help='algorithm name',
-                        choices=['tiecomm','tiecomm_random','tiecomm_one','tiecomm_g','tiecomm_default','ac_mlp','gnn','ac_att','commnet','ic3net','tarmac','magic'])
+    parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
+                        choices=['tiecomm','tiecomm_random','tiecomm_one','tiecomm_default','ac_mlp','gnn','ac_att','commnet','ic3net','tarmac','magic'])
     parser.add_argument('--block', type=str, default='no',choices=['no','inter','intra'], help='only works for tiecomm')
-    parser.add_argument('--group_interval', type=int, default=1, help='only works for tiecomm')
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
-    parser.add_argument('--total_epoches', type=int, default=1000, help='total number of training epochs')
-    parser.add_argument('--batch_size', type=int, default=1500, help='batch size')
+    parser.add_argument('--total_epoches', type=int, default=600, help='total number of training epochs')
     parser.add_argument('--n_processes', type=int, default=6, help='number of processes')
     args = parser.parse_args()
 
