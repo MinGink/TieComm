@@ -177,9 +177,9 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="gnn", help='memo name')
-    parser.add_argument('--env', type=str, default="lbf", help='environment name',
+    parser.add_argument('--env', type=str, default="mpe", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
-    parser.add_argument('--map', type=str, default="Foraging-easy-v0", help='environment map name',
+    parser.add_argument('--map', type=str, default="mpe-large-spread-v1", help='environment map name',
                         choices=['easy','medium','hard','mpe-large-spread-v1','Foraging-easy-v0'])
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
                         choices=['tiecomm','tiecomm_random','tiecomm_one','tiecomm_default','ac_mlp','gnn','ac_att','commnet','ic3net','tarmac','magic'])
@@ -187,7 +187,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
-    parser.add_argument('--total_epoches', type=int, default=600, help='total number of training epochs')
+    parser.add_argument('--total_epoches', type=int, default=1500, help='total number of training epochs')
     parser.add_argument('--n_processes', type=int, default=6, help='number of processes')
     args = parser.parse_args()
 

@@ -20,10 +20,10 @@ class RunnerTiecomm(Runner):
 
         #self.optimizer_agent_ac = Adam(params=self.agent.parameters(), lr=self.args.lr)
         self.optimizer_agent_ac = RMSprop(self.agent.agent.parameters(), lr = self.args.lr, alpha=0.97, eps=1e-6)
-        self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr = self.args.lr, alpha=0.97, eps=1e-6)
+        self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr = self.args.lr*2, alpha=0.97, eps=1e-6)
 
         self.n_nodes = int(self.n_agents * (self.n_agents - 1) / 2)
-        self.interval = self.args.interval
+        self.interval = 5
 
 
 
@@ -159,6 +159,7 @@ class RunnerTiecomm(Runner):
             obs = next_obs
             episode_return += int(np.sum(rewards))
             step += 1
+            num_group += len(set[1])
 
 
         log['episode_return'] = episode_return

@@ -11,5 +11,6 @@
 
 #lbforaging:Foraging-10x10-3p-3f-v2
 
-python main.py --agent tiecomm --env lbf --map Foraging-easy-v0 --block intra --use_multiprocessing --memo tfpart
-python main.py --agent tiecomm_default --env lbf --map Foraging-easy-v0 --use_multiprocessing --memo tfpart
+python main.py --agent tiecomm --env lbf --map Foraging-easy-v0 --block no --use_multiprocessing --memo final_baselines
+python main.py --agent tiecomm --env lbf --map Foraging-easy-v0 --block inter --use_multiprocessing --memo final_baselines
+python main.py --agent tiecomm --env lbf --map Foraging-easy-v0 --block intra --use_multiprocessing --memo final_baselines

@@ -19,12 +19,15 @@ class Scenario(BaseScenario):
 
         self.shuffle_obs = shuffle_obs
 
+        self.num_agents = num_agents
+
         self.cooperative = cooperative
         self.groups = groups
         self.group_indices = [a * [i] for i, a in enumerate(self.groups)]
         self.group_indices = [
             item for sublist in self.group_indices for item in sublist
         ]
+
         # generate colors:
         self.colors = [np.random.random(3) for _ in groups]
 
@@ -101,34 +104,42 @@ class Scenario(BaseScenario):
 
     def reward(self, agent, world):
         # Agents are rewarded based on minimum agent distance to each landmark, penalized for collisions
-        rew = 0
 
         i = world.agents.index(agent)
         rew = -np.sqrt(np.sum(np.square(agent.state.p_pos- world.landmarks[self.group_indices[i]].state.p_pos)))
 
-        if self.cooperative:
-            return 0
-        else:
-            return rew
+
+        if agent.collide:
+            for a in world.agents:
+                if self.is_collision(a, agent):
+                    rew -= 5
+
+
+        # if self.cooperative:
+        #     return 0
+        # else:
+        return rew
 
     def global_reward(self, world):
-        rew = 0
-
-        for i, a in zip(self.group_indices, world.agents):
-            l = world.landmarks[i]
-            rew -= np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos)))
-
-        if self.cooperative:
-            return rew
-        else:
-            return 0
+        # rew = 0
+        #
+        # for i, a in zip(self.group_indices, world.agents):
+        #     l = world.landmarks[i]
+        #     rew -= np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos)))
+        #
+        # rew = rew / self.num_agents
+        #
+        # #if self.cooperative:
+        # return rew
+        # # else:
+        return 0
 
     def observation(self, agent, world):
         entity_pos = []
         for  entity_index, entity in enumerate (world.landmarks):  # world.entities:
             related_pos = entity.state.p_pos - agent.state.p_pos
 
-            if np.linalg.norm(related_pos) <= 2 or agent.group_id != entity_index:
+            if np.linalg.norm(related_pos) <= 0 or agent.group_id != entity_index:
                 entity_pos.append(np.array(related_pos))
             else:
                 entity_pos.append(np.array([100,100]))

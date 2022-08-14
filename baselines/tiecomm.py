@@ -41,9 +41,9 @@ class TieCommAgent(nn.Module):
         g.add_nodes_from(G.nodes(data=False), node_strength = 0.0)
         for e in G.edges():
             strength = measure_strength(G, e[0], e[1])
-            g.nodes[e[0]]['node_strength'] += strength
-            g.nodes[e[1]]['node_strength'] += strength
             if strength > thershold:
+                g.nodes[e[0]]['node_strength'] += strength
+                g.nodes[e[1]]['node_strength'] += strength
                 g.add_edge(e[0], e[1])
                 # print(strength)
                 # raise ValueError('strength > thershold')
@@ -106,8 +106,9 @@ class GodAC(nn.Module):
         self.threshold = self.args.threshold
         self.tanh = nn.Tanh()
 
-        self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents**2 , self.hid_size * 4)
-        self.fc2 = nn.Linear(self.hid_size * 4 , self.hid_size)
+        #self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents**2 , self.hid_size * 4)
+        self.fc1 = nn.Linear(self.n_agents**2 , self.hid_size)
+        self.fc2 = nn.Linear(self.hid_size , self.hid_size)
         self.head = nn.Linear(self.hid_size, 10)
         self.value = nn.Linear(self.hid_size, 1)
 
@@ -115,8 +116,9 @@ class GodAC(nn.Module):
     def forward(self, input, graph):
 
         adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1)
-        hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
-        hid = self.tanh(self.fc1(hid))
+        #hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
+
+        hid = self.tanh(self.fc1(adj_matrix))
         hid = self.tanh(self.fc2(hid))
 
         a = F.log_softmax(self.head(hid), dim=-1)

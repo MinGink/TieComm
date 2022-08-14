@@ -2,16 +2,14 @@ import torch
 import torch.nn as nn
 from collections import namedtuple
 import numpy as np
-from torch.optim import Adam
-from modules.utils import merge_dict, multinomials_log_densities
+from torch.optim import RMSprop, Adam
+from modules.utils import merge_dict, multinomials_log_density
 from .runner import Runner
 import time
+from baselines.models import MLP
 
-Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards', 'values',
-                                       'episode_masks', 'episode_agent_masks'))
-
-God_Transition = namedtuple('God_Transition', ('god_action_out', 'god_value', 'god_action', 'god_reward','episode_masks',
-                                       ))
+Transition = namedtuple('Transition', ('action_outs', 'actions', 'rewards', 'values', 'episode_masks', 'episode_agent_masks'))
+God_Transition = namedtuple('God_Transition', ('god_action_out', 'god_action', 'god_reward', 'god_value', 'episode_masks',))
 
 
 
@@ -23,81 +21,114 @@ class RunnerDual(Runner):
         self.interval = self.args.interval
 
 
+        # self.optimizer_agent_ac = RMSprop(self.agent.agent.parameters(), lr=0.001)
+        # self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr=0.002)
+        # self.optimizer_god_actor = RMSprop(self.agent.god_actor.parameters(), lr=0.002)
+        # self.optimizer_god_critic = RMSprop(self.agent.god_critic.parameters(), lr=0.002)
+
+
+
+    # def optimizer_zero_grad(self):
+    #     self.optimizer_agent_ac.zero_grad()
+    #     self.optimizer_god_ac.zero_grad()
+    #     # self.optimizer_god_actor.zero_grad()
+    #     # self.optimizer_god_critic.zero_grad()
+
+
+    # def optimizer_step(self):
+    #     self.optimizer_agent_ac.step()
+    #     self.optimizer_god_ac.step()
+    #     # self.optimizer_god_actor.step()
+    #     # self.optimizer_god_critic.step()
 
 
     def run_an_episode(self):
 
+        log = dict()
         memory = []
         god_memory = []
-        log = dict()
-        episode_return = np.zeros(self.n_agents)
+        episode_return = 0
+        step = 1
+
+        num_group = 0
 
         self.reset()
-        obs = self.env.get_obs()
-
-        step = 1
         done = False
 
-
+        obs = self.env.get_obs()
         obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-        graph, set, god_action_out, god_value, god_action = self.agent.god(obs_tensor)
-        god_reward = np.zeros(1)
-        num_group = 0
+        # graph = self.env.get_graph()
+        # god_action_out, god_value = self.agent.god(obs_tensor, graph)
+        # god_action = self.choose_action(god_action_out)
+        # god_action = [god_action[0].reshape(1)]
+        # treashold = float((god_action[0]) * 0.1)
+        # g, set = self.agent.graph_partition(graph, treashold)
+
+        # god_reward_list = []
+        # god_reward = np.zeros(1)
+
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
-            if step % self.interval == 0:
-                graph, set, god_action_out, god_value, god_action = self.agent.god(obs_tensor)
+            # if step % self.interval == 0:
+            #     graph = self.env.get_graph()
+            #     god_action_out, god_value = self.agent.god(obs_tensor, graph)
+            #     god_action = self.choose_action(god_action_out)
+            #     god_action = [god_action[0].reshape(1)]
+            #     treashold = float((god_action[0]) * 0.1)
+            #     g, set = self.agent.graph_partition(graph, treashold)
 
-            after_comm = self.agent.communicate(obs_tensor, graph, set)
-            action_outs, values = self.agent.agent(after_comm)
-
+            # after_comm = self.agent.communicate(obs_tensor, g, set)
+            # action_outs, values = self.agent.agent(after_comm)
+            action_outs, values = self.agent(obs_tensor)
             actions = self.choose_action(action_outs)
+
             rewards, dones, env_info = self.env.step(actions)
-            god_reward += np.sum(rewards)
+            # god_reward_list.append(np.mean(rewards).reshape(1))
+            #
+            # if step % self.interval == 0:
+            #     god_reward = np.mean(god_reward_list).reshape(1)
+            #     god_reward_list = []
 
             next_obs = self.env.get_obs()
 
             episode_mask = np.ones(rewards.shape)
-
+            god_episode_mask = np.ones(1)
             episode_agent_mask = np.ones(rewards.shape)
+
             if done:
                 episode_mask = np.zeros(rewards.shape)
-            else:
-                if 'is_completed' in env_info:
-                    episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
+                god_episode_mask = np.zeros(1)
+            elif 'completed_agent' in env_info:
+                episode_agent_mask = 1 - np.array(env_info['completed_agent']).reshape(-1)
 
-            trans = Transition(np.array(obs),  action_outs, actions, np.array(rewards), values,
-                                    episode_mask, episode_agent_mask)
-
-            if step % self.interval == 0:
-                god_trans = God_Transition(god_action_out, god_value, god_action, god_reward,np.ones(god_value.shape),)
-                god_memory.append(god_trans)
-                god_reward = np.zeros(1)
-
-
+            trans = Transition(action_outs, actions, rewards, values, episode_mask, episode_agent_mask)
             memory.append(trans)
 
+            # if step % self.interval == 0:
+            #     god_trans = God_Transition(god_action_out, god_action, god_reward, god_value, god_episode_mask)
+            #     god_memory.append(god_trans)
 
             obs = next_obs
-            episode_return += rewards.astype(episode_return.dtype)
+            episode_return += int(sum(rewards))
             step += 1
-            num_group += len(set)
-
-
-        god_trans = God_Transition(god_action_out, god_value, god_action, god_reward, np.zeros(god_value.shape))
-        god_memory.append(god_trans)
-
+            num_group += 1 # len(set[1])
 
         log['episode_return'] = episode_return
         log['episode_steps'] = [step-1]
         log['num_groups'] = num_group / (step-1)
 
-        if self.args.env == 'tj':
-            merge_dict(self.env.get_stat(), log)
+        if 'num_collisions' in env_info:
+            log['num_collisions'] = env_info['num_collisions']
 
-        return (memory,god_memory), log
+        # if self.args.env == 'tj':
+        #     merge_dict(self.env.get_stat(), log)
+
+        return memory, log
+
+        #return (memory,god_memory), log
+
 
 
 
@@ -113,27 +144,31 @@ class RunnerDual(Runner):
     def compute_god_grad(self, batch):
 
         log = dict()
-
-        dim_actions = self.n_nodes
         batch_size = len(batch.god_value)
+        n = 1
+
+        rewards = torch.Tensor(np.array(batch.god_reward))
+        actions = torch.Tensor(np.array(batch.god_action))
+        actions = actions.transpose(1, 2).view(-1, n, 1)
 
 
-        episode_masks = torch.Tensor(np.array(batch.episode_masks)).squeeze(-1)
+        episode_masks = torch.Tensor(np.array(batch.episode_masks))
+
         values = torch.cat(batch.god_value, dim=0)
-        rewards = torch.Tensor(np.array(batch.god_reward)).unsqueeze(-1)
-        actions = torch.stack(batch.god_action, dim=0)
         action_outs = torch.stack(batch.god_action_out, dim=0)
 
 
 
-        returns = torch.Tensor(batch_size, 1)
-        advantages = torch.Tensor(batch_size, 1)
-        values = values.view(batch_size, 1)
+        returns = torch.Tensor(batch_size, n)
+        advantages = torch.Tensor(batch_size, n)
+        values = values.view(batch_size, n)
         prev_returns = 0
+
 
         for i in reversed(range(batch_size)):
             returns[i] = rewards[i] + self.args.gamma * prev_returns * episode_masks[i]
             prev_returns = returns[i].clone()
+
 
         for i in reversed(range(batch_size)):
             advantages[i] = returns[i] - values.data[i]
@@ -142,19 +177,17 @@ class RunnerDual(Runner):
             advantages = (advantages - advantages.mean()) / advantages.std()
 
 
-
-        log_p_a = action_outs
-        # actions: [(batch_size*n) * dim_actions]
-        actions = actions.contiguous().view(-1, dim_actions)
-        log_prob = multinomials_log_densities(actions, log_p_a)
-        # the log prob of each action head is multiplied by the advantage
-        action_loss = -advantages.view(-1).unsqueeze(-1) * log_prob
+        log_p_a = [action_outs.view(-1, 10)]
+        actions = actions.contiguous().view(-1, 1)
+        log_prob = multinomials_log_density(actions, log_p_a)
+        action_loss = -advantages.view(-1) * log_prob.squeeze()
         actor_loss = action_loss.sum()
 
 
         targets = returns
         value_loss = (values - targets).pow(2).view(-1)
         critic_loss = value_loss.sum()
+
 
         total_loss = actor_loss + self.args.value_coeff * critic_loss
         total_loss.backward()
