@@ -23,7 +23,7 @@ class RunnerTiecomm(Runner):
         self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr = self.args.lr*2, alpha=0.97, eps=1e-6)
 
         self.n_nodes = int(self.n_agents * (self.n_agents - 1) / 2)
-        self.interval = 5
+        self.interval = self.args.interval
 
 
 

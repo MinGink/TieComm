@@ -106,9 +106,9 @@ class GodAC(nn.Module):
         self.threshold = self.args.threshold
         self.tanh = nn.Tanh()
 
-        #self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents**2 , self.hid_size * 4)
-        self.fc1 = nn.Linear(self.n_agents**2 , self.hid_size)
-        self.fc2 = nn.Linear(self.hid_size , self.hid_size)
+        self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents**2 , self.hid_size * 2)
+        #self.fc1 = nn.Linear(self.n_agents**2 , self.hid_size)
+        self.fc2 = nn.Linear(self.hid_size *2 , self.hid_size)
         self.head = nn.Linear(self.hid_size, 10)
         self.value = nn.Linear(self.hid_size, 1)
 
@@ -116,9 +116,8 @@ class GodAC(nn.Module):
     def forward(self, input, graph):
 
         adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1)
-        #hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
-
-        hid = self.tanh(self.fc1(adj_matrix))
+        hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
+        hid = self.tanh(self.fc1(hid))
         hid = self.tanh(self.fc2(hid))
 
         a = F.log_softmax(self.head(hid), dim=-1)
