@@ -150,6 +150,7 @@ class ForagingEnv(Env):
         self.observation_space = gym.spaces.Tuple(tuple([self._get_observation_space()] * len(self.players)))
 
         self.viewer = None
+        self.current_step = 0
 
 
 
@@ -525,6 +526,8 @@ class ForagingEnv(Env):
     def reset(self):
         self.completed_agent = 0
         self.field = np.zeros(self.field_size, np.int32)
+        #print(self.current_step)
+
         self.num_collisions = 0
         self.completed_agent_list = [0 for _ in range(self.n_agents)]
 
@@ -592,7 +595,7 @@ class ForagingEnv(Env):
             if len(v) > 1:  # make sure no more than an player will arrive at location
                 self.num_collisions += 1
                 for paly in v:
-                    paly.reward = -2.0
+                    paly.reward = -0.5
 
             else:
                 v[0].position = k
@@ -627,8 +630,8 @@ class ForagingEnv(Env):
             # else the food was loaded and each player scores points
             for a in adj_players:
                 a.reward = float(a.level * food)
-                if self._normalize_reward:
-                    a.reward = a.reward / float(adj_player_level * self._food_spawned)
+                # if self._normalize_reward:
+                #     a.reward = a.reward / float(adj_player_level * self._food_spawned)
                 a.level = 0
                 a.position = (frow, fcol)
                 self.completed_agent += 1

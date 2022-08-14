@@ -145,10 +145,10 @@ def main(args):
                     'num_groups': log['num_groups']/log['num_episodes'],
                     })
 
-        if args.agent in ['tiecomm_random','tiecomm_default']:
-            wandb.log({'epoch': epoch,
-                    'num_groups': log['num_groups']/log['num_episodes'],
-                    })
+        # if args.agent in ['tiecomm_random','tiecomm_default']:
+        #     wandb.log({'epoch': epoch,
+        #             'num_groups': log['num_groups']/log['num_episodes'],
+        #             })
 
         # if args.env == 'tj':
         #     wandb.log({'epoch': epoch,
@@ -159,7 +159,7 @@ def main(args):
         if args.env == 'lbf':
             wandb.log({'epoch': epoch,
                        'episode': total_num_episodes,
-                       'num_collisions':np.mean(log['num_collisions']),
+                       'num_collisions':log['num_collisions']/log['num_episodes'],
                        })
 
 
@@ -176,7 +176,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="please", help='memo name')
+    parser.add_argument('--memo', type=str, default="gnn", help='memo name')
     parser.add_argument('--env', type=str, default="lbf", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="Foraging-easy-v0", help='environment map name',

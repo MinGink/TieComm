@@ -21,8 +21,7 @@ class TieCommAgent(nn.Module):
         self.hid_size = self.args.hid_size
 
         self.agent = AgentAC(self.args)
-        self.god_actor = GodActor(self.args)
-        self.god_critic = GodCritic(self.args)
+        self.god = GodAC(self.args)
 
         if hasattr(self.args, 'random_prob'):
             self.random_prob = self.args.random_prob
@@ -44,7 +43,7 @@ class TieCommAgent(nn.Module):
             strength = measure_strength(G, e[0], e[1])
             g.nodes[e[0]]['node_strength'] += strength
             g.nodes[e[1]]['node_strength'] += strength
-            if strength > 1:
+            if strength > thershold:
                 g.add_edge(e[0], e[1])
                 # print(strength)
                 # raise ValueError('strength > thershold')
@@ -62,18 +61,19 @@ class TieCommAgent(nn.Module):
 
 
 
-    def communicate(self, local_obs, graph, node_set):
+    def communicate(self, local_obs, graph=None, node_set =None):
 
         core_node, set = node_set
 
         local_obs = self.agent.local_emb(local_obs)
         intra_obs = self.agent.intra_com(local_obs, graph)
 
-        adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1).repeat(self.n_agents, 1)
+
+        #adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1).repeat(self.n_agents, 1)
 
         inter_obs = torch.zeros_like(intra_obs)
         if len(set) != 1:
-            core_obs = intra_obs[core_node, :]
+            core_obs = intra_obs[core_node, :].clone().detach()
             group_obs = self.agent.inter_com(core_obs)
             for index, group_members in enumerate (set):
                 inter_obs[group_members, :] = group_obs[index,:].repeat(len(group_members), 1)
@@ -93,12 +93,6 @@ class TieCommAgent(nn.Module):
         return after_comm
 
 
-    def god(self, obs, graph):
-        a = self.god_actor(obs, graph)
-        v = self.god_critic(obs, graph)
-        return a, v
-
-
 
 
 
@@ -112,17 +106,17 @@ class GodAC(nn.Module):
         self.threshold = self.args.threshold
         self.tanh = nn.Tanh()
 
-        self.fc1 = nn.Linear(args.obs_shape * self.n_agents , self.hid_size * 2)
-        self.fc2 = nn.Linear(self.hid_size * 2 + self.n_agents**2, self.hid_size)
+        self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents**2 , self.hid_size * 4)
+        self.fc2 = nn.Linear(self.hid_size * 4 , self.hid_size)
         self.head = nn.Linear(self.hid_size, 10)
         self.value = nn.Linear(self.hid_size, 1)
 
 
     def forward(self, input, graph):
 
-        adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1,-1)
-        hid = self.tanh(self.fc1(input.view(1, -1)))
-        hid = torch.cat((hid, adj_matrix), dim=1)
+        adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1)
+        hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
+        hid = self.tanh(self.fc1(hid))
         hid = self.tanh(self.fc2(hid))
 
         a = F.log_softmax(self.head(hid), dim=-1)
@@ -190,21 +184,21 @@ class AgentAC(nn.Module):
         self.args = args
         self.n_agents = args.n_agents
         self.hid_size = args.hid_size
+        self.n_actions = self.args.n_actions
         self.tanh = nn.Tanh()
 
         self.emb_fc = nn.Linear(args.obs_shape, self.hid_size)
+
         self.intra = GATConv(self.hid_size, self.hid_size, add_self_loops= False, heads=1,concat=False)
         self.inter = nn.MultiheadAttention(self.hid_size, num_heads=1, batch_first=True)
 
 
         if self.args.block == 'no':
-            self.actor_fc1 = nn.Linear(self.hid_size * 3,  self.hid_size)
-            self.value_fc1 = nn.Linear(self.hid_size * 3, self.hid_size)
+            self.affine2 = nn.Linear(self.hid_size * 3, self.hid_size)
         else:
-            self.actor_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
-            self.value_fc1 = nn.Linear(self.hid_size * 2, self.hid_size)
+            self.affine2 = nn.Linear(self.hid_size * 2, self.hid_size)
 
-        self.actor_head = nn.Linear(self.hid_size, args.n_actions)
+        self.actor_head = nn.Linear(self.hid_size, self.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)
 
     def local_emb(self, input):
@@ -214,12 +208,11 @@ class AgentAC(nn.Module):
     def intra_com(self, x, graph):
 
         if list(graph.edges()) == []:
-            edge_index = torch.zeros((1, 2), dtype=torch.long)
+            h = x
         else:
             edge_index = torch.tensor(list(graph.edges()), dtype=torch.long)
-
-        data = Data(x=x, edge_index=edge_index.t().contiguous())
-        h = self.tanh(self.intra(data.x, data.edge_index))
+            data = Data(x=x, edge_index=edge_index.t().contiguous())
+            h = self.tanh(self.intra(data.x, data.edge_index))
 
         return h
 
@@ -233,11 +226,9 @@ class AgentAC(nn.Module):
 
     def forward(self, final_obs):
 
-        a = self.tanh(self.actor_fc1(final_obs))
-        a = F.log_softmax(self.actor_head(a), dim=-1)
-
-
-        v = self.tanh(self.value_fc1(final_obs))
-        v = self.value_head(v)
+        #h = self.tanh(sum([self.affine2(final_obs), final_obs]))
+        h = self.tanh(self.affine2(final_obs))
+        a = F.log_softmax(self.actor_head(h), dim=-1)
+        v = self.value_head(h)
 
         return a, v

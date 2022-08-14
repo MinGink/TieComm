@@ -6,6 +6,7 @@ from torch.optim import RMSprop, Adam
 from modules.utils import merge_dict, multinomials_log_density
 from .runner import Runner
 import time
+from baselines.models import MLP
 
 Transition = namedtuple('Transition', ('action_outs', 'actions', 'rewards', 'values', 'episode_masks', 'episode_agent_masks'))
 God_Transition = namedtuple('God_Transition', ('god_action_out', 'god_action', 'god_reward', 'god_value', 'episode_masks',))
@@ -20,22 +21,25 @@ class RunnerDual(Runner):
         self.interval = self.args.interval
 
 
-        self.optimizer_agent_ac = RMSprop(self.agent.agent.parameters(), lr=0.001)
-        self.optimizer_god_actor = RMSprop(self.agent.god_actor.parameters(), lr=0.002)
-        self.optimizer_god_critic = RMSprop(self.agent.god_critic.parameters(), lr=0.002)
+        # self.optimizer_agent_ac = RMSprop(self.agent.agent.parameters(), lr=0.001)
+        # self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr=0.002)
+        # self.optimizer_god_actor = RMSprop(self.agent.god_actor.parameters(), lr=0.002)
+        # self.optimizer_god_critic = RMSprop(self.agent.god_critic.parameters(), lr=0.002)
 
 
 
-    def optimizer_zero_grad(self):
-        self.optimizer_agent_ac.zero_grad()
-        self.optimizer_god_actor.zero_grad()
-        self.optimizer_god_critic.zero_grad()
+    # def optimizer_zero_grad(self):
+    #     self.optimizer_agent_ac.zero_grad()
+    #     self.optimizer_god_ac.zero_grad()
+    #     # self.optimizer_god_actor.zero_grad()
+    #     # self.optimizer_god_critic.zero_grad()
 
 
-    def optimizer_step(self):
-        self.optimizer_agent_ac.step()
-        self.optimizer_god_actor.step()
-        self.optimizer_god_critic.step()
+    # def optimizer_step(self):
+    #     self.optimizer_agent_ac.step()
+    #     self.optimizer_god_ac.step()
+    #     # self.optimizer_god_actor.step()
+    #     # self.optimizer_god_critic.step()
 
 
     def run_an_episode(self):
@@ -53,40 +57,42 @@ class RunnerDual(Runner):
 
         obs = self.env.get_obs()
         obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
-        graph = self.env.get_graph()
-        god_action_out, god_value = self.agent.god(obs_tensor, graph)
-        god_action = self.choose_action(god_action_out)
-        god_action = [god_action[0].reshape(1)]
-        treashold = float((god_action[0]) * 0.1)
-        g, set = self.agent.graph_partition(graph, treashold)
+        # graph = self.env.get_graph()
+        # god_action_out, god_value = self.agent.god(obs_tensor, graph)
+        # god_action = self.choose_action(god_action_out)
+        # god_action = [god_action[0].reshape(1)]
+        # treashold = float((god_action[0]) * 0.1)
+        # g, set = self.agent.graph_partition(graph, treashold)
 
-        god_reward_list = []
-        god_reward = np.zeros(1)
+        # god_reward_list = []
+        # god_reward = np.zeros(1)
 
         while not done and step <= self.args.episode_length:
 
             obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
 
-            if step % self.interval == 0:
-                graph = self.env.get_graph()
-                god_action_out, god_value = self.agent.god(obs_tensor, graph)
-                god_action = self.choose_action(god_action_out)
-                god_action = [god_action[0].reshape(1)]
-                treashold = float((god_action[0]) * 0.1)
-                g, set = self.agent.graph_partition(graph, treashold)
+            # if step % self.interval == 0:
+            #     graph = self.env.get_graph()
+            #     god_action_out, god_value = self.agent.god(obs_tensor, graph)
+            #     god_action = self.choose_action(god_action_out)
+            #     god_action = [god_action[0].reshape(1)]
+            #     treashold = float((god_action[0]) * 0.1)
+            #     g, set = self.agent.graph_partition(graph, treashold)
 
-            after_comm = self.agent.communicate(obs_tensor, g, set)
-            action_outs, values = self.agent.agent(after_comm)
+            # after_comm = self.agent.communicate(obs_tensor, g, set)
+            # action_outs, values = self.agent.agent(after_comm)
+            action_outs, values = self.agent(obs_tensor)
             actions = self.choose_action(action_outs)
 
             rewards, dones, env_info = self.env.step(actions)
-            god_reward_list.append(np.mean(rewards).reshape(1))
-
-            if step % self.interval == 0:
-                god_reward = np.mean(god_reward_list).reshape(1)
-                god_reward_list = []
+            # god_reward_list.append(np.mean(rewards).reshape(1))
+            #
+            # if step % self.interval == 0:
+            #     god_reward = np.mean(god_reward_list).reshape(1)
+            #     god_reward_list = []
 
             next_obs = self.env.get_obs()
+
             episode_mask = np.ones(rewards.shape)
             god_episode_mask = np.ones(1)
             episode_agent_mask = np.ones(rewards.shape)
@@ -100,14 +106,14 @@ class RunnerDual(Runner):
             trans = Transition(action_outs, actions, rewards, values, episode_mask, episode_agent_mask)
             memory.append(trans)
 
-            if step % self.interval == 0:
-                god_trans = God_Transition(god_action_out, god_action, god_reward, god_value, god_episode_mask)
-                god_memory.append(god_trans)
+            # if step % self.interval == 0:
+            #     god_trans = God_Transition(god_action_out, god_action, god_reward, god_value, god_episode_mask)
+            #     god_memory.append(god_trans)
 
             obs = next_obs
             episode_return += int(sum(rewards))
             step += 1
-            num_group += len(set[1])
+            num_group += 1 # len(set[1])
 
         log['episode_return'] = episode_return
         log['episode_steps'] = [step-1]
@@ -119,7 +125,9 @@ class RunnerDual(Runner):
         # if self.args.env == 'tj':
         #     merge_dict(self.env.get_stat(), log)
 
-        return (memory,god_memory), log
+        return memory, log
+
+        #return (memory,god_memory), log
 
 
 

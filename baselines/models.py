@@ -40,16 +40,16 @@ class Attention(nn.Module):
     def __init__(self, agent_config):
         super(Attention, self).__init__()
         self.args = argparse.Namespace(**agent_config)
-        self.att_head = self.args.att_head
+        self.att_head = 1
         self.hid_size = self.args.hid_size
         self.obs_shape = self.args.obs_shape
         self.n_actions = self.args.n_actions
         self.tanh = nn.Tanh()
 
         self.affine1 = nn.Linear(self.obs_shape, self.hid_size)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
-                                                         batch_first=True)
-        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=1)
+        # encoder_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=4, dim_feedforward=self.hid_size,
+        #                                                  batch_first=True)
+        # self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=1)
         self.affine2 = nn.Linear(self.hid_size *2, self.hid_size)
         self.head = nn.Linear(self.hid_size,self.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)
@@ -68,7 +68,7 @@ class Attention(nn.Module):
         h, _ = self.attn(x,x,x)
         # h = self.transformer(x.unsqueeze(0))
         # y = self.tanh(self.affine2(torch.cat([h.squeeze(0), x],dim=-1)))
-        h = torch.cat([h.squeeze(0), x.squeeze(0)], dim=-1)
+        h = torch.cat([x.squeeze(0),h.squeeze(0)], dim=-1)
         y = self.tanh(self.affine2(h))
         a = F.log_softmax(self.head(y), dim=-1)
         v = self.value_head(y)

@@ -8,6 +8,7 @@ from .runner_baselines import RunnerBaseline
 from collections import namedtuple
 from .runner_ic3net import RunnerIcnet
 from .runner_default import RunnerDefault
+from .runner_tiecomm import RunnerTiecomm
 
 
 
@@ -21,7 +22,7 @@ REGISTRY["ac_mlp"] = Runner
 REGISTRY["ac_att"] = Runner
 REGISTRY["gnn"] = RunnerGNN
 
-REGISTRY["tiecomm"] = RunnerDual
+REGISTRY["tiecomm"] = RunnerTiecomm
 REGISTRY["tiecomm_random"] = RunnerRandom
 REGISTRY["tiecomm_one"] = RunnerOne
 REGISTRY["tiecomm_default"] = RunnerDefault
