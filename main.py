@@ -187,7 +187,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')
-    parser.add_argument('--total_epoches', type=int, default=1500, help='total number of training epochs')
+    parser.add_argument('--total_epoches', type=int, default=800, help='total number of training epochs')
     parser.add_argument('--n_processes', type=int, default=6, help='number of processes')
     args = parser.parse_args()
 

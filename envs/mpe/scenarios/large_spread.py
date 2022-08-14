@@ -48,6 +48,7 @@ class Scenario(BaseScenario):
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
             landmark.name = "landmark %d" % i
+            landmark.id = self.group_indices[i]
             landmark.collide = False
             landmark.movable = False
         return world
@@ -106,14 +107,18 @@ class Scenario(BaseScenario):
         # Agents are rewarded based on minimum agent distance to each landmark, penalized for collisions
 
         i = world.agents.index(agent)
+        landmark_index = self.group_indices[i]
         rew = -np.sqrt(np.sum(np.square(agent.state.p_pos- world.landmarks[self.group_indices[i]].state.p_pos)))
+        # rew = 0
+        # for i, a in zip(self.group_indices, world.agents):
+        #     if landmark_index == world.landmarks[i].id:
+        #         rew -= np.sqrt(np.sum(np.square(a.state.p_pos - world.landmarks[i].state.p_pos)))
 
 
         if agent.collide:
             for a in world.agents:
                 if self.is_collision(a, agent):
                     rew -= 5
-
 
         # if self.cooperative:
         #     return 0
@@ -139,18 +144,13 @@ class Scenario(BaseScenario):
         for  entity_index, entity in enumerate (world.landmarks):  # world.entities:
             related_pos = entity.state.p_pos - agent.state.p_pos
 
-            if np.linalg.norm(related_pos) <= 0 or agent.group_id != entity_index:
+            if np.linalg.norm(related_pos) <= 2 or agent.group_id != entity_index:
                 entity_pos.append(np.array(related_pos))
             else:
-                entity_pos.append(np.array([100,100]))
+                entity_pos.append(np.array([20,20]))
         x = np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + [agent.group_one_hot])
         if self.shuffle_obs:
             x = list(x)
             random.Random(self.group_indices[world.agents.index(agent)]).shuffle(x)
             x = np.array(x)
         return x
-
-
-
-
-

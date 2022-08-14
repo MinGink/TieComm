@@ -1,6 +1,6 @@
 env: 'mpe'
 map: pz-mpe-large-spread-v1
-time_limit: 100
+time_limit: 50
 
 
 #map:

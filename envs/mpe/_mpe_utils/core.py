@@ -45,6 +45,7 @@ class Entity(object):  # properties and state of physical world entity
         self.state = EntityState()
         # mass
         self.initial_mass = 1.0
+        self.id = None
 
     @property
     def mass(self):
