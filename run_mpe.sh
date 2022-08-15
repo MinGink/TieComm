@@ -11,8 +11,13 @@
 
 #lbforaging:Foraging-10x10-3p-3f-v2
 
-python main.py --agent ac_mlp --env mpe --map mpe-large-spread-v1 --use_multiprocessing --memo baselines
-python main.py --agent ac_att --env mpe --map mpe-large-spread-v1 --use_multiprocessing --memo baselines
-python main.py --agent tiecomm --env mpe --map mpe-large-spread-v1 --use_multiprocessing --memo baselines
 
 
+#v1 50
+#python main.py --agent ac_mlp --env mpe --map mpe-large-spread-v1  --time_limit 50   --use_multiprocessing --memo aaai
+#python main.py --agent ac_att --env mpe --map mpe-large-spread-v1  --time_limit 50   --use_multiprocessing --memo aaai
+python main.py --agent tiecomm --block no     --env mpe --map mpe-large-spread-v1 --time_limit 50   --use_multiprocessing --memo aaai
+python main.py --agent tiecomm  --block inter --env mpe --map mpe-large-spread-v1 --time_limit 50   --use_multiprocessing --memo aaai
+
+python main.py --agent tiecomm --block no     --env mpe --map mpe-large-spread-v2 --time_limit 100   --use_multiprocessing --memo aaai
+python main.py --agent tiecomm  --block inter --env mpe --map mpe-large-spread-v2 --time_limit 100   --use_multiprocessing --memo aaai
