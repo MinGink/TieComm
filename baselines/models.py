@@ -87,7 +87,8 @@ class GNN(nn.Module):
 
 
         self.fnn1 = nn.Linear(self.obs_shape, self.hid_size)
-        self.conv2 = GATConv(self.hid_size, self.hid_size, heads=1)
+        #self.conv2 = GATConv(self.hid_size, self.hid_size, heads=1)
+        self.conv2 = GCNConv(self.hid_size, self.hid_size)
         # self.conv3 = GATConv(self.hid_size, self.hid_size, heads=1)
         # self.conv4 = GATConv(self.hid_size, self.hid_size, heads=1)
         self.fnn3 = nn.Linear(self.hid_size *2, self.hid_size)
