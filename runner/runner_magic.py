@@ -69,7 +69,7 @@ class RunnerMagic(Runner):
 
             actions = self.choose_action(action_outs)
 
-            rewards, dones, env_info = self.env.step(actions)
+            rewards, done, env_info = self.env.step(actions)
 
             # next_state = self.env.get_state()
             next_obs = self.env.get_obs()
