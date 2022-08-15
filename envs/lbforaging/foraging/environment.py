@@ -90,9 +90,9 @@ class ForagingEnv(Env):
 
 
         if type == "easy":
-            players = [1,5]
+            players = [2,5]
             player_level = [0,1]
-            foods = [1]
+            foods = [2]
             food_level = [1]
             sight = 1
             field_size = (10,10)
@@ -683,10 +683,6 @@ class ForagingEnv(Env):
                     # if self.players[i].level == self.players[j].level or \
                     #     np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=3.0:
                     #         G.add_edge(i,j)
-                    # if self.scenario.group_indices[i] == self.scenario.group_indices[j] or \
-                    #         np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<=1:
-                    #     G.add_edge(i, j)
-        #
         # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
         # plt.show()
 
