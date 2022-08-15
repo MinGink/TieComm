@@ -109,7 +109,7 @@ class ForagingEnv(Env):
             sight = 1
             max_episode_steps = 50
             force_coop = False
-
+            normalize_reward = False
         else:
             raise ValueError("Invalid type")
 
