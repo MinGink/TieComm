@@ -9,7 +9,7 @@ from collections import namedtuple
 from .runner_ic3net import RunnerIcnet
 
 from .runner_tiecomm import RunnerTiecomm
-
+from .runner_default import RunnerDefualt
 
 
 
@@ -23,6 +23,7 @@ REGISTRY["ac_att"] = Runner
 REGISTRY["gnn"] = RunnerGNN
 
 REGISTRY["tiecomm"] = RunnerTiecomm
+REGISTRY["tiecomm_default"] = RunnerDefualt
 
 
 

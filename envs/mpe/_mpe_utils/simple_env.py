@@ -281,7 +281,7 @@ class SimpleEnv(AECEnv):
                     #     G.add_edge(i,j)
                     if self.scenario.group_indices[i] == self.scenario.group_indices[j] or \
                             np.linalg.norm(np.array(self.world.agents[i].state.p_pos) - np.array(self.world.agents[j].state.p_pos))<= 2.0:
-                        G.add_edge(i, j)
+                            G.add_edge(i, j)
 
         # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
         # plt.show()

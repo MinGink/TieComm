@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch import nn
-from torch_geometric.nn import GATConv
+from torch_geometric.nn import GATConv,GCNConv
 import networkx as nx
 import argparse
 from modules.graph import measure_strength
@@ -80,7 +80,7 @@ class TieCommAgent(nn.Module):
 
 
         if self.block == 'no':
-            #after_comm = torch.cat((local_obs, inter_obs), dim=-1)
+            #after_comm = torch.cat((intra_obs, inter_obs), dim=-1)
             after_comm = torch.cat((local_obs,  inter_obs,  intra_obs), dim=-1)
         elif self.block == 'inter':
             after_comm = torch.cat((local_obs,  intra_obs), dim=-1)
@@ -190,7 +190,8 @@ class AgentAC(nn.Module):
 
         self.emb_fc = nn.Linear(args.obs_shape, self.hid_size)
 
-        self.intra = GATConv(self.hid_size, self.hid_size, add_self_loops= False, heads=1,concat=False)
+        self.intra = GATConv(self.hid_size, self.hid_size, heads=1,concat=False)
+        #self.intra = GCNConv(self.hid_size, self.hid_size, add_self_loops= False)
         self.inter = nn.MultiheadAttention(self.hid_size, num_heads=1, batch_first=True)
 
 

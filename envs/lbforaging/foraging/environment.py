@@ -101,9 +101,9 @@ class ForagingEnv(Env):
             normalize_reward = False
 
         elif type == 'medium':
-            players = [2, 4, 4]
+            players = [2, 2, 3]
             player_level = [0, 1, 2,]
-            foods = [2]
+            foods = [1, 1]
             food_level = [1, 2]
             field_size = (12,12)
             sight = 1
