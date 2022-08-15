@@ -180,7 +180,7 @@ if __name__ == '__main__':
     parser.add_argument('--env', type=str, default="lbf", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="Foraging-easy-v0", help='environment map name',
-                        choices=['easy','medium','hard','mpe-large-spread-v2','mpe-large-spread-v1','Foraging-easy-v0'])
+                        choices=['easy','medium','hard','mpe-large-spread-v2','mpe-large-spread-v1','Foraging-easy-v0','Foraging-medium-v0'])
     parser.add_argument('--time_limit', type=int, default=100, help='time limit')
     parser.add_argument('--agent', type=str, default="tiecomm", help='algorithm name',
                         choices=['tiecomm','tiecomm_random','tiecomm_one','tiecomm_default','ac_mlp','gnn','ac_att','commnet','ic3net','tarmac','magic'])
