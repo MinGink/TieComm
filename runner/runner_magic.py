@@ -8,8 +8,7 @@ from modules.utils import merge_dict
 from .runner import Runner
 import time
 
-Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
-                                        'episode_masks', 'episode_agent_masks', 'values'))
+Transition = namedtuple('Transition', ('action_outs', 'actions', 'rewards', 'values', 'episode_masks', 'episode_agent_masks'))
 class RunnerMagic(Runner):
     def __init__(self, args, env, agent):
         super(RunnerMagic, self).__init__(args, env, agent)
@@ -32,7 +31,7 @@ class RunnerMagic(Runner):
         #
         #
         # self.params = list(self.agent.parameters())
-        # self.optimizer_agent_ac = Adam(params=self.params, lr=args.lr)
+        # self.optimizer = Adam(params=self.params, lr=args.lr)
 
 
 
@@ -40,8 +39,8 @@ class RunnerMagic(Runner):
         memory = []
         info = dict()
         log = dict()
+        # episode_return = np.zeros(self.n_agents)
         episode_return = 0
-
 
         self.reset()
 
@@ -85,23 +84,25 @@ class RunnerMagic(Runner):
                 if 'is_completed' in env_info:
                     episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
 
-            trans = Transition(np.array(obs), action_outs, actions, np.array(rewards),
-                               episode_mask, episode_agent_mask, values)
+            trans = Transition(action_outs, actions, rewards, values, episode_mask, episode_agent_mask)
             memory.append(trans)
 
 
             obs = next_obs
 
-            episode_return += rewards
+            # episode_return += rewards.astype(episode_return.dtype)
+            episode_return += int(np.sum(rewards))
             step += 1
 
             # episode_return += float(sum(rewards))
             # self.total_steps += 1
         log['episode_return'] = episode_return
         log['episode_steps'] = [step - 1]
+        if 'num_collisions' in env_info:
+            log['num_collisions'] = int(env_info['num_collisions'])
 
-        if self.args.env == 'tj':
-            merge_dict(self.env.get_stat(), log)
+        # if self.args.env == 'tj':
+        #     merge_dict(self.env.get_stat(), log)
         return memory, log
 
 

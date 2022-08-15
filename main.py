@@ -79,7 +79,7 @@ def main(args):
     elif args.agent=='commnet':
         exp_config['hard_attn']=False
         exp_config['commnet']=True
-        exp_config['detach_gap'] = 1
+        exp_config['detach_gap'] = 10
     elif args.agent=='tarmac':
         exp_config['hard_attn']=False
         exp_config['commnet']=True

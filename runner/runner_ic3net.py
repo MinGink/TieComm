@@ -9,8 +9,7 @@ import time
 import argparse
 from .runner import Runner
 
-Transition = namedtuple('Transition', ('obs', 'action_outs', 'actions', 'rewards',
-                                        'episode_masks', 'episode_agent_masks', 'values'))
+Transition = namedtuple('Transition', ('action_outs', 'actions', 'rewards', 'values', 'episode_masks', 'episode_agent_masks'))
 class RunnerIcnet(Runner):
     def __init__(self, config, env, agent):
         super(RunnerIcnet, self).__init__(config, env, agent)
@@ -21,6 +20,7 @@ class RunnerIcnet(Runner):
         memory = []
         info = dict()
         log = dict()
+        # episode_return = np.zeros(self.n_agents)
         episode_return = 0
 
         self.reset()
@@ -86,14 +86,14 @@ class RunnerIcnet(Runner):
                     episode_agent_mask = 1 - env_info['is_completed'].reshape(-1)
 
 
-            trans = Transition(np.array(obs), action_outs, actions, np.array(rewards),
-                                    episode_mask, episode_agent_mask, values)
+            trans = Transition(action_outs, actions, rewards, values, episode_mask, episode_agent_mask)
             memory.append(trans)
 
 
             #state = next_state
             obs = next_obs
-            episode_return += rewards
+            # episode_return += rewards.astype(episode_return.dtype)
+            episode_return += int(np.sum(rewards))
             step += 1
 
 
@@ -101,6 +101,9 @@ class RunnerIcnet(Runner):
             # self.total_steps += 1
         log['episode_return'] = episode_return
         log['episode_steps'] = [step - 1]
+        if 'num_collisions' in env_info:
+            log['num_collisions'] = int(env_info['num_collisions'])
+
 
         if self.args.env == 'tj':
             merge_dict(self.env.get_stat(), log)
@@ -125,11 +128,12 @@ class RunnerIcnet(Runner):
         log = dict()
 
         n = self.n_agents
-        batch_size = len(batch.obs)
+        batch_size = len(batch.actions)
         rewards = torch.Tensor(batch.rewards)
         actions = torch.Tensor(batch.actions)
         actions = actions.transpose(1, 2)
-        actions = actions.reshape(-1, n, self.args.n_actions)
+        # actions = actions.reshape(-1, n, self.args.dim_actions)
+        actions = actions.reshape(-1, n, 2)
 
         episode_masks = torch.Tensor(batch.episode_masks)
         episode_agent_masks = torch.Tensor(batch.episode_agent_masks)

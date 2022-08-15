@@ -30,7 +30,7 @@ hard_attn: False #Whether to use hard attention: action - talk|silent
 comm_action_one: False #Whether to always talk, sanity check for hard attention.
 advantages_per_action: False #Whether to multipy log porb for each chosen action with advantages
 share_weights: False #Share weights for hops
-hid_size: 128
+hid_size: 64
 recurrent: True #make the model recurrent in time
 
 
