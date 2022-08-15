@@ -104,7 +104,7 @@ class ForagingEnv(Env):
             players = [2, 4, 4]
             player_level = [0, 1, 2,]
             foods = [2]
-            food_level = [1]
+            food_level = [1, 2]
             field_size = (12,12)
             sight = 1
             max_episode_steps = 50

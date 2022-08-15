@@ -90,9 +90,9 @@ class GNN(nn.Module):
         self.conv2 = GATConv(self.hid_size, self.hid_size, heads=1)
         # self.conv3 = GATConv(self.hid_size, self.hid_size, heads=1)
         # self.conv4 = GATConv(self.hid_size, self.hid_size, heads=1)
-        self.fnn3 = nn.Linear(self.hid_size*2, self.hid_size)
+        self.fnn3 = nn.Linear(self.hid_size *2, self.hid_size)
 
-        self.head = nn.Linear(self.hid_size,self.n_actions)
+        self.head = nn.Linear(self.hid_size ,self.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)
 
 
@@ -101,12 +101,11 @@ class GNN(nn.Module):
 
         x = self.tanh(self.fnn1(obs))
         if list(g.edges()) == []:
-            edge_index = torch.zeros((1,2), dtype=torch.long)
+            h = x
         else:
             edge_index = torch.tensor(list(g.edges()), dtype=torch.long)
-
-        data = Data(x=x,edge_index=edge_index.t().contiguous())
-        h = self.tanh(self.conv2(data.x, data.edge_index))
+            data = Data(x=x,edge_index=edge_index.t().contiguous())
+            h = self.tanh(self.conv2(data.x, data.edge_index))
         # data = Data(x=h, edge_index=edge_index.t().contiguous())
         # h = self.tanh(self.conv3(data.x, data.edge_index))
         # data = Data(x=h, edge_index=edge_index.t().contiguous())
