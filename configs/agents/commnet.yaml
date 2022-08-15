@@ -23,7 +23,7 @@ hid_size: 64
 comm_mode: 'avg' #Type of mode for communication tensor calculation [avg|sum]
 comm_passes: 1 #Number of comm passes per step over the model
 comm_mask_zero: False #Whether communication should be there
-recurrent: True #make the model recurrent in time
+recurrent: False #make the model recurrent in time
 rnn_type: 'LSTM' #type of rnn to use. [LSTM|MLP]
 detach_gap: 10 #detach hidden state and cell state for rnns at this interval.' + ' Default 10000 (very high)
 comm_init: 'uniform' #how to initialise comm weights [uniform|zeros]
