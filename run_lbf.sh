@@ -11,7 +11,7 @@
 
 #lbforaging:Foraging-10x10-3p-3f-v2
 
-python main.py --agent tiecomm --total_epoches 1000 --env lbf --map Foraging-easy-v0 --block no --use_multiprocessing --memo aaai &
-python main.py --agent tarmac --total_epoches 1000 --env lbf --map Foraging-easy-v0 --block no --use_multiprocessing --memo aaai &
+python main.py --agent tiecomm --total_epoches 1000 --env lbf --map Foraging-medium-v0 --block no --use_multiprocessing --memo aaai &
+python main.py --agent tarmac --total_epoches 1000 --env lbf --map Foraging-medium-v0 --block no --use_multiprocessing --memo aaai &
 #python main.py --agent tiecomm --total_epoches 500 --env lbf --map Foraging-easy-v0 --block inter --use_multiprocessing --memo aaai &
 #python main.py --agent tiecomm --env lbf --map Foraging-easy-v0 --block intra --use_multiprocessing --memo aaai &

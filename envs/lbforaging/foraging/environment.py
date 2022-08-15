@@ -102,7 +102,7 @@ class ForagingEnv(Env):
 
         elif type == 'medium':
             players = [2, 4, 4]
-            player_level = [0, 2]
+            player_level = [0, 1, 2,]
             foods = [2]
             food_level = [1]
             field_size = (12,12)
