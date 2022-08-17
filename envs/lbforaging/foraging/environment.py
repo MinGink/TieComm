@@ -90,10 +90,10 @@ class ForagingEnv(Env):
 
 
         if type == "easy":
-            players = [2,5]
-            player_level = [0,1]
-            foods = [2]
-            food_level = [1]
+            players = [2,4]
+            player_level = [1,2]
+            foods = [1,1]
+            food_level = [1,2]
             sight = 1
             field_size = (10,10)
             max_episode_steps = 50
@@ -678,10 +678,10 @@ class ForagingEnv(Env):
         for i in range (self.n_agents):
             for j in range (self.n_agents):
                 if i != j:
-                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position)) <= 3.0:
+                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position)) <= 2.0:
                         G.add_edge(i, j)
                     # if self.players[i].level == self.players[j].level or \
-                    #     np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=3.0:
+                    #     np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=2.0:
                     #         G.add_edge(i,j)
         # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
         # plt.show()

@@ -1,6 +1,6 @@
 from ._mpe_utils.simple_env import SimpleEnv, make_env
 from .scenarios.large_spread import Scenario
-from utils.to_parallel import parallel_wrapper_fn
+from .utils.to_parallel import parallel_wrapper_fn
 
 
 class raw_env(SimpleEnv):
