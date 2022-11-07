@@ -21,8 +21,19 @@ def main(args):
     env_config = get_config(args.env, 'envs')
     agent_config = get_config(args.agent, 'agents')
 
+
+
     if args.seed == None:
         args.seed = np.random.randint(0, 10000)
+
+
+    if args.agent == 'tiecomm':
+        args.block = 'no'
+    elif args.agent == 'tiecomm_wo_inter':
+        args.block = 'inter'
+    elif args.agent == 'tiecomm_wo_intra':
+        args.block = 'intra'
+
 
     torch.manual_seed(args.seed)
     random.seed(args.seed)
@@ -41,6 +52,10 @@ def main(args):
     config.update(env_config)
     config.update(agent_config)
 
+
+
+
+
     #======================================load config==============================================
     args = argparse.Namespace(**config)
     args.device = "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
@@ -55,7 +70,7 @@ def main(args):
 
     tags = ['Ming', args.env, args.map, args.agent, args.memo]
 
-    wandb.init(project='Fight', name=args.exp_id, tags=tags, dir=results_path)
+    wandb.init(project='DASDFAA', name=args.exp_id, tags=tags, dir=results_path)
     wandb.config.update(args)
 
 
@@ -176,14 +191,14 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
-    parser.add_argument('--memo', type=str, default="aaai", help='memo name')
+    parser.add_argument('--memo', type=str, default="DASFAA", help='memo name')
     parser.add_argument('--env', type=str, default="lbf", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
     parser.add_argument('--map', type=str, default="Foraging-easy-v0", help='environment map name',
                         choices=['easy','medium','hard','mpe-large-spread-v2','mpe-large-spread-v1','Foraging-easy-v0','Foraging-medium-v0'])
     parser.add_argument('--time_limit', type=int, default=50, help='time limit')
     parser.add_argument('--agent', type=str, default="tiecomm_default", help='algorithm name',
-                        choices=['tiecomm','tiecomm_default','gnn','commnet','ic3net','tarmac','magic'])
+                        choices=['tiecomm','tiecomm_wo_inter','tiecomm_wo_intra','tiecomm_default','gnn','commnet','ic3net','tarmac','magic'])
     parser.add_argument('--block', type=str, default='no',choices=['no','inter','intra'], help='only works for tiecomm')
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
