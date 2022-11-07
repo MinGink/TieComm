@@ -90,7 +90,7 @@ class ForagingEnv(Env):
 
 
         if type == "easy":
-            players = [2,4]
+            players = [2,3]
             player_level = [1,2]
             foods = [1,1]
             food_level = [1,2]
@@ -107,7 +107,18 @@ class ForagingEnv(Env):
             food_level = [1, 2]
             field_size = (12,12)
             sight = 1
-            max_episode_steps = 50
+            max_episode_steps = 80
+            force_coop = False
+            normalize_reward = False
+
+        elif type == 'hard':
+            players = [2, 2, 3]
+            player_level = [0, 1, 2,]
+            foods = [1, 1]
+            food_level = [1, 2]
+            field_size = (15,15)
+            sight = 1
+            max_episode_steps = 100
             force_coop = False
             normalize_reward = False
         else:
@@ -122,6 +133,7 @@ class ForagingEnv(Env):
         self.players = [Player(i) for i in range(sum(players))]
         self.player_list = [a * [player_level[i]] for i, a in enumerate(players)]
         self.player_list = [item for sublist in self.player_list for item in sublist]
+        self.players_id_one_hot = np.eye(sum(players))
 
         self.foods = [Food() for _ in range(sum(foods))]
         self.food_list = [a * [food_level[i]] for i, a in enumerate(foods)]
@@ -429,7 +441,7 @@ class ForagingEnv(Env):
                 obs[self.food_list * 3 + 3 * i + 1] = -1
                 obs[self.food_list * 3 + 3 * i + 2] = 0
 
-            for i, p in enumerate(seen_players):
+            for i, p in enumerate(self_players):
                 obs[self.food_list * 3 + 3 * i] = p.position[0]
                 obs[self.food_list * 3 + 3 * i + 1] = p.position[1]
                 # obs[self.food_list * 3 + 3 * i + 2] = p.level
@@ -490,7 +502,7 @@ class ForagingEnv(Env):
             # agent_layer = agent_layer.flatten()
 
 
-            (agent_x, agent_y) =  position
+            (agent_x, agent_y) = position
             one_hot_id = np.zeros(self.max_player_level, dtype=np.float32)
             one_hot_id[level] = 1
 
@@ -678,7 +690,7 @@ class ForagingEnv(Env):
         for i in range (self.n_agents):
             for j in range (self.n_agents):
                 if i != j:
-                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position)) <= 2.0:
+                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position)) <= 3.0:
                         G.add_edge(i, j)
                     # if self.players[i].level == self.players[j].level or \
                     #     np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=2.0:

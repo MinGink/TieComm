@@ -14,10 +14,10 @@
 
 
 #v1 50
-#python main.py --agent ac_mlp --env mpe --map mpe-large-spread-v1  --time_limit 50   --use_multiprocessing --memo aaai
-#python main.py --agent ac_att --env mpe --map mpe-large-spread-v1  --time_limit 50   --use_multiprocessing --memo aaai
-python main.py --agent tiecomm --block no     --env mpe --map mpe-large-spread-v1 --time_limit 50   --use_multiprocessing --memo aaai
-python main.py --agent tiecomm  --block inter --env mpe --map mpe-large-spread-v1 --time_limit 50   --use_multiprocessing --memo aaai
-
-python main.py --agent tiecomm --block no     --env mpe --map mpe-large-spread-v2 --time_limit 100   --use_multiprocessing --memo aaai
-python main.py --agent tiecomm  --block inter --env mpe --map mpe-large-spread-v2 --time_limit 100   --use_multiprocessing --memo aaai
+python main.py --agent ac_mlp --env mpe --map mpe-large-spread-v1  --time_limit 50   --use_multiprocessing --memo env_test &
+python main.py --agent ac_att --env mpe --map mpe-large-spread-v1  --time_limit 50   --use_multiprocessing --memo env_test &
+#python main.py --agent    --env mpe --map mpe-large-spread-v1 --time_limit 50   --use_multiprocessing
+#python main.py --agent tiecomm   --env mpe --map mpe-large-spread-v1 --time_limit 50   --use_multiprocessing
+#
+#python main.py --agent tiecomm   --env mpe --map mpe-large-spread-v2 --time_limit 100   --use_multiprocessing
+#python main.py --agent tiecomm   --env mpe --map mpe-large-spread-v2 --time_limit 100   --use_multiprocessing
