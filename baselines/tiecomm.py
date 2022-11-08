@@ -36,17 +36,35 @@ class TieCommAgent(nn.Module):
         return G, set
 
 
-    def graph_partition(self, G, thershold):
-        g = nx.Graph()
-        g.add_nodes_from(G.nodes(data=False), node_strength = 0.0)
+    def graph_partition(self, G, god_action):
+
+        #min_value = 0.5
+        min_max_list = []
         for e in G.edges():
             strength = measure_strength(G, e[0], e[1])
-            if strength > thershold:
+            G.add_edge(e[0], e[1], weight = strength)
+            min_max_list.append(strength)
+
+        if min_max_list:
+            min_max_list.sort()
+            min_value = min_max_list[0]
+            max_value = min_max_list[-1]
+            thershold = ((max_value - min_value) / 10) * int(god_action[0]) + min_value
+        else:
+            thershold = 0.0
+
+        # thershold = 2
+
+        g = nx.Graph()
+        g.add_nodes_from(G.nodes(data=False), node_strength =0.0)
+        for e in G.edges():
+            strength = G.get_edge_data(e[0], e[1])['weight']
+            if strength >= thershold:
                 g.nodes[e[0]]['node_strength'] += strength
                 g.nodes[e[1]]['node_strength'] += strength
                 g.add_edge(e[0], e[1])
-                # print(strength)
-                # raise ValueError('strength > thershold')
+            # print(strength)
+            # raise ValueError('strength > thershold')
 
         attr_dict = nx.get_node_attributes(g, 'node_strength')
         set = []
@@ -61,6 +79,11 @@ class TieCommAgent(nn.Module):
 
 
 
+
+
+
+
+
     def communicate(self, local_obs, graph=None, node_set =None):
 
         core_node, set = node_set
@@ -69,11 +92,11 @@ class TieCommAgent(nn.Module):
         intra_obs = self.agent.intra_com(local_obs, graph)
 
 
-        #adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1).repeat(self.n_agents, 1)
+        adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1).repeat(self.n_agents, 1)
 
         inter_obs = torch.zeros_like(intra_obs)
         if len(set) != 1:
-            core_obs = intra_obs[core_node, :].clone().detach()
+            core_obs = intra_obs[core_node, :] #.clone().detach()
             group_obs = self.agent.inter_com(core_obs)
             for index, group_members in enumerate (set):
                 inter_obs[group_members, :] = group_obs[index,:].repeat(len(group_members), 1)
@@ -81,8 +104,8 @@ class TieCommAgent(nn.Module):
 
         if self.block == 'no':
             #after_comm = (local_obs, inter_obs, intra_obs)
-            #after_comm = torch.cat((intra_obs, inter_obs), dim=-1)
-            after_comm = torch.cat((local_obs,  inter_obs,  intra_obs), dim=-1)
+            after_comm = torch.cat((local_obs, intra_obs, inter_obs), dim=-1)
+            #after_comm = torch.cat((local_obs,  inter_obs,  intra_obs, adj_matrix), dim=-1)
         elif self.block == 'inter':
             after_comm = torch.cat((local_obs,  intra_obs), dim=-1)
         elif self.block == 'intra':
@@ -190,15 +213,19 @@ class AgentAC(nn.Module):
         self.n_actions = self.args.n_actions
         self.tanh = nn.Tanh()
 
-        self.emb_fc = nn.Linear(args.obs_shape, self.hid_size, )
+        self.emb_fc = nn.Linear(args.obs_shape, self.hid_size)
 
-        self.intra = GATConv(self.hid_size, self.hid_size, heads=1,add_self_loops = False)
+        self.intra = GATConv(self.hid_size, self.hid_size, heads=1, add_self_loops =False, concat=False)
         #self.intra = GCNConv(self.hid_size, self.hid_size, add_self_loops= False)
+
+        #encoder_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=1, dim_feedforward=self.hid_size,
+        #                                                batch_first=True)
+        #self.inter = nn.TransformerEncoder(encoder_layer, num_layers=1)
         self.inter = nn.MultiheadAttention(self.hid_size, num_heads=1, batch_first=True)
 
 
         if self.args.block == 'no':
-            self.affine2 = nn.Linear(self.hid_size * 3, self.hid_size)
+            self.affine2 = nn.Linear(self.hid_size *3 , self.hid_size)
         else:
             self.affine2 = nn.Linear(self.hid_size * 2, self.hid_size)
 
@@ -212,7 +239,7 @@ class AgentAC(nn.Module):
     def intra_com(self, x, graph):
 
         if list(graph.edges()) == []:
-            h = torch.zeros(x.shape[0], self.hid_size)
+            h = torch.zeros(x.shape)
         else:
             edge_index = torch.tensor(list(graph.edges()), dtype=torch.long)
             data = Data(x=x, edge_index=edge_index.t().contiguous())
@@ -223,6 +250,8 @@ class AgentAC(nn.Module):
     def inter_com(self, input):
         x = input.unsqueeze(0)
         h, weights = self.inter(x, x, x)
+        #h = self.inter(x)
+
         return h.squeeze(0)
 
 

@@ -26,7 +26,7 @@ treshold: 0.5 #threshold for the tie comm model
 
 
 add_value_last_step: True
-recurrent: True #make the model recurrent in time
+recurrent: False #make the model recurrent in time
 
 
 # ---CommNet specific args---

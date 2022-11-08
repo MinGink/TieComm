@@ -20,7 +20,7 @@ class RunnerTiecomm(Runner):
 
         #self.optimizer_agent_ac = Adam(params=self.agent.parameters(), lr=self.args.lr)
         self.optimizer_agent_ac = RMSprop(self.agent.agent.parameters(), lr = self.args.lr, alpha=0.97, eps=1e-6)
-        self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr = self.args.lr*3, alpha=0.97, eps=1e-6)
+        self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr = self.args.lr * 2, alpha=0.97, eps=1e-6)
 
         self.n_nodes = int(self.n_agents * (self.n_agents - 1) / 2)
         self.interval = self.args.interval
@@ -99,8 +99,7 @@ class RunnerTiecomm(Runner):
         god_action_out, god_value = self.agent.god(obs_tensor, graph)
         god_action = self.choose_action(god_action_out)
         god_action = [god_action[0].reshape(1)]
-        treashold = float((god_action[0]) * 0.1)
-        g, set = self.agent.graph_partition(graph, treashold)
+        g, set = self.agent.graph_partition(graph, god_action)
 
         god_reward_list = []
         god_reward = np.zeros(1)
@@ -118,8 +117,7 @@ class RunnerTiecomm(Runner):
                 god_action_out, god_value = self.agent.god(obs_tensor, graph)
                 god_action = self.choose_action(god_action_out)
                 god_action = [god_action[0].reshape(1)]
-                treashold = float((god_action[0]) * 0.1)
-                g, set = self.agent.graph_partition(graph, treashold)
+                g, set = self.agent.graph_partition(graph, god_action)
 
 
             after_comm = self.agent.communicate(obs_tensor, g, set)

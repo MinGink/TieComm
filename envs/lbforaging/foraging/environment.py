@@ -457,10 +457,10 @@ class ForagingEnv(Env):
             grid_shape_y += 2 * self.sight
             grid_shape = (grid_shape_x, grid_shape_y)
 
-            # self.agents_layer = np.zeros(grid_shape, dtype=np.float32)
-            # for player in self.players:
-            #     player_x, player_y = player.position
-            #     self.agents_layer[player_x + self.sight, player_y + self.sight] = player.level
+            self.agents_layer = np.zeros(grid_shape, dtype=np.float32)
+            for player in self.players:
+                player_x, player_y = player.position
+                self.agents_layer[player_x + self.sight, player_y + self.sight] = player.level
             
             foods_layer = np.zeros(grid_shape, dtype=np.float32)
             foods_layer[self.sight:-self.sight, self.sight:-self.sight] = self.field.copy()
@@ -477,15 +477,15 @@ class ForagingEnv(Env):
             access_layer[:, -self.sight:] = 0.0
             #agent locations are not accessible
             for player in self.players:
-                if player.level !=0:
-                    player_x, player_y = player.position
-                    access_layer[player_x + self.sight, player_y + self.sight] = 0.0
+                player_x, player_y = player.position
+                access_layer[player_x + self.sight, player_y + self.sight] = 0.0
+
             #food locations are not accessible
             foods_x, foods_y = self.field.nonzero()
             for x, y in zip(foods_x, foods_y):
                 access_layer[x + self.sight, y + self.sight] = 0.0
             
-            return np.stack([foods_layer, access_layer])
+            return np.stack([self.agents_layer, foods_layer, access_layer])
 
         def get_agent_grid_bounds(agent_x, agent_y):
             return agent_x, agent_x + 2 * self.sight + 1, agent_y, agent_y + 2 * self.sight + 1
@@ -502,16 +502,18 @@ class ForagingEnv(Env):
             # agent_layer = agent_layer.flatten()
 
 
-            (agent_x, agent_y) = position
+            # (agent_x, agent_y) = position
             one_hot_id = np.zeros(self.max_player_level, dtype=np.float32)
             one_hot_id[level] = 1
 
-            one_hot_x = np.zeros((self.field_size[0]), dtype=np.float32)
-            one_hot_x[agent_x] = 1
-            one_hot_y = np.zeros((self.field_size[1]), dtype=np.float32)
-            one_hot_y[agent_y] = 1
+            # one_hot_x = np.zeros((self.field_size[0]), dtype=np.float32)
+            # one_hot_x[agent_x] = 1
+            # one_hot_y = np.zeros((self.field_size[1]), dtype=np.float32)
+            # one_hot_y[agent_y] = 1
 
-            return np.concatenate([one_hot_x, one_hot_y])
+            #return np.concatenate([one_hot_x, one_hot_y])
+
+            return one_hot_id
         
         def get_player_reward(obs):
                 return obs.reward
@@ -521,9 +523,9 @@ class ForagingEnv(Env):
         # if self._grid_observation:
         layers = make_global_grid_arrays()
         agents_bounds = [get_agent_grid_bounds(*player.position) for player in self.players]
-        raw_nobs = tuple([layers[:, start_x:end_x, start_y:end_y].reshape(-1, 1) for start_x, end_x, start_y, end_y in agents_bounds])
-        agents_obs = [get_agent_position(player.position, player.level).reshape(-1,1) for index, player in enumerate(self.players)]
-        nobs = [np.concatenate((raw_nobs[i], agents_obs[i])) for i in range(len(raw_nobs))]
+        nobs = tuple([layers[:, start_x:end_x, start_y:end_y].reshape(-1, 1) for start_x, end_x, start_y, end_y in agents_bounds])
+        # agents_obs = [get_agent_position(player.position, player.level).reshape(-1,1) for index, player in enumerate(self.players)]
+        # nobs = [np.concatenate((raw_nobs[i], agents_obs[i])) for i in range(len(raw_nobs))]
 
         # else:
         #     nobs = tuple([make_obs_array(obs) for obs in observations])
