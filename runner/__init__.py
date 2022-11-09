@@ -24,7 +24,8 @@ REGISTRY["gnn"] = RunnerGNN
 
 REGISTRY["tiecomm"] = RunnerTiecomm
 REGISTRY["tiecomm_default"] = RunnerDefualt
-
+REGISTRY["tiecomm_wo_inter"] = RunnerTiecomm
+REGISTRY["tiecomm_wo_intra"] = RunnerTiecomm
 
 
 REGISTRY["magic"] = RunnerMagic

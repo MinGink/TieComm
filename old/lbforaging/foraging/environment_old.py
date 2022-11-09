@@ -6,12 +6,6 @@ from gym import Env
 import gym
 from gym.utils import seeding
 import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
-from modules.graph import measure_strength
-
-
-
 
 
 class Action(Enum):
@@ -81,51 +75,16 @@ class ForagingEnv(Env):
 
     def __init__(
         self,
-        type
-
+        players,
+        max_player_level,
+        field_size,
+        max_food,
+        sight,
+        max_episode_steps,
+        force_coop,
+        normalize_reward=True,
+        grid_observation=False,
     ):
-        if type == "easy":
-            players = 4
-            max_player_level = 1
-            max_food = 2
-            max_food_level = 2
-            sight = 1
-            field_size = (8,8)
-            max_episode_steps = 40
-            force_coop = True
-            normalize_reward = True
-            grid_observation = True
-
-
-        elif type == 'medium':
-            players = 6
-            max_player_level = 1
-            max_food_level = 2
-            max_food = 3
-            sight = 1
-            field_size = (10,10)
-            max_episode_steps = 60
-            force_coop = True,
-            normalize_reward = True,
-            grid_observation = True,
-
-        elif type == 'hard':
-            players = 9
-            max_player_level = 1
-            max_food_level = 3
-            max_food = 3
-            sight = 1
-            field_size = (12,12)
-            max_episode_steps = 100
-            force_coop = True,
-            normalize_reward = True
-            grid_observation = True,
-
-        else:
-            raise ValueError("Invalid type")
-
-
-
         self.logger = logging.getLogger(__name__)
         self.seed()
         self.players = [Player() for _ in range(players)]
@@ -135,7 +94,6 @@ class ForagingEnv(Env):
         self.max_food = max_food
         self._food_spawned = 0.0
         self.max_player_level = max_player_level
-        self.max_food_level = max_food_level
         self.sight = sight
         self.force_coop = force_coop
         self._game_over = None
@@ -153,7 +111,6 @@ class ForagingEnv(Env):
         self.viewer = None
 
         self.n_agents = len(self.players)
-        self.reset()
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -183,26 +140,21 @@ class ForagingEnv(Env):
             grid_shape = (1 + 2 * self.sight, 1 + 2 * self.sight)
 
             # agents layer: agent levels
-            loc_min = np.zeros((self.field.shape[1], 2), dtype=np.float32).reshape(-1,1)
-            loc_max = np.ones((self.field.shape[1], 2), dtype=np.float32).reshape(-1,1) * self.max_player_level
-
-            # agents_min = np.zeros(grid_shape, dtype=np.float32)
-            # agents_max = np.ones(grid_shape, dtype=np.float32) * self.max_player_level
+            agents_min = np.zeros(grid_shape, dtype=np.float32)
+            agents_max = np.ones(grid_shape, dtype=np.float32) * self.max_player_level
 
             # foods layer: foods level
             max_food_level = self.max_player_level * len(self.players)
-            foods_min = np.zeros(grid_shape, dtype=np.float32).reshape(-1,1)
-            foods_max = np.ones(grid_shape, dtype=np.float32).reshape(-1,1) * max_food_level
+            foods_min = np.zeros(grid_shape, dtype=np.float32)
+            foods_max = np.ones(grid_shape, dtype=np.float32) * max_food_level
 
             # access layer: i the cell available
-            access_min = np.zeros(grid_shape, dtype=np.float32).reshape(-1,1)
-            access_max = np.ones(grid_shape, dtype=np.float32).reshape(-1,1)
+            access_min = np.zeros(grid_shape, dtype=np.float32)
+            access_max = np.ones(grid_shape, dtype=np.float32)
 
             # total layer
-            min_obs = np.concatenate([loc_min, foods_min, access_min])
-            max_obs = np.concatenate([loc_max, foods_max, access_max])
-            # min_obs = np.stack([agents_min, foods_min, access_min])
-            # max_obs = np.stack([agents_max, foods_max, access_max])
+            min_obs = np.stack([agents_min, foods_min, access_min])
+            max_obs = np.stack([agents_max, foods_max, access_max])
 
         return gym.spaces.Box(np.array(min_obs), np.array(max_obs), dtype=np.float32)
 
@@ -458,10 +410,10 @@ class ForagingEnv(Env):
             grid_shape_y += 2 * self.sight
             grid_shape = (grid_shape_x, grid_shape_y)
 
-            # agents_layer = np.zeros(grid_shape, dtype=np.float32)
-            # for player in self.players:
-            #     player_x, player_y = player.position
-            #     agents_layer[player_x + self.sight, player_y + self.sight] = player.level
+            agents_layer = np.zeros(grid_shape, dtype=np.float32)
+            for player in self.players:
+                player_x, player_y = player.position
+                agents_layer[player_x + self.sight, player_y + self.sight] = player.level
             
             foods_layer = np.zeros(grid_shape, dtype=np.float32)
             foods_layer[self.sight:-self.sight, self.sight:-self.sight] = self.field.copy()
@@ -473,17 +425,15 @@ class ForagingEnv(Env):
             access_layer[:, :self.sight] = 0.0
             access_layer[:, -self.sight:] = 0.0
             # agent locations are not accessible
-            # for player in self.players:
-            #     player_x, player_y = player.position
-            #     access_layer[player_x + self.sight, player_y + self.sight] = 0.0
+            for player in self.players:
+                player_x, player_y = player.position
+                access_layer[player_x + self.sight, player_y + self.sight] = 0.0
             # food locations are not accessible
             foods_x, foods_y = self.field.nonzero()
             for x, y in zip(foods_x, foods_y):
                 access_layer[x + self.sight, y + self.sight] = 0.0
             
-            # return np.stack([agents_layer, foods_layer, access_layer])
-
-            return np.stack([foods_layer, access_layer])
+            return np.stack([agents_layer, foods_layer, access_layer])
 
         def get_agent_grid_bounds(agent_x, agent_y):
             return agent_x, agent_x + 2 * self.sight + 1, agent_y, agent_y + 2 * self.sight + 1
@@ -493,43 +443,28 @@ class ForagingEnv(Env):
                 if p.is_self:
                     return p.reward
 
-        def get_agent_self_info(agent_x, agent_y, level):
-
-            one_hot_x = np.zeros((self.field_size[0]), dtype=np.float32)
-            one_hot_x[agent_x] = level
-            one_hot_y = np.zeros((self.field_size[1]), dtype=np.float32)
-            one_hot_y[agent_y] = level
-
-            return np.concatenate([one_hot_x, one_hot_y]).reshape(-1,1)
-
-
         observations = [self._make_obs(player) for player in self.players]
         if self._grid_observation:
             layers = make_global_grid_arrays()
             agents_bounds = [get_agent_grid_bounds(*player.position) for player in self.players]
-            raw_nobs = tuple([layers[:, start_x:end_x, start_y:end_y].reshape(-1,1) for start_x, end_x, start_y, end_y in agents_bounds])
-            self_info_obs = [get_agent_self_info(*player.position, player.level) for player in self.players]
-            nobs = [np.concatenate((raw_nobs[i], self_info_obs[i])) for i in range(len(raw_nobs))]
+            nobs = tuple([layers[:, start_x:end_x, start_y:end_y] for start_x, end_x, start_y, end_y in agents_bounds])
         else:
             nobs = tuple([make_obs_array(obs) for obs in observations])
         nreward = [get_player_reward(obs) for obs in observations]
         ndone = [obs.game_over for obs in observations]
         # ninfo = [{'observation': obs} for obs in observations]
-        ninfo = {'num_collisions': self.num_collisions}
+        ninfo = {}
 
         return nobs, nreward, ndone, ninfo
 
     def reset(self):
-
-        self.num_collisions = 0
-
-
         self.field = np.zeros(self.field_size, np.int32)
         self.spawn_players(self.max_player_level)
-
         player_levels = sorted([player.level for player in self.players])
 
-        self.spawn_food(self.max_food, max_level=self.max_food_level)
+        self.spawn_food(
+            self.max_food, max_level=sum(player_levels[:3])
+        )
         self.current_step = 0
         self._game_over = False
         self._gen_valid_moves()
@@ -584,12 +519,8 @@ class ForagingEnv(Env):
 
         for k, v in collisions.items():
             if len(v) > 1:  # make sure no more than an player will arrive at location
-                self.num_collisions += 1
-                for player in v:
-                    player.reward = -0.4
-            else:
-                v[0].position = k
-                v[0].reward = -0.1
+                continue
+            v[0].position = k
 
         # finally process the loadings:
         while loading_players:
@@ -646,44 +577,3 @@ class ForagingEnv(Env):
     def close(self):
         if self.viewer:
             self.viewer.close()
-
-
-    def get_graph(self):
-
-        G = nx.Graph()
-        G.add_nodes_from([i for i in range(self.n_agents)])
-
-        # for i in range(self.ncar):
-        #     G.add_node(i, feature = np.array(self.obs[i]))
-
-        for i in range (self.n_agents):
-            for j in range (self.n_agents):
-                if i != j:
-                    if np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position)) <= 3.0:
-                        G.add_edge(i, j)
-                    # if self.players[i].level == self.players[j].level or \
-                    #     np.linalg.norm(np.array(self.players[i].position) - np.array(self.players[j].position))<=2.0:
-                    #         G.add_edge(i,j)
-        # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
-        # plt.show()
-
-
-
-        # g = nx.Graph()
-        # g.add_nodes_from(G.nodes(data=False))
-        #
-        # for e in G.edges():
-        #     strength = measure_strength(G, e[0], e[1])
-        #     print(strength)
-        #     if strength > 0.5:
-        #         g.add_edge(e[0], e[1])
-        #
-        # #set = [list(c) for c in nx.connected_components(g)]
-        #
-        # subax1 = plt.subplot(121)
-        # nx.draw(G, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=100, width=1)
-        # subax2 = plt.subplot(122)
-        # nx.draw(g, pos=nx.spring_layout(g), with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2',
-        #         node_size=100, edge_cmap=plt.cm.Blues, width=1)
-        # plt.show()
-        return G

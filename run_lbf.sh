@@ -16,8 +16,13 @@
 #python main.py --agent tiecomm_default   --env lbf --map Foraging-easy-v0  --use_multiprocessing --memo vison3 &
 #python main.py --agent tiecomm           --env lbf --map Foraging-easy-v0  --use_multiprocessing --memo vison3 &
 #python main.py --agent magic            -env lbf --map Foraging-easy-v0  --use_multiprocessing &
-python main.py --agent ac_mlp   --env lbf --map Foraging-easy-v0  --total_epoches 500 --use_multiprocessing --memo env_test &
-python main.py --agent gnn      --env lbf --map Foraging-easy-v0  --total_epoches 500 --use_multiprocessing --memo env_test &
+#python main.py --agent ac_mlp   --env lbf --map Foraging-easy-v0  --total_epoches 1500 --use_multiprocessing --memo env_test &
+#python main.py --agent ac_att   --env lbf --map Foraging-easy-v0  --total_epoches 1500 --use_multiprocessing --memo env_test &
 
+#python main.py --agent ac_mlp   --env lbf --map Foraging-medium-v0  --total_epoches 1500 --use_multiprocessing --memo env_test &
+#python main.py --agent ac_att   --env lbf --map Foraging-medium-v0  --total_epoches 1500 --use_multiprocessing --memo env_test &
+
+python main.py --agent ac_mlp   --env lbf --map Foraging-hard-v0  --time_limit 100 --total_epoches 1000 --use_multiprocessing --memo env_test &
+python main.py --agent ac_att   --env lbf --map Foraging-hard-v0  --time_limit 100 --total_epoches 1000 --use_multiprocessing --memo env_test &
 
 #python main.py --agent tarmac --total_epoches 500 --env lbf --map Foraging-easy-v0 --block no --use_multiprocessing --memo aaai &
