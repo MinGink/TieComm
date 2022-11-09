@@ -26,7 +26,7 @@ class CellEntity(Enum):
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, i):
         self.controller = None
         self.position = None
         self.level = None
@@ -35,6 +35,7 @@ class Player:
         self.reward = 0
         self.history = None
         self.current_step = None
+        self.id = i
 
     def setup(self, position, level, field_size):
         self.history = []

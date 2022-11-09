@@ -32,7 +32,7 @@ class CellEntity(Enum):
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, i):
         self.controller = None
         self.position = None
         self.level = None
@@ -41,6 +41,7 @@ class Player:
         self.reward = 0
         self.history = None
         self.current_step = None
+        self.id = i
 
     def setup(self, position, level, field_size):
         self.history = []
@@ -86,39 +87,39 @@ class ForagingEnv(Env):
     ):
         if type == "easy":
             players = 4
-            max_player_level = 1
+            max_player_level = 2
             max_food = 2
             max_food_level = 2
             sight = 1
             field_size = (8,8)
             max_episode_steps = 40
             force_coop = True
-            normalize_reward = True
+            normalize_reward = False
             grid_observation = True
 
 
         elif type == 'medium':
             players = 6
-            max_player_level = 1
+            max_player_level = 2
             max_food_level = 2
             max_food = 3
             sight = 1
             field_size = (10,10)
             max_episode_steps = 60
             force_coop = True,
-            normalize_reward = True,
+            normalize_reward = False
             grid_observation = True,
 
         elif type == 'hard':
-            players = 9
-            max_player_level = 1
+            players = 12
+            max_player_level = 3
             max_food_level = 3
-            max_food = 3
+            max_food = 6
             sight = 1
-            field_size = (12,12)
-            max_episode_steps = 100
+            field_size = (16,16)
+            max_episode_steps = 80
             force_coop = True,
-            normalize_reward = True
+            normalize_reward = False
             grid_observation = True,
 
         else:
@@ -128,7 +129,8 @@ class ForagingEnv(Env):
 
         self.logger = logging.getLogger(__name__)
         self.seed()
-        self.players = [Player() for _ in range(players)]
+        self.players = [Player(i) for i in range(players)]
+        self.n_agents = len(self.players)
 
         self.field = np.zeros(field_size, np.int32)
 
@@ -152,7 +154,7 @@ class ForagingEnv(Env):
 
         self.viewer = None
 
-        self.n_agents = len(self.players)
+
         self.reset()
 
     def seed(self, seed=None):
@@ -185,6 +187,8 @@ class ForagingEnv(Env):
             # agents layer: agent levels
             loc_min = np.zeros((self.field.shape[1], 2), dtype=np.float32).reshape(-1,1)
             loc_max = np.ones((self.field.shape[1], 2), dtype=np.float32).reshape(-1,1) * self.max_player_level
+            # id_min = np.zeros((self.n_agents, 1), dtype=np.float32).reshape(-1, 1)
+            # id_max = np.ones((self.n_agents, 1), dtype=np.float32).reshape(-1, 1)
 
             # agents_min = np.zeros(grid_shape, dtype=np.float32)
             # agents_max = np.ones(grid_shape, dtype=np.float32) * self.max_player_level
@@ -338,7 +342,7 @@ class ForagingEnv(Env):
                 if self._is_empty_location(row, col):
                     player.setup(
                         (row, col),
-                        int((i % 3) + 1), # self.np_random.randint(1, max_player_level),
+                        int((i % max_player_level) + 1), #self.np_random.randint(1, max_player_level), #int((i % 3) + 1), #
                         self.field_size,
                     )
                     break
@@ -493,12 +497,15 @@ class ForagingEnv(Env):
                 if p.is_self:
                     return p.reward
 
-        def get_agent_self_info(agent_x, agent_y, level):
+        def get_agent_self_info(agent_x, agent_y, level, id):
 
             one_hot_x = np.zeros((self.field_size[0]), dtype=np.float32)
             one_hot_x[agent_x] = level
             one_hot_y = np.zeros((self.field_size[1]), dtype=np.float32)
             one_hot_y[agent_y] = level
+
+            # one_hot_id = np.zeros((self.n_agents), dtype=np.float32)
+            # one_hot_id[id] = 1
 
             return np.concatenate([one_hot_x, one_hot_y]).reshape(-1,1)
 
@@ -508,7 +515,7 @@ class ForagingEnv(Env):
             layers = make_global_grid_arrays()
             agents_bounds = [get_agent_grid_bounds(*player.position) for player in self.players]
             raw_nobs = tuple([layers[:, start_x:end_x, start_y:end_y].reshape(-1,1) for start_x, end_x, start_y, end_y in agents_bounds])
-            self_info_obs = [get_agent_self_info(*player.position, player.level) for player in self.players]
+            self_info_obs = [get_agent_self_info(*player.position, player.level, player.id) for player in self.players]
             nobs = [np.concatenate((raw_nobs[i], self_info_obs[i])) for i in range(len(raw_nobs))]
         else:
             nobs = tuple([make_obs_array(obs) for obs in observations])

@@ -22,7 +22,7 @@ class RunnerDefualt(Runner):
 
         self.n_nodes = int(self.n_agents * (self.n_agents - 1) / 2)
         self.interval = self.args.interval
-        self.treashold = 0.5
+        self.treashold = [0.5]
 
 
 
