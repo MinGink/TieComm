@@ -118,9 +118,9 @@ class ForagingEnv(Env):
             sight = 1
             field_size = (16,16)
             max_episode_steps = 80
-            force_coop = True,
+            force_coop = True
             normalize_reward = False
-            grid_observation = True,
+            grid_observation = True
 
         else:
             raise ValueError("Invalid type")
@@ -593,7 +593,7 @@ class ForagingEnv(Env):
             if len(v) > 1:  # make sure no more than an player will arrive at location
                 self.num_collisions += 1
                 for player in v:
-                    player.reward = -0.4
+                    player.reward = -0.3
             else:
                 v[0].position = k
                 v[0].reward = -0.1
