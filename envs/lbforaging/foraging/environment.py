@@ -86,12 +86,12 @@ class ForagingEnv(Env):
 
     ):
         if type == "easy":
-            players = 4
-            max_player_level = 2
-            max_food = 2
-            max_food_level = 2
+            players = 6
+            max_player_level = 1
+            max_food = 4
+            max_food_level = 1
             sight = 1
-            field_size = (12,12)
+            field_size = (10,10)
             max_episode_steps = 40
             force_coop = True
             normalize_reward = False
@@ -99,24 +99,24 @@ class ForagingEnv(Env):
 
 
         elif type == 'medium':
-            players = 6
+            players = 9
             max_player_level = 2
+            max_food = 6
             max_food_level = 2
-            max_food = 3
             sight = 1
-            field_size = (10,10)
+            field_size = (12,12)
             max_episode_steps = 60
-            force_coop = True,
+            force_coop = True
             normalize_reward = False
-            grid_observation = True,
+            grid_observation = True
 
         elif type == 'hard':
             players = 12
             max_player_level = 3
             max_food_level = 3
-            max_food = 6
+            max_food = 8
             sight = 1
-            field_size = (16,16)
+            field_size = (14,14)
             max_episode_steps = 80
             force_coop = True
             normalize_reward = False
@@ -186,7 +186,7 @@ class ForagingEnv(Env):
 
             # agents layer: agent levels
             loc_min = np.zeros((self.field.shape[1], 2), dtype=np.float32).reshape(-1,1)
-            loc_max = np.ones((self.field.shape[1], 2), dtype=np.float32).reshape(-1,1) * self.max_player_level
+            loc_max = np.ones((self.field.shape[1], 2), dtype=np.float32).reshape(-1,1)* self.max_player_level
             # id_min = np.zeros((self.n_agents, 1), dtype=np.float32).reshape(-1, 1)
             # id_max = np.ones((self.n_agents, 1), dtype=np.float32).reshape(-1, 1)
 
@@ -205,8 +205,8 @@ class ForagingEnv(Env):
             # total layer
             min_obs = np.concatenate([loc_min, foods_min, access_min])
             max_obs = np.concatenate([loc_max, foods_max, access_max])
-            # min_obs = np.stack([agents_min, foods_min, access_min])
-            # max_obs = np.stack([agents_max, foods_max, access_max])
+            # min_obs = np.stack([foods_min, access_min])
+            # max_obs = np.stack([foods_max, access_max])
 
         return gym.spaces.Box(np.array(min_obs), np.array(max_obs), dtype=np.float32)
 
@@ -534,7 +534,7 @@ class ForagingEnv(Env):
         self.field = np.zeros(self.field_size, np.int32)
         self.spawn_players(self.max_player_level)
 
-        player_levels = sorted([player.level for player in self.players])
+        # player_levels = sorted([player.level for player in self.players])
 
         self.spawn_food(self.max_food, max_level=self.max_food_level)
         self.current_step = 0
@@ -593,10 +593,12 @@ class ForagingEnv(Env):
             if len(v) > 1:  # make sure no more than an player will arrive at location
                 self.num_collisions += 1
                 for player in v:
-                    player.reward = -0.3
+                    player.reward = -0.2
             else:
                 v[0].position = k
-                v[0].reward = -0.1
+                v[0].reward = 0.1
+
+
 
         # finally process the loadings:
         while loading_players:
@@ -622,9 +624,10 @@ class ForagingEnv(Env):
             for a in adj_players:
                 a.reward = float(a.level * food)
                 if self._normalize_reward:
-                    a.reward = a.reward / float(
-                        adj_player_level * self._food_spawned
-                    )  # normalize reward
+                    a.reward = food / len(adj_players) * a.level
+                    # a.reward = a.reward / float(
+                    #     adj_player_level * self._food_spawned
+                    # )  # normalize reward
             # and the food is removed
             self.field[frow, fcol] = 0
 
