@@ -91,7 +91,7 @@ class ForagingEnv(Env):
             max_food = 2
             max_food_level = 2
             sight = 1
-            field_size = (8,8)
+            field_size = (12,12)
             max_episode_steps = 40
             force_coop = True
             normalize_reward = False

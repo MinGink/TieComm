@@ -16,9 +16,13 @@
 #v1 50
 #python main.py --agent ac_mlp --env mpe --map mpe-large-spread-v1  --total_epoches 5000 --time_limit 50   --use_multiprocessing --memo env_test &
 #python main.py --agent ac_att --env mpe --map mpe-large-spread-v1  --total_epoches 5000 --time_limit 50   --use_multiprocessing --memo env_test &
-python main.py --agent magic --env mpe --map mpe-large-spread-v1  --total_epoches 5000 --time_limit 50   --use_multiprocessing --memo env_test &
-python main.py --agent tiecomm --env mpe --map mpe-large-spread-v1  --total_epoches 5000 --time_limit 50   --use_multiprocessing --memo env_test &
-#python main.py --agent    --env mpe --map mpe-large-spread-v1 --time_limit 50   --use_multiprocessing
+#python main.py --agent magic   --env mpe --map mpe-large-spread-v1   --total_epoches 1000 --time_limit 50   --use_multiprocessing --memo env_test &
+#python main.py --agent tiecomm          --env mpe --map mpe-large-spread-v1  --total_epoches 1000 --time_limit 50   --use_multiprocessing --memo ming &
+#python main.py --agent tiecomm_default  --env mpe --map mpe-large-spread-v1  --total_epoches 1000 --time_limit 50   --use_multiprocessing --memo ming &
+python main.py --agent tiecomm_wo_inter --env mpe --map mpe-large-spread-v1  --total_epoches 1000 --time_limit 50   --use_multiprocessing --memo ming &
+python main.py --agent tiecomm_wo_intra --env mpe --map mpe-large-spread-v1  --total_epoches 1000 --time_limit 50   --use_multiprocessing --memo ming &
+
+
 #python main.py --agent tiecomm   --env mpe --map mpe-large-spread-v1 --time_limit 50   --use_multiprocessing
 #
 #python main.py --agent tiecomm   --env mpe --map mpe-large-spread-v2 --time_limit 100   --use_multiprocessing

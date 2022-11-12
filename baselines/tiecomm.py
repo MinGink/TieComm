@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -32,24 +33,28 @@ class TieCommAgent(nn.Module):
 
     def random_set(self):
         G = nx.binomial_graph(self.n_agents, self.random_prob, seed=self.seed , directed=False)
-        set = self.graph_partition(G, 0.5)
-        return G, set
+        sets = self.graph_partition(G, 0.5)
+        return G, sets
 
 
     def graph_partition(self, G, god_action):
 
         #min_value = 0.5
-        min_max_list = []
+        min_max_set = set()
         for e in G.edges():
             strength = measure_strength(G, e[0], e[1])
-            G.add_edge(e[0], e[1], weight = strength)
-            min_max_list.append(strength)
+            G.add_edge(e[0], e[1], weight = round(strength,2))
+            min_max_set.add(strength)
+            #min_max_list.append(strength)
 
+        min_max_list = list(min_max_set)
         if min_max_list:
-            min_max_list.sort()
-            min_value = min_max_list[0]
-            max_value = min_max_list[-1]
-            thershold = ((max_value - min_value) / 10) * int(god_action[0]) + min_value
+            thershold = np.percentile(np.array(min_max_list), (int(god_action[0])) * 10)
+            # min_max_list.sort()
+            # min_value = min_max_list[0]
+            # max_value = min_max_list[-1]
+            # thershold = ((max_value - min_value) / 10) * int(god_action[0]) + min_value
+            # print(thershold)
         else:
             thershold = 0.0
 
@@ -67,15 +72,15 @@ class TieCommAgent(nn.Module):
             # raise ValueError('strength > thershold')
 
         attr_dict = nx.get_node_attributes(g, 'node_strength')
-        set = []
+        sets = []
         core_node = []
         for c in nx.connected_components(g):
             list_c = list(c)
-            set.append(list_c)
+            sets.append(list_c)
             list_c_attr = [attr_dict[i] for i in list_c]
             core_node.append(list_c[list_c_attr.index(max(list_c_attr))])
 
-        return g, (core_node, set)
+        return g, (core_node, sets)
 
 
 
@@ -92,24 +97,23 @@ class TieCommAgent(nn.Module):
         intra_obs = self.agent.intra_com(local_obs, graph)
 
 
-        adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1).repeat(self.n_agents, 1)
+        #adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1).repeat(self.n_agents, 1)
 
         inter_obs = torch.zeros_like(intra_obs)
         if len(set) != 1:
-            core_obs = intra_obs[core_node, :] #.clone().detach()
+            core_obs = intra_obs[core_node, :]
             group_obs = self.agent.inter_com(core_obs)
             for index, group_members in enumerate (set):
                 inter_obs[group_members, :] = group_obs[index,:].repeat(len(group_members), 1)
 
 
         if self.block == 'no':
-            #after_comm = (local_obs, inter_obs, intra_obs)
-            after_comm = torch.cat((local_obs, intra_obs, inter_obs), dim=-1)
-            #after_comm = torch.cat((local_obs,  inter_obs,  intra_obs, adj_matrix), dim=-1)
+            #after_comm = torch.cat((local_obs, intra_obs, inter_obs, adj_matrix), dim=-1)
+            after_comm = torch.cat((local_obs,  inter_obs,  intra_obs), dim=-1)
         elif self.block == 'inter':
-            after_comm = torch.cat((local_obs,  intra_obs), dim=-1)
+            after_comm = torch.cat((local_obs,  intra_obs, torch.rand_like(inter_obs)), dim=-1)
         elif self.block == 'intra':
-            after_comm = torch.cat((local_obs, inter_obs), dim=-1)
+            after_comm = torch.cat((local_obs,  inter_obs, torch.rand_like(intra_obs)), dim=-1)
         else:
             raise ValueError('block must be one of no, inter, intra')
 
@@ -152,54 +156,6 @@ class GodAC(nn.Module):
 
 
 
-class GodActor(nn.Module):
-    def __init__(self, args):
-        super(GodActor, self).__init__()
-        self.args = args
-        self.n_agents = args.n_agents
-        self.hid_size = args.hid_size
-        self.threshold = self.args.threshold
-        self.tanh = nn.Tanh()
-
-        self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents**2 , self.hid_size * 4)
-        self.fc2 = nn.Linear(self.hid_size * 4 , self.hid_size)
-        self.head = nn.Linear(self.hid_size, 10)
-
-    def forward(self, input, graph):
-
-        adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1)
-        hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
-        hid = self.tanh(self.fc1(hid))
-        hid = self.tanh(self.fc2(hid))
-        a = F.log_softmax(self.head(hid), dim=-1)
-
-        return a
-
-
-
-class GodCritic(nn.Module):
-    def __init__(self, args):
-        super(GodCritic, self).__init__()
-        self.args = args
-        self.n_agents = args.n_agents
-        self.hid_size = args.hid_size
-        self.threshold = self.args.threshold
-        self.tanh = nn.ReLU()
-
-        self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents ** 2, self.hid_size * 4)
-        self.fc2 = nn.Linear(self.hid_size * 4 , self.hid_size)
-        self.value = nn.Linear(self.hid_size, 1)
-
-    def forward(self, input, graph):
-
-        adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1)
-        hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
-        hid = self.tanh(self.fc1(hid))
-        hid = self.tanh(self.fc2(hid))
-        v = self.value(hid)
-
-        return v
-
 
 
 
@@ -209,25 +165,22 @@ class AgentAC(nn.Module):
 
         self.args = args
         self.n_agents = args.n_agents
-        self.hid_size = args.hid_size
+        self.hid_size = 32
         self.n_actions = self.args.n_actions
         self.tanh = nn.Tanh()
 
         self.emb_fc = nn.Linear(args.obs_shape, self.hid_size)
 
-        self.intra = GATConv(self.hid_size, self.hid_size, heads=1, add_self_loops =False, concat=False)
-        #self.intra = GCNConv(self.hid_size, self.hid_size, add_self_loops= False)
+        #self.intra = GATConv(self.hid_size, self.hid_size, heads=1, add_self_loops =False, concat=False)
+        self.intra = GCNConv(self.hid_size, self.hid_size, add_self_loops= False)
 
         #encoder_layer = nn.TransformerEncoderLayer(d_model=self.hid_size, nhead=1, dim_feedforward=self.hid_size,
         #                                                batch_first=True)
         #self.inter = nn.TransformerEncoder(encoder_layer, num_layers=1)
         self.inter = nn.MultiheadAttention(self.hid_size, num_heads=1, batch_first=True)
+        # self.affine2 = nn.Linear(self.hid_size * 3 + self.n_agents**2  , self.hid_size)
+        self.affine2 = nn.Linear(self.hid_size * 3, self.hid_size)
 
-
-        if self.args.block == 'no':
-            self.affine2 = nn.Linear(self.hid_size *3 , self.hid_size)
-        else:
-            self.affine2 = nn.Linear(self.hid_size * 2, self.hid_size)
 
         self.actor_head = nn.Linear(self.hid_size, self.n_actions)
         self.value_head = nn.Linear(self.hid_size, 1)
@@ -263,3 +216,57 @@ class AgentAC(nn.Module):
         v = self.value_head(h)
 
         return a, v
+
+
+
+
+
+#
+# class GodActor(nn.Module):
+#     def __init__(self, args):
+#         super(GodActor, self).__init__()
+#         self.args = args
+#         self.n_agents = args.n_agents
+#         self.hid_size = self.hid_size
+#         self.threshold = self.args.threshold
+#         self.tanh = nn.Tanh()
+#
+#         self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents**2 , self.hid_size * 3)
+#         self.fc2 = nn.Linear(self.hid_size * 3 , self.hid_size)
+#         self.head = nn.Linear(self.hid_size, 10)
+#
+#     def forward(self, input, graph):
+#
+#         adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1)
+#         hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
+#         hid = self.tanh(self.fc1(hid))
+#         hid = self.tanh(self.fc2(hid))
+#         a = F.log_softmax(self.head(hid), dim=-1)
+#
+#         return a
+#
+#
+#
+# class GodCritic(nn.Module):
+#     def __init__(self, args):
+#         super(GodCritic, self).__init__()
+#         self.args = args
+#         self.n_agents = args.n_agents
+#         self.hid_size = args.hid_size
+#         self.threshold = self.args.threshold
+#         self.tanh = nn.ReLU()
+#
+#         self.fc1 = nn.Linear(args.obs_shape * self.n_agents + self.n_agents ** 2, self.hid_size * 4)
+#         self.fc2 = nn.Linear(self.hid_size * 4 , self.hid_size)
+#         self.value = nn.Linear(self.hid_size, 1)
+#
+#     def forward(self, input, graph):
+#
+#         adj_matrix = torch.tensor(nx.to_numpy_array(graph), dtype=torch.float).view(1, -1)
+#         hid = torch.cat([input.view(1,-1), adj_matrix], dim=1)
+#         hid = self.tanh(self.fc1(hid))
+#         hid = self.tanh(self.fc2(hid))
+#         v = self.value(hid)
+#
+#         return v
+#

@@ -5,6 +5,7 @@ import numpy as np
 from torch.optim import Adam,RMSprop
 from modules.utils import merge_dict, multinomials_log_density
 import time
+import random
 from runner import Runner
 
 import argparse
@@ -22,7 +23,10 @@ class RunnerDefualt(Runner):
 
         self.n_nodes = int(self.n_agents * (self.n_agents - 1) / 2)
         self.interval = self.args.interval
-        self.treashold = [0.5]
+
+
+    def random_god_action(self):
+        return [np.array(random.randint(1, 10)).reshape(1)]
 
 
 
@@ -58,14 +62,13 @@ class RunnerDefualt(Runner):
         log = dict()
 
         memory = []
-        god_memory = []
 
         self.reset()
         obs = self.env.get_obs()
 
         obs_tensor = torch.tensor(np.array(obs), dtype=torch.float)
         graph = self.env.get_graph()
-        g, set = self.agent.graph_partition(graph, self.treashold)
+        g, set = self.agent.graph_partition(graph, self.random_god_action())
 
 
         step = 1
@@ -78,7 +81,7 @@ class RunnerDefualt(Runner):
 
             if step % self.interval == 0:
                 graph = self.env.get_graph()
-                g, set = self.agent.graph_partition(graph, self.treashold)
+                g, set = self.agent.graph_partition(graph, self.random_god_action())
 
 
             after_comm = self.agent.communicate(obs_tensor, g, set)

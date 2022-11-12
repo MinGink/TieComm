@@ -12,6 +12,7 @@ from envs import REGISTRY as env_REGISTRY
 from baselines import REGISTRY as agent_REGISTRY
 from runner import REGISTRY as runner_REGISTRY
 from modules.multi_processing import MultiPeocessRunner
+from modules.multi_processing_double import MultiPeocessRunnerDouble
 from configs.utils import get_config, recursive_dict_update, signal_handler, merge_dict
 
 
@@ -151,7 +152,7 @@ def main(args):
                    'total_loss': log['total_loss'],
                    })
 
-        if args.agent =='tiecomm':
+        if args.agent in ['tiecomm', 'tiecomm_wo_inter', 'tiecomm_wo_intra']:
             wandb.log({'epoch': epoch,
                     #'episode': total_num_episodes,
                     'god_action_loss': log['god_action_loss'],
@@ -160,16 +161,11 @@ def main(args):
                     'num_groups': log['num_groups']/log['num_episodes'],
                     })
 
-        # if args.agent in ['tiecomm_random','tiecomm_default']:
-        #     wandb.log({'epoch': epoch,
-        #             'num_groups': log['num_groups']/log['num_episodes'],
-        #             })
+        if args.agent =='tiecomm_default':
+            wandb.log({'epoch': epoch,
+                    'num_groups': log['num_groups']/log['num_episodes'],
+                    })
 
-        # if args.env == 'tj':
-        #     wandb.log({'epoch': epoch,
-        #                'episode': total_num_episodes,
-        #                'success_rate':log['success']/log['num_episodes'],
-        #                })
 
         if args.env == 'lbf':
             wandb.log({'epoch': epoch,
@@ -192,14 +188,14 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TieComm')
     parser.add_argument('--memo', type=str, default="DASFAA", help='memo name')
-    parser.add_argument('--env', type=str, default="lbf", help='environment name',
+    parser.add_argument('--env', type=str, default="mpe", help='environment name',
                         choices=['mpe','lbf','rware','tj'])
-    parser.add_argument('--map', type=str, default="Foraging-easy-v0", help='environment map name',
+    parser.add_argument('--map', type=str, default="mpe-large-spread-v1", help='environment map name',
                         choices=['easy','medium','hard','mpe-large-spread-v2','mpe-large-spread-v1','Foraging-easy-v0','Foraging-medium-v0','Foraging-hard-v0'])
     parser.add_argument('--time_limit', type=int, default=50, help='time limit')
     parser.add_argument('--agent', type=str, default="tiecomm_default", help='algorithm name',
                         choices=['tiecomm','tiecomm_wo_inter','tiecomm_wo_intra','tiecomm_default','ac_att','ac_mlp','gnn','commnet','ic3net','tarmac','magic'])
-    parser.add_argument('--block', type=str, default='no',choices=['no','inter','intra'], help='only works for tiecomm')
+    # parser.add_argument('--block', type=str, default='no',choices=['no','inter','intra'], help='only works for tiecomm')
     parser.add_argument('--seed', type=int, default=1234, help='random seed')
     parser.add_argument('--use_offline_wandb', action='store_true', help='use offline wandb')
     parser.add_argument('--use_multiprocessing', action='store_true', help='use multiprocessing')

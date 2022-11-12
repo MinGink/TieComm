@@ -19,8 +19,8 @@ class RunnerTiecomm(Runner):
 
 
         #self.optimizer_agent_ac = Adam(params=self.agent.parameters(), lr=self.args.lr)
-        self.optimizer_agent_ac = RMSprop(self.agent.agent.parameters(), lr = self.args.lr, alpha=0.97, eps=1e-6)
-        self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr = self.args.lr * 2, alpha=0.97, eps=1e-6)
+        self.optimizer_agent_ac = RMSprop(self.agent.agent.parameters(), lr = 0.005, alpha=0.97, eps=1e-6)
+        self.optimizer_god_ac = RMSprop(self.agent.god.parameters(), lr = 0.01, alpha=0.97, eps=1e-6)
 
         self.n_nodes = int(self.n_agents * (self.n_agents - 1) / 2)
         self.interval = self.args.interval
@@ -43,9 +43,13 @@ class RunnerTiecomm(Runner):
         log=dict()
         agent_log = self.compute_agent_grad(batch[0])
         god_log = self.compute_god_grad(batch[1])
+
         merge_dict(agent_log, log)
         merge_dict(god_log, log)
         return log
+
+
+
 
 
     def train_batch(self, batch_size):
