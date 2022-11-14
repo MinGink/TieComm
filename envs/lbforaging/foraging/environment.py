@@ -87,9 +87,9 @@ class ForagingEnv(Env):
     ):
         if type == "easy":
             players = 6
-            max_player_level = 1
+            max_player_level = 2
             max_food = 4
-            max_food_level = 1
+            max_food_level = 2
             sight = 1
             field_size = (10,10)
             max_episode_steps = 40
@@ -592,11 +592,10 @@ class ForagingEnv(Env):
         for k, v in collisions.items():
             if len(v) > 1:  # make sure no more than an player will arrive at location
                 self.num_collisions += 1
-                for player in v:
-                    player.reward = -0.2
+                # for player in v:
+                #     player.reward = -0.2
             else:
                 v[0].position = k
-                v[0].reward = 0.1
 
 
 
@@ -624,16 +623,14 @@ class ForagingEnv(Env):
             for a in adj_players:
                 a.reward = float(a.level * food)
                 if self._normalize_reward:
-                    a.reward = food / len(adj_players) * a.level
+                    a.reward = food / adj_player_level * a.level
                     # a.reward = a.reward / float(
                     #     adj_player_level * self._food_spawned
                     # )  # normalize reward
             # and the food is removed
             self.field[frow, fcol] = 0
 
-        self._game_over = (
-            self.field.sum() == 0 or self._max_episode_steps <= self.current_step
-        )
+        self._game_over = (self._max_episode_steps <= self.current_step)
         self._gen_valid_moves()
 
         for p in self.players:
