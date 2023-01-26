@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 
 def measure_strength(G, node_i, node_j):
@@ -73,12 +74,14 @@ def graph_test(threshold):
 
     A1 = nx.adjacency_matrix(G).todense()
 
-    ax = plt.matshow(A1)
-    plt.colorbar(ax.colorbar, fraction=0.025)
-    # plt.colorbar.tick_params(labelsize=16)
-    plt.xticks(fontsize=16)
-    plt.yticks(fontsize=16)
-    # plt.title("matrix")
+    fig = plt.figure(figsize=(2, 2))
+    ax = fig.add_subplot(1, 1, 1)
+    ax = ax.matshow(A1) # cmap=plt.cm.Blues)
+    plt.colorbar(ax, fraction=0.25)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.tight_layout()
+    fig.savefig('myplot1.png')
     plt.show()
 
 
@@ -98,35 +101,38 @@ def graph_test(threshold):
 
     # S = [ list(c) for c in nx.connected_components(g_1)]
 
-    plt.figure(1)
+    fig1 = plt.figure(figsize=(2.5, 2))
     pos = nx.spring_layout(G, seed=7)
 
     # nodes
-    nx.draw_networkx_nodes(G, pos, node_size=1000, node_color='#4682B4')
-
+    nx.draw_networkx_nodes(G, pos, node_size=400, node_color='#d9ebfc')
     # edges
-    nx.draw_networkx_edges(G, pos, width=3, edge_color='#808080')
-    nx.draw_networkx_labels(G, pos, font_size=16)
+    nx.draw_networkx_edges(G, pos, width=1.5, edge_color='#368a73')
+    nx.draw_networkx_labels(G, pos, font_size=14)
     # edge weight labels
     edge_labels = nx.get_edge_attributes(G, "weight")
-    nx.draw_networkx_edge_labels(G, pos, edge_labels)
+    # nx.draw_networkx_edge_labels(G, pos, edge_labels)
+
+    # nx.draw(G)
     ax = plt.gca()
     ax.margins(0.08)
     plt.axis("on")
     plt.tight_layout()
     plt.show()
+    fig1.savefig('myplot2.png')
 
 
 
-    plt.figure(2)
+
+    fig2 = plt.figure(figsize=(2.5, 2))
     pos = nx.spring_layout(g_1, seed=7)
 
     # nodes
-    nx.draw_networkx_nodes(g_1, pos, node_size=1000, node_color='#4682B4')
+    nx.draw_networkx_nodes(g_1, pos, node_size=400, node_color='#d9ebfc')
 
     # edges
-    nx.draw_networkx_edges(g_1, pos, width=5, edge_color='#808080')
-    nx.draw_networkx_labels(g_1, pos, font_size=16)
+    nx.draw_networkx_edges(g_1, pos, width=1.5, edge_color='#368a73')
+    nx.draw_networkx_labels(g_1, pos, font_size=12)
     # edge weight labels
     # edge_labels = nx.get_edge_attributes(g_1, "weight")
     # nx.draw_networkx_edge_labels(g_1, pos, edge_labels)
@@ -135,20 +141,21 @@ def graph_test(threshold):
     plt.axis("on")
     plt.tight_layout()
     plt.show()
+    fig2.savefig('myplot3.png')
 
 
 
 
 
-    plt.figure(3)
+    fig3 = plt.figure(figsize=(2.5, 2))
     pos = nx.spring_layout(g_2, seed=7)
 
     # nodes
-    nx.draw_networkx_nodes(g_2, pos, node_size=1000, node_color='#4682B4')
+    nx.draw_networkx_nodes(g_2, pos, node_size=400, node_color='#d9ebfc')
 
     # edges
-    nx.draw_networkx_edges(g_2, pos, width=5, edge_color='#808080')
-    nx.draw_networkx_labels(g_2, pos, font_size=16)
+    nx.draw_networkx_edges(g_2, pos, width=1.5, edge_color='#368a73')
+    nx.draw_networkx_labels(g_2, pos, font_size=12)
     # edge weight labels
     # edge_labels = nx.get_edge_attributes(g_1, "weight")
     # nx.draw_networkx_edge_labels(g_1, pos, edge_labels)
@@ -157,20 +164,21 @@ def graph_test(threshold):
     plt.axis("on")
     plt.tight_layout()
     plt.show()
+    fig3.savefig('myplot4.png')
 
 
 
-    plt.figure(3)
-    nx.draw(g_2, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=300, width=2)
-    plt.show()
-
-    plt.figure(4)
-    nx.draw(g_3, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=300, width=2)
-    plt.show()
+    # plt.figure(3)
+    # nx.draw(g_2, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=300, width=2)
+    # plt.show()
+    #
+    # plt.figure(4)
+    # nx.draw(g_3, with_labels=True, node_color='#A0CBE2', edge_color='#A0CBE2', node_size=300, width=2)
+    # plt.show()
     print('test')
 
 
 if __name__ == '__main__':
-    threshold = 0.7
+    threshold = 0.61
     graph_test(threshold)
 
